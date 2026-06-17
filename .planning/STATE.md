@@ -2,7 +2,7 @@
 
 **Project:** Virtuaalitalli
 **Initialized:** 2026-06-17
-**Current Phase:** Phase 3 — Admin-paneeli (Not started)
+**Current Phase:** Phase 4 — Tietoturva & Deploy
 
 ## Workflow Status
 
@@ -10,7 +10,7 @@
 |-------|--------|---------|-----------|
 | Phase 1 — Perusta & DB | ✅ Complete | 2026-06-17 | 2026-06-17 |
 | Phase 2 — Julkiset sivut | ✅ Complete | 2026-06-17 | 2026-06-17 |
-| Phase 3 — Admin-paneeli | 🔲 Not started | — | — |
+| Phase 3 — Admin-paneeli | ✅ Complete | 2026-06-17 | 2026-06-17 |
 | Phase 4 — Tietoturva & Deploy | 🔲 Not started | — | — |
 
 ## Configuration
@@ -26,9 +26,15 @@
 
 _(none yet — decisions will be recorded here as phases execute)_
 
+## Active Decisions
+
+- Admin-paneeli: kirjautuminen bcrypt+CSRF, pehmeä poisto hevosille, kuvat finfo_file() MIME-tarkistuksella
+- Slug generoidaan automaattisesti nimestä (slugify), duplikaatit saavat numeron loppuun
+- horse_edit.php estää itse-viittauksen sire/dam dropdowneissa
+
 ## Next Action
 
-Run `/gsd-discuss-phase 3` tai `/gsd-plan-phase 3` aloittaaksesi admin-paneelin.
+Run `/gsd-plan-phase 4` tai `/gsd-discuss-phase 4` aloittaaksesi tietoturva & deploy -vaiheen.
 
 ---
-*Last updated: 2026-06-17 — Phase 2 complete, 5 julkista sivua toiminnassa*
+*Last updated: 2026-06-17 — Phase 3 complete, admin-paneeli täysin toiminnassa*
