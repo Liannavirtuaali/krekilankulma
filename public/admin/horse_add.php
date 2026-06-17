@@ -2,10 +2,6 @@
 require_once __DIR__ . '/../src/includes/db.php';
 requireLogin();
 
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
 $db = getDB();
 $allHorses    = $db->query('SELECT id, name FROM horses WHERE is_deleted = 0 ORDER BY name')->fetchAll();
 $disciplines  = $db->query('SELECT id, name FROM disciplines ORDER BY name')->fetchAll();
@@ -22,7 +18,7 @@ $f = [
 ];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+    if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
         $errors[] = 'Virheellinen pyyntö.';
     } else {
         foreach ($f as $k => $_) {
@@ -94,7 +90,7 @@ require __DIR__ . '/includes/admin_header.php';
   <ul class="flash-err"><?php foreach ($errors as $e_msg): ?><li><?= e($e_msg) ?></li><?php endforeach; ?></ul>
 <?php endif; ?>
 <form method="post" action="">
-  <input type="hidden" name="csrf_token" value="<?= e($_SESSION['csrf_token']) ?>">
+  <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
 
   <div class="form-row">
     <div class="form-group">

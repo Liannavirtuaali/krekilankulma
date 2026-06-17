@@ -48,7 +48,7 @@ require __DIR__ . '/includes/admin_header.php';
         <a href="<?= e(horseUrl($horse)) ?>" class="btn-sm btn-view" target="_blank">Näytä</a>
         <a href="<?= e(SITE_URL) ?>/admin/photos.php?horse_id=<?= (int)$horse['id'] ?>" class="btn-sm btn-photos">Kuvat</a>
         <form method="post" action="<?= e(SITE_URL) ?>/admin/horse_delete.php" style="display:inline">
-          <input type="hidden" name="csrf_token" value="<?= e($_SESSION['csrf_token'] ?? '') ?>">
+          <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
           <input type="hidden" name="id" value="<?= (int)$horse['id'] ?>">
           <button type="submit" class="btn-sm btn-danger" onclick="return confirm('Poistetaanko hevonen <?= e(addslashes($horse['name'])) ?>?')">Poista</button>
         </form>

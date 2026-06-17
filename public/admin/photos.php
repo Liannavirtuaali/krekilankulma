@@ -15,15 +15,11 @@ if (!$horse) {
     redirect(SITE_URL . '/admin/horses.php');
 }
 
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
 $error   = '';
 $success = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+    if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
         $error = 'Virheellinen pyyntö.';
     } else {
         // Tarkista max kuvamäärä
@@ -33,22 +29,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($photoCount >= MAX_PHOTOS_PER_HORSE) {
             $error = 'Hevosella on jo ' . MAX_PHOTOS_PER_HORSE . ' kuvaa. Poista ensin vanha kuva.';
-        } elseif (!isset($_FILES['photo']) || $_FILES['photo']['error'] !== UPLOAD_ERR_OK) {
+        } elseif (!isset($_FILES['photo'])) {
             $error = 'Tiedoston lataus epäonnistui. Tarkista tiedosto ja yritä uudelleen.';
-        } elseif ($_FILES['photo']['size'] > MAX_UPLOAD_SIZE) {
-            $error = 'Tiedosto on liian suuri (max 5 Mt).';
         } else {
-            // MIME-tarkistus finfo_file():llä
-            $finfo = new finfo(FILEINFO_MIME_TYPE);
-            $mime  = $finfo->file($_FILES['photo']['tmp_name']);
-            $ext   = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
-
-            if (!in_array($mime, ALLOWED_MIME_TYPES, true)) {
-                $error = 'Kelpaamaton tiedostotyyppi. Sallitut: JPEG, PNG, GIF, WebP.';
-            } elseif (!in_array($ext, ALLOWED_EXTENSIONS, true)) {
-                $error = 'Kelpaamaton tiedostopääte. Sallitut: jpg, jpeg, png, gif, webp.';
+            $uploadResult = validate_image_upload($_FILES['photo'], MAX_UPLOAD_SIZE);
+            if (!$uploadResult['valid']) {
+                $error = $uploadResult['error'];
             } else {
-                $filename = uniqid('img_', true) . '.' . $ext;
+                $ext      = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
+                $filename = generate_safe_filename($ext);
                 $dest     = UPLOADS_DIR . $filename;
 
                 if (!move_uploaded_file($_FILES['photo']['tmp_name'], $dest)) {
@@ -100,7 +89,7 @@ require __DIR__ . '/includes/admin_header.php';
            style="max-width:140px;max-height:100px;object-fit:cover;display:block;margin:0 auto 0.4rem">
       <small style="display:block;color:#888;word-break:break-all"><?= e($photo['original_name']) ?></small>
       <form method="post" action="<?= e(SITE_URL) ?>/admin/photo_delete.php" style="margin-top:0.4rem">
-        <input type="hidden" name="csrf_token" value="<?= e($_SESSION['csrf_token']) ?>">
+        <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
         <input type="hidden" name="photo_id"  value="<?= (int)$photo['id'] ?>">
         <input type="hidden" name="horse_id"  value="<?= (int)$horse_id ?>">
         <button type="submit" class="btn-sm btn-danger" onclick="return confirm('Poistetaanko kuva?')">Poista</button>
@@ -115,7 +104,7 @@ require __DIR__ . '/includes/admin_header.php';
 <?php if (count($photos) < MAX_PHOTOS_PER_HORSE): ?>
 <h3>Lataa uusi kuva</h3>
 <form method="post" enctype="multipart/form-data" action="">
-  <input type="hidden" name="csrf_token" value="<?= e($_SESSION['csrf_token']) ?>">
+  <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
   <div class="form-group" style="max-width:400px">
     <label for="photo">Kuvatiedosto (JPEG, PNG, GIF, WebP — max 5 Mt)</label>
     <input type="file" id="photo" name="photo" accept="image/*" required>

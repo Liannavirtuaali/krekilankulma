@@ -17,10 +17,6 @@ if (!$horse) {
 
 $allHorses = $db->query('SELECT id, name FROM horses WHERE is_deleted = 0 ORDER BY name')->fetchAll();
 
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
 $edit_id = (int)($_GET['edit'] ?? 0);
 $errors  = [];
 $flash   = '';
@@ -29,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action  = $_POST['action'] ?? '';
     $foal_id = (int)($_POST['foal_id'] ?? 0);
 
-    if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+    if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
         $errors[] = 'Virheellinen pyyntö.';
     } else {
         if ($action === 'add') {
@@ -141,7 +137,7 @@ require __DIR__ . '/includes/admin_header.php';
       <td style="white-space:nowrap">
         <a href="?horse_id=<?= $horse_id ?>&edit=<?= (int)$fo['id'] ?>" class="btn-sm btn-edit">Muokkaa</a>
         <form method="post" action="" style="display:inline">
-          <input type="hidden" name="csrf_token" value="<?= e($_SESSION['csrf_token']) ?>">
+          <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
           <input type="hidden" name="action"  value="delete">
           <input type="hidden" name="foal_id" value="<?= (int)$fo['id'] ?>">
           <button type="submit" class="btn-sm btn-danger" onclick="return confirm('Poistetaanko varsamerkintä?')">Poista</button>
@@ -157,7 +153,7 @@ require __DIR__ . '/includes/admin_header.php';
 
 <h3><?= $editFoal ? 'Muokkaa varsamerkintää' : 'Lisää varsamerkintä' ?></h3>
 <form method="post" action="?horse_id=<?= $horse_id ?>">
-  <input type="hidden" name="csrf_token" value="<?= e($_SESSION['csrf_token']) ?>">
+  <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
   <input type="hidden" name="action"  value="<?= $editFoal ? 'edit' : 'add' ?>">
   <?php if ($editFoal): ?><input type="hidden" name="foal_id" value="<?= (int)$editFoal['id'] ?>"><?php endif; ?>
 
