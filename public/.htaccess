@@ -18,16 +18,6 @@ Options -Indexes
     Deny from all
 </FilesMatch>
 
-# Estä PHP:n suoritus ladattujen tiedostojen kansioissa
-<Directory "uploads">
-    <IfModule mod_php.c>
-        php_flag engine off
-    </IfModule>
-    <FilesMatch "\.ph(p[3-7]?|ar|ps)$">
-        Deny from all
-    </FilesMatch>
-</Directory>
-
 # PHP-virheiden piilotus tuotannossa (tietoturva)
 php_flag display_errors Off
 php_flag display_startup_errors Off

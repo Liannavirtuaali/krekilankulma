@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>003 — Kasvatus</title>
+  <link rel="stylesheet" href="../themes/default.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-serif);
+      background: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.6;
+      padding-top: 46px;
+    }
+
+    /* ── Variant tabs ── */
+    #variant-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 9998;
+      background: var(--color-primary);
+      border-bottom: 3px solid var(--color-gold);
+      padding: 6px 16px;
+      display: flex; gap: 8px; align-items: center;
+      font-family: var(--font-sans); font-size: 13px;
+    }
+    #variant-nav span { color: var(--color-cream); margin-right: 8px; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
+    .variant-tab {
+      background: rgba(255,255,255,0.1); color: var(--color-cream);
+      border: 1px solid rgba(201,184,154,0.3); border-radius: var(--radius-sm);
+      padding: 4px 14px; cursor: pointer; font-family: var(--font-sans); font-size: 13px;
+      transition: all 0.15s ease;
+    }
+    .variant-tab:hover { background: rgba(255,255,255,0.2); }
+    .variant-tab.active { background: var(--color-gold); color: var(--color-primary); font-weight: 600; border-color: var(--color-gold); }
+
+    /* ── Chrome ── */
+    .site-header {
+      background: var(--color-primary); color: var(--color-cream);
+      padding: .9rem 2rem; display: flex; align-items: center; gap: 2rem;
+    }
+    .site-title { color: var(--color-cream); font-size: 1.35rem; font-weight: bold; text-decoration: none; }
+    .site-nav { display: flex; gap: 1.5rem; list-style: none; }
+    .site-nav a { color: var(--color-border-warm); text-decoration: none; font-size: .88rem; text-transform: uppercase; letter-spacing: .05em; font-family: var(--font-sans); }
+    .site-nav a.active { color: var(--color-cream); }
+
+    .page-hero {
+      background: var(--color-surface-accent); border-bottom: 1px solid var(--color-border);
+      padding: 2rem 2rem 1.5rem; max-width: 900px; margin: 0 auto;
+    }
+    .page-hero h1 { font-size: 2rem; color: var(--color-primary); margin-bottom: .25rem; }
+    .page-hero p { color: var(--color-text-muted); font-size: var(--text-sm); font-family: var(--font-sans); }
+
+    main { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    /* ── Section headers ── */
+    .foal-section { margin-bottom: 2.5rem; }
+    .section-header {
+      display: flex; align-items: center; gap: .75rem;
+      margin-bottom: 1rem; padding-bottom: .5rem;
+      border-bottom: 2px solid var(--color-border);
+    }
+    .section-header h2 { font-size: 1.15rem; color: var(--color-primary); }
+    .section-count {
+      background: var(--color-parchment); color: var(--color-text-muted);
+      border: 1px solid var(--color-border-warm);
+      border-radius: var(--radius-full); padding: 1px 10px;
+      font-size: .75rem; font-family: var(--font-sans);
+    }
+    .section-expected .section-header { border-bottom-color: var(--color-gold); }
+    .section-expected .section-header h2 { color: var(--color-accent); }
+
+    /* ── Status badges ── */
+    .status-expected {
+      display: inline-block; background: #fff8e6; color: #8a6500;
+      border: 1px solid #e6c84a; border-radius: var(--radius-full);
+      padding: 2px 10px; font-size: .72rem; font-family: var(--font-sans); font-weight: 600;
+    }
+    .status-born {
+      display: inline-block; background: #f0f5ef; color: #3d6b38;
+      border: 1px solid #8ab884; border-radius: var(--radius-full);
+      padding: 2px 10px; font-size: .72rem; font-family: var(--font-sans); font-weight: 600;
+    }
+
+    /* ── Placeholder for unnamed/unborn ── */
+    .foal-ph {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .no-photo {
+      width: 100%; height: 100%;
+      background: repeating-linear-gradient(
+        45deg, var(--color-surface-accent), var(--color-surface-accent) 4px,
+        var(--color-parchment) 4px, var(--color-parchment) 8px
+      );
+      display: flex; align-items: center; justify-content: center;
+      font-size: .7rem; color: var(--color-text-muted); font-family: var(--font-sans);
+      text-align: center; padding: .25rem;
+    }
+
+    /* ══════════════════════════════════════
+       VARIANT A — Nimi ensin
+    ══════════════════════════════════════ */
+    #variant-a .foal-card {
+      display: flex; gap: 0; background: var(--color-surface);
+      border: 1px solid var(--color-border); border-radius: var(--radius-md);
+      overflow: hidden; box-shadow: var(--shadow-sm); margin-bottom: 1rem;
+      transition: box-shadow 0.2s, transform 0.15s;
+    }
+    #variant-a .foal-card:hover { box-shadow: var(--shadow-md); transform: translateX(3px); }
+    #variant-a .foal-card .card-img {
+      width: 130px; flex-shrink: 0; overflow: hidden;
+    }
+    #variant-a .foal-card .card-img img,
+    #variant-a .foal-card .card-img .no-photo { width: 130px; height: 100%; min-height: 85px; }
+    #variant-a .foal-card .card-body {
+      padding: .75rem 1.1rem; display: flex; flex-direction: column; justify-content: center; gap: .2rem;
+      flex: 1;
+    }
+    #variant-a .foal-name { font-size: 1.05rem; color: var(--color-primary); font-weight: 600; }
+    #variant-a .foal-unnamed { font-size: 1.05rem; color: var(--color-text-muted); font-style: italic; }
+    #variant-a .foal-parents {
+      font-size: .85rem; color: var(--color-text-muted); font-family: var(--font-sans);
+    }
+    #variant-a .foal-parents a { color: var(--color-primary); text-decoration: none; }
+    #variant-a .foal-parents a:hover { text-decoration: underline; }
+    #variant-a .foal-meta {
+      display: flex; gap: .75rem; align-items: center; margin-top: .15rem;
+      font-size: .8rem; color: var(--color-text-muted); font-family: var(--font-sans);
+    }
+
+    /* ══════════════════════════════════════
+       VARIANT B — Vanhemmat ensin
+    ══════════════════════════════════════ */
+    #variant-b .foal-card {
+      display: flex; gap: 0; background: var(--color-surface);
+      border: 1px solid var(--color-border); border-radius: var(--radius-md);
+      overflow: hidden; box-shadow: var(--shadow-sm); margin-bottom: 1rem;
+      transition: box-shadow 0.2s, transform 0.15s;
+    }
+    #variant-b .foal-card:hover { box-shadow: var(--shadow-md); transform: translateX(3px); }
+    #variant-b .foal-card .card-img {
+      width: 130px; flex-shrink: 0; overflow: hidden; position: relative;
+    }
+    #variant-b .foal-card .card-img img,
+    #variant-b .foal-card .card-img .no-photo { width: 130px; height: 100%; min-height: 95px; }
+    #variant-b .foal-card .card-body {
+      padding: .75rem 1.1rem; flex: 1; display: flex; flex-direction: column; justify-content: center; gap: .15rem;
+    }
+    #variant-b .foal-parents-main {
+      font-size: 1rem; color: var(--color-primary); font-weight: 600;
+    }
+    #variant-b .foal-parents-main a { color: inherit; text-decoration: none; }
+    #variant-b .foal-parents-main a:hover { text-decoration: underline; }
+    #variant-b .cross { color: var(--color-accent); margin: 0 .2rem; font-style: normal; }
+    #variant-b .foal-name-sub { font-size: .9rem; color: var(--color-text-muted); font-style: italic; }
+    #variant-b .foal-name-sub strong { color: var(--color-text); font-style: normal; font-size: .92rem; }
+    #variant-b .foal-meta {
+      display: flex; gap: .75rem; align-items: center; margin-top: .2rem;
+      font-size: .78rem; color: var(--color-text-muted); font-family: var(--font-sans);
+    }
+
+    /* ══════════════════════════════════════
+       VARIANT C — Kompakti status-lista
+    ══════════════════════════════════════ */
+    #variant-c .filter-bar {
+      display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1.25rem; align-items: center;
+    }
+    #variant-c .filter-btn {
+      background: var(--color-surface); border: 1px solid var(--color-border);
+      border-radius: var(--radius-full); padding: 4px 14px;
+      font-size: .82rem; font-family: var(--font-sans); cursor: pointer;
+      color: var(--color-text-muted); transition: all 0.15s;
+    }
+    #variant-c .filter-btn:hover, #variant-c .filter-btn.active {
+      background: var(--color-primary); color: var(--color-cream); border-color: var(--color-primary);
+    }
+    #variant-c .foal-card {
+      display: flex; align-items: center; gap: 0; background: var(--color-surface);
+      border: 1px solid var(--color-border); border-radius: var(--radius-md);
+      overflow: hidden; margin-bottom: .6rem;
+      box-shadow: var(--shadow-sm); transition: box-shadow 0.2s, transform 0.15s;
+    }
+    #variant-c .foal-card.is-expected { border-left: 4px solid var(--color-gold); }
+    #variant-c .foal-card.is-born { border-left: 4px solid #8ab884; }
+    #variant-c .foal-card:hover { box-shadow: var(--shadow-md); transform: translateX(2px); }
+    #variant-c .card-img { width: 80px; height: 60px; flex-shrink: 0; overflow: hidden; }
+    #variant-c .card-img img, #variant-c .card-img .no-photo { width: 80px; height: 60px; object-fit: cover; display: block; }
+    #variant-c .card-body {
+      padding: .5rem .9rem; flex: 1; display: flex; align-items: center; gap: 1rem;
+      flex-wrap: wrap;
+    }
+    #variant-c .foal-name { font-size: .95rem; font-weight: 600; color: var(--color-primary); min-width: 140px; }
+    #variant-c .foal-unnamed { font-size: .95rem; color: var(--color-text-muted); font-style: italic; min-width: 140px; }
+    #variant-c .foal-parents-c {
+      font-size: .82rem; color: var(--color-text-muted); font-family: var(--font-sans); flex: 1;
+    }
+    #variant-c .foal-parents-c a { color: var(--color-primary); text-decoration: none; }
+    #variant-c .foal-parents-c a:hover { text-decoration: underline; }
+    #variant-c .foal-yr { font-size: .8rem; color: var(--color-text-light); font-family: var(--font-sans); white-space: nowrap; }
+    #variant-c .card-status { padding: 0 .85rem; flex-shrink: 0; }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      body { padding-top: 80px; }
+      #variant-nav { flex-wrap: wrap; gap: 6px; }
+      .site-header { flex-wrap: wrap; gap: .75rem; padding: .75rem 1rem; }
+      .site-nav { flex-wrap: wrap; gap: .75rem; }
+      main { padding: 1.25rem 1rem; }
+
+      #variant-a .foal-card,
+      #variant-b .foal-card { flex-direction: column; }
+      #variant-a .foal-card .card-img,
+      #variant-b .foal-card .card-img { width: 100%; }
+      #variant-a .foal-card .card-img img,
+      #variant-b .foal-card .card-img img,
+      #variant-a .foal-card .card-img .no-photo,
+      #variant-b .foal-card .card-img .no-photo { width: 100%; height: 140px; }
+
+      #variant-c .card-body { gap: .5rem; }
+      #variant-c .foal-parents-c { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Variant nav -->
+<div id="variant-nav">
+  <span>Luonnos 003</span>
+  <button class="variant-tab active" onclick="showVariant('a', this)">A: Nimi ensin</button>
+  <button class="variant-tab" onclick="showVariant('b', this)">B: Vanhemmat ensin</button>
+  <button class="variant-tab" onclick="showVariant('c', this)">C: Kompakti lista</button>
+</div>
+
+<!-- ════════════════════ VARIANT A — Nimi ensin ════════════════════ -->
+<div id="variant-a" class="variant">
+  <div class="site-header">
+    <a href="#" class="site-title">Tähtihevonen</a>
+    <nav><ul class="site-nav">
+      <li><a href="#">Etusivu</a></li><li><a href="#">Hevoset</a></li>
+      <li><a href="#" class="active">Kasvatus</a></li><li><a href="#">Yhteystiedot</a></li>
+    </ul></nav>
+  </div>
+  <div class="page-hero"><h1>Kasvatus</h1><p>Tallin kasvatustoiminta ja varsarekisteri</p></div>
+  <main>
+
+    <!-- Odotetut -->
+    <div class="foal-section section-expected">
+      <div class="section-header">
+        <h2>Odotetut varsat</h2><span class="section-count">2</span>
+      </div>
+
+      <div class="foal-card">
+        <div class="card-img"><div class="no-photo">Ei kuvaa vielä</div></div>
+        <div class="card-body">
+          <span class="foal-unnamed">Nimetön varsa</span>
+          <div class="foal-parents">Isä: <a href="#">Starlight Express</a> &nbsp;·&nbsp; Emä: <a href="#">Solar Queen</a></div>
+          <div class="foal-meta"><span>2024</span><span class="status-expected">Odotettu</span></div>
+        </div>
+      </div>
+
+      <div class="foal-card">
+        <div class="card-img"><div class="no-photo">Ei kuvaa vielä</div></div>
+        <div class="card-body">
+          <span class="foal-unnamed">Nimetön varsa</span>
+          <div class="foal-parents">Isä: <a href="#">Iron Thunder</a> &nbsp;·&nbsp; Emä: <a href="#">Moonbeam Duchess</a></div>
+          <div class="foal-meta"><span>2024</span><span class="status-expected">Odotettu</span><span>Tamma</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Syntyneet -->
+    <div class="foal-section">
+      <div class="section-header">
+        <h2>Syntyneet varsat</h2><span class="section-count">5</span>
+      </div>
+
+      <div class="foal-card">
+        <div class="card-img"><img src="https://picsum.photos/seed/f1/130/90" alt="Moonlight Melody" class="foal-ph"></div>
+        <div class="card-body">
+          <span class="foal-name">Moonlight Melody</span>
+          <div class="foal-parents">Isä: <a href="#">Starlight Express</a> &nbsp;·&nbsp; Emä: <a href="#">Luna Dream</a></div>
+          <div class="foal-meta"><span>2023</span><span class="status-born">Syntynyt</span><span>Tamma</span></div>
+        </div>
+      </div>
+
+      <div class="foal-card">
+        <div class="card-img"><img src="https://picsum.photos/seed/f2/130/90" alt="Thunder Prince" class="foal-ph"></div>
+        <div class="card-body">
+          <span class="foal-name">Thunder Prince</span>
+          <div class="foal-parents">Isä: <a href="#">Iron Thunder</a> &nbsp;·&nbsp; Emä: <a href="#">Velvet Rose</a></div>
+          <div class="foal-meta"><span>2022</span><span class="status-born">Syntynyt</span><span>Ori</span></div>
+        </div>
+      </div>
+
+      <div class="foal-card">
+        <div class="card-img"><img src="https://picsum.photos/seed/f3/130/90" alt="Golden Star" class="foal-ph"></div>
+        <div class="card-body">
+          <span class="foal-name">Golden Star</span>
+          <div class="foal-parents">Isä: <a href="#">Golden Dawn</a> &nbsp;·&nbsp; Emä: <a href="#">Silver Lining</a></div>
+          <div class="foal-meta"><span>2023</span><span class="status-born">Syntynyt</span><span>Tamma</span></div>
+        </div>
+      </div>
+
+      <div class="foal-card">
+        <div class="card-img"><img src="https://picsum.photos/seed/f4/130/90" alt="Crimson Knight" class="foal-ph"></div>
+        <div class="card-body">
+          <span class="foal-name">Crimson Knight</span>
+          <div class="foal-parents">Isä: <a href="#">Grand Master</a> &nbsp;·&nbsp; Emä: <a href="#">Solar Queen</a></div>
+          <div class="foal-meta"><span>2021</span><span class="status-born">Syntynyt</span><span>Ori</span></div>
+        </div>
+      </div>
+
+      <div class="foal-card">
+        <div class="card-img"><img src="https://picsum.photos/seed/f5/130/90" alt="Rose Garden" class="foal-ph"></div>
+        <div class="card-body">
+          <span class="foal-name">Rose Garden</span>
+          <div class="foal-parents">Isä: <a href="#">Silver Storm</a> &nbsp;·&nbsp; Emä: <a href="#">Velvet Rose</a></div>
+          <div class="foal-meta"><span>2022</span><span class="status-born">Syntynyt</span><span>Tamma</span></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ════════════════════ VARIANT B — Vanhemmat ensin ════════════════════ -->
+<div id="variant-b" class="variant" style="display:none">
+  <div class="site-header">
+    <a href="#" class="site-title">Tähtihevonen</a>
+    <nav><ul class="site-nav">
+      <li><a href="#">Etusivu</a></li><li><a href="#">Hevoset</a></li>
+      <li><a href="#" class="active">Kasvatus</a></li><li><a href="#">Yhteystiedot</a></li>
+    </ul></nav>
+  </div>
+  <div class="page-hero"><h1>Kasvatus</h1><p>Tallin kasvatustoiminta ja varsarekisteri</p></div>
+  <main>
+
+    <!-- Odotetut -->
+    <div class="foal-section section-expected">
+      <div class="section-header">
+        <h2>Odotetut varsat</h2><span class="section-count">2</span>
+      </div>
+
+      <div class="foal-card">
+        <div class="card-img"><div class="no-photo">Ei kuvaa</div></div>
+        <div class="card-body">
+          <div class="foal-parents-main"><a href="#">Starlight Express</a><em class="cross">×</em><a href="#">Solar Queen</a></div>
+          <div class="foal-name-sub">Varsa ei vielä nimetty</div>
+          <div class="foal-meta"><span>2024</span><span class="status-expected">Odotettu</span></div>
+        </div>
+      </div>
+
+      <div class="foal-card">
+        <div class="card-img"><div class="no-photo">Ei kuvaa</div></div>
+        <div class="card-body">
+          <div class="foal-parents-main"><a href="#">Iron Thunder</a><em class="cross">×</em><a href="#">Moonbeam Duchess</a></div>
+          <div class="foal-name-sub">Varsa ei vielä nimetty</div>
+          <div class="foal-meta"><span>2024</span><span class="status-expected">Odotettu</span><span>Tamma</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Syntyneet -->
+    <div class="foal-section">
+      <div class="section-header">
+        <h2>Syntyneet varsat</h2><span class="section-count">5</span>
+      </div>
+
+      <div class="foal-card">
+        <div class="card-img"><img src="https://picsum.photos/seed/f1/130/95" alt="Moonlight Melody"></div>
+        <div class="card-body">
+          <div class="foal-parents-main"><a href="#">Starlight Express</a><em class="cross">×</em><a href="#">Luna Dream</a></div>
+          <div class="foal-name-sub"><strong>Moonlight Melody</strong></div>
+          <div class="foal-meta"><span>2023</span><span class="status-born">Syntynyt</span><span>Tamma</span></div>
+        </div>
+      </div>
+
+      <div class="foal-card">
+        <div class="card-img"><img src="https://picsum.photos/seed/f2/130/95" alt="Thunder Prince"></div>
+        <div class="card-body">
+          <div class="foal-parents-main"><a href="#">Iron Thunder</a><em class="cross">×</em><a href="#">Velvet Rose</a></div>
+          <div class="foal-name-sub"><strong>Thunder Prince</strong></div>
+          <div class="foal-meta"><span>2022</span><span class="status-born">Syntynyt</span><span>Ori</span></div>
+        </div>
+      </div>
+
+      <div class="foal-card">
+        <div class="card-img"><img src="https://picsum.photos/seed/f3/130/95" alt="Golden Star"></div>
+        <div class="card-body">
+          <div class="foal-parents-main"><a href="#">Golden Dawn</a><em class="cross">×</em><a href="#">Silver Lining</a></div>
+          <div class="foal-name-sub"><strong>Golden Star</strong></div>
+          <div class="foal-meta"><span>2023</span><span class="status-born">Syntynyt</span><span>Tamma</span></div>
+        </div>
+      </div>
+
+      <div class="foal-card">
+        <div class="card-img"><img src="https://picsum.photos/seed/f4/130/95" alt="Crimson Knight"></div>
+        <div class="card-body">
+          <div class="foal-parents-main"><a href="#">Grand Master</a><em class="cross">×</em><a href="#">Solar Queen</a></div>
+          <div class="foal-name-sub"><strong>Crimson Knight</strong></div>
+          <div class="foal-meta"><span>2021</span><span class="status-born">Syntynyt</span><span>Ori</span></div>
+        </div>
+      </div>
+
+      <div class="foal-card">
+        <div class="card-img"><img src="https://picsum.photos/seed/f5/130/95" alt="Rose Garden"></div>
+        <div class="card-body">
+          <div class="foal-parents-main"><a href="#">Silver Storm</a><em class="cross">×</em><a href="#">Velvet Rose</a></div>
+          <div class="foal-name-sub"><strong>Rose Garden</strong></div>
+          <div class="foal-meta"><span>2022</span><span class="status-born">Syntynyt</span><span>Tamma</span></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ════════════════════ VARIANT C — Kompakti status-lista ════════════════════ -->
+<div id="variant-c" class="variant" style="display:none">
+  <div class="site-header">
+    <a href="#" class="site-title">Tähtihevonen</a>
+    <nav><ul class="site-nav">
+      <li><a href="#">Etusivu</a></li><li><a href="#">Hevoset</a></li>
+      <li><a href="#" class="active">Kasvatus</a></li><li><a href="#">Yhteystiedot</a></li>
+    </ul></nav>
+  </div>
+  <div class="page-hero"><h1>Kasvatus</h1><p>Tallin kasvatustoiminta ja varsarekisteri</p></div>
+  <main>
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="setFilterC(this,'all')">Kaikki (7)</button>
+      <button class="filter-btn" onclick="setFilterC(this,'expected')">Odotetut (2)</button>
+      <button class="filter-btn" onclick="setFilterC(this,'born')">Syntyneet (5)</button>
+    </div>
+
+    <div id="foal-list-c">
+      <div class="foal-card is-expected" data-status="expected">
+        <div class="card-img"><div class="no-photo">—</div></div>
+        <div class="card-body">
+          <span class="foal-unnamed">Nimetön varsa</span>
+          <div class="foal-parents-c"><a href="#">Starlight Express</a> × <a href="#">Solar Queen</a></div>
+          <span class="foal-yr">2024</span>
+        </div>
+        <div class="card-status"><span class="status-expected">Odotettu</span></div>
+      </div>
+
+      <div class="foal-card is-expected" data-status="expected">
+        <div class="card-img"><div class="no-photo">—</div></div>
+        <div class="card-body">
+          <span class="foal-unnamed">Nimetön varsa</span>
+          <div class="foal-parents-c"><a href="#">Iron Thunder</a> × <a href="#">Moonbeam Duchess</a></div>
+          <span class="foal-yr">2024 · Tamma</span>
+        </div>
+        <div class="card-status"><span class="status-expected">Odotettu</span></div>
+      </div>
+
+      <div class="foal-card is-born" data-status="born">
+        <div class="card-img"><img src="https://picsum.photos/seed/f1/80/60" alt="Moonlight Melody"></div>
+        <div class="card-body">
+          <span class="foal-name">Moonlight Melody</span>
+          <div class="foal-parents-c"><a href="#">Starlight Express</a> × <a href="#">Luna Dream</a></div>
+          <span class="foal-yr">2023 · Tamma</span>
+        </div>
+        <div class="card-status"><span class="status-born">Syntynyt</span></div>
+      </div>
+
+      <div class="foal-card is-born" data-status="born">
+        <div class="card-img"><img src="https://picsum.photos/seed/f2/80/60" alt="Thunder Prince"></div>
+        <div class="card-body">
+          <span class="foal-name">Thunder Prince</span>
+          <div class="foal-parents-c"><a href="#">Iron Thunder</a> × <a href="#">Velvet Rose</a></div>
+          <span class="foal-yr">2022 · Ori</span>
+        </div>
+        <div class="card-status"><span class="status-born">Syntynyt</span></div>
+      </div>
+
+      <div class="foal-card is-born" data-status="born">
+        <div class="card-img"><img src="https://picsum.photos/seed/f3/80/60" alt="Golden Star"></div>
+        <div class="card-body">
+          <span class="foal-name">Golden Star</span>
+          <div class="foal-parents-c"><a href="#">Golden Dawn</a> × <a href="#">Silver Lining</a></div>
+          <span class="foal-yr">2023 · Tamma</span>
+        </div>
+        <div class="card-status"><span class="status-born">Syntynyt</span></div>
+      </div>
+
+      <div class="foal-card is-born" data-status="born">
+        <div class="card-img"><img src="https://picsum.photos/seed/f4/80/60" alt="Crimson Knight"></div>
+        <div class="card-body">
+          <span class="foal-name">Crimson Knight</span>
+          <div class="foal-parents-c"><a href="#">Grand Master</a> × <a href="#">Solar Queen</a></div>
+          <span class="foal-yr">2021 · Ori</span>
+        </div>
+        <div class="card-status"><span class="status-born">Syntynyt</span></div>
+      </div>
+
+      <div class="foal-card is-born" data-status="born">
+        <div class="card-img"><img src="https://picsum.photos/seed/f5/80/60" alt="Rose Garden"></div>
+        <div class="card-body">
+          <span class="foal-name">Rose Garden</span>
+          <div class="foal-parents-c"><a href="#">Silver Storm</a> × <a href="#">Velvet Rose</a></div>
+          <span class="foal-yr">2022 · Tamma</span>
+        </div>
+        <div class="card-status"><span class="status-born">Syntynyt</span></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Sketch toolbar -->
+<div id="sketch-tools" style="position:fixed;bottom:12px;right:12px;z-index:9999;font-family:system-ui;font-size:12px;background:rgba(0,0,0,0.75);color:white;padding:8px 12px;border-radius:8px;opacity:0.35;transition:opacity 0.2s;display:flex;gap:10px;align-items:center;" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.35'">
+  <span style="opacity:.7">003 Kasvatus</span>
+  <select onchange="document.querySelector('link[href*=themes]').href='../themes/'+this.value+'.css'" style="background:#222;color:white;border:none;border-radius:4px;padding:2px 6px;font-size:11px;">
+    <option value="default">Default</option>
+  </select>
+  <span style="opacity:.5">|</span>
+  <button onclick="setVp(375)" style="background:none;border:1px solid rgba(255,255,255,0.3);color:white;padding:2px 7px;border-radius:3px;font-size:11px;cursor:pointer;">📱</button>
+  <button onclick="setVp(null)" style="background:none;border:1px solid rgba(255,255,255,0.3);color:white;padding:2px 7px;border-radius:3px;font-size:11px;cursor:pointer;">🖥</button>
+</div>
+
+<script>
+function showVariant(id, btn) {
+  document.querySelectorAll('.variant').forEach(v => v.style.display = 'none');
+  document.querySelectorAll('.variant-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('variant-' + id).style.display = 'block';
+  btn.classList.add('active');
+}
+function setFilterC(btn, status) {
+  document.querySelectorAll('#variant-c .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#foal-list-c .foal-card').forEach(card => {
+    card.style.display = (status === 'all' || card.dataset.status === status) ? '' : 'none';
+  });
+}
+function setVp(w) {
+  document.querySelectorAll('main').forEach(el => el.style.maxWidth = w ? w + 'px' : '');
+}
+</script>
+</body>
+</html>

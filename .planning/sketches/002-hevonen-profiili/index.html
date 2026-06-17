@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>002 — Hevonen profiili</title>
+  <link rel="stylesheet" href="../themes/default.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-serif);
+      background: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.6;
+      padding-top: 46px;
+    }
+
+    /* ── Variant tabs ── */
+    #variant-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 9998;
+      background: var(--color-primary);
+      border-bottom: 3px solid var(--color-gold);
+      padding: 6px 16px;
+      display: flex; gap: 8px; align-items: center;
+      font-family: var(--font-sans); font-size: 13px;
+    }
+    #variant-nav span { color: var(--color-cream); margin-right: 8px; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
+    .variant-tab {
+      background: rgba(255,255,255,0.1); color: var(--color-cream);
+      border: 1px solid rgba(201,184,154,0.3); border-radius: var(--radius-sm);
+      padding: 4px 14px; cursor: pointer; font-family: var(--font-sans); font-size: 13px;
+      transition: all 0.15s ease;
+    }
+    .variant-tab:hover { background: rgba(255,255,255,0.2); }
+    .variant-tab.active { background: var(--color-gold); color: var(--color-primary); font-weight: 600; border-color: var(--color-gold); }
+
+    /* ── Shared chrome ── */
+    .site-header {
+      background: var(--color-primary);
+      color: var(--color-cream);
+      padding: .9rem 2rem;
+      display: flex; align-items: center; gap: 2rem;
+    }
+    .site-title { color: var(--color-cream); font-size: 1.35rem; font-weight: bold; text-decoration: none; }
+    .site-nav { display: flex; gap: 1.5rem; list-style: none; }
+    .site-nav a { color: var(--color-border-warm); text-decoration: none; font-size: .88rem; text-transform: uppercase; letter-spacing: .05em; font-family: var(--font-sans); }
+    .site-nav a.active { color: var(--color-cream); }
+
+    /* ── Shared photo placeholder ── */
+    .photo-ph {
+      background: var(--color-surface-accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 4rem; color: var(--color-border-warm);
+    }
+
+    /* ═══════════════════════════════════════
+       VARIANT A — Lineaarinen scroll
+    ═══════════════════════════════════════ */
+    #variant-a .horse-hero {
+      background: var(--color-primary);
+      color: var(--color-cream);
+      padding: 2rem;
+      display: flex; gap: 2rem; align-items: flex-start;
+    }
+    #variant-a .horse-hero .main-photo {
+      width: 260px; height: 200px; flex-shrink: 0;
+      border-radius: var(--radius-md); overflow: hidden;
+      border: 3px solid var(--color-gold);
+    }
+    #variant-a .horse-hero .hero-text h1 { font-size: 2rem; margin-bottom: .2rem; }
+    #variant-a .horse-hero .hero-text .callname { font-size: 1rem; color: var(--color-gold); font-style: italic; margin-bottom: .8rem; }
+    #variant-a .horse-hero .hero-pills { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .5rem; }
+    #variant-a .hero-pill {
+      background: rgba(255,255,255,0.12); border: 1px solid rgba(201,184,154,0.4);
+      border-radius: var(--radius-full); padding: 3px 12px;
+      font-size: .8rem; font-family: var(--font-sans);
+    }
+    #variant-a main { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+    #variant-a section { margin-bottom: 2.5rem; }
+    #variant-a section h2 {
+      font-size: 1.15rem; color: var(--color-primary);
+      border-bottom: 2px solid var(--color-border); padding-bottom: .4rem; margin-bottom: 1rem;
+    }
+    #variant-a .info-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: .4rem 2rem;
+    }
+    #variant-a .info-row { display: flex; gap: .5rem; font-size: .9rem; }
+    #variant-a .info-row dt { color: var(--color-text-muted); font-family: var(--font-sans); font-size: .82rem; min-width: 110px; }
+    #variant-a .info-row dd { font-weight: 500; }
+    #variant-a .comp-table { width: 100%; border-collapse: collapse; }
+    #variant-a .comp-table th, #variant-a .comp-table td { padding: .5rem .75rem; border: 1px solid var(--color-border); font-size: .88rem; text-align: left; }
+    #variant-a .comp-table th { background: var(--color-surface-accent); font-family: var(--font-sans); font-size: .8rem; color: var(--color-text-muted); font-weight: 600; }
+    #variant-a .comp-table tr:hover td { background: var(--color-parchment); }
+    #variant-a .placement-badge {
+      display: inline-block; font-weight: bold; font-size: .85rem;
+      color: var(--color-accent); font-family: var(--font-sans);
+    }
+    #variant-a .gallery { display: flex; gap: .75rem; flex-wrap: wrap; }
+    #variant-a .gallery .gph { width: 160px; height: 110px; border-radius: var(--radius-sm); border: 1px solid var(--color-border); overflow: hidden; }
+    #variant-a .ped-table { width: 100%; border-collapse: collapse; }
+    #variant-a .ped-table th { background: var(--color-primary); color: var(--color-cream); padding: .45rem .75rem; font-size: .82rem; font-family: var(--font-sans); }
+    #variant-a .ped-cell { border: 1px solid var(--color-border-warm); padding: .45rem .75rem; font-size: .85rem; vertical-align: middle; background: var(--color-surface); }
+    #variant-a .ped-cell a { color: var(--color-primary); text-decoration: none; }
+    #variant-a .ped-cell a:hover { text-decoration: underline; }
+    #variant-a .ped-gen1 { background: var(--color-surface-accent); font-weight: 600; }
+    #variant-a .ped-gen2 { background: var(--color-parchment); }
+
+    /* ═══════════════════════════════════════
+       VARIANT B — Hero + Sidebar
+    ═══════════════════════════════════════ */
+    #variant-b .hero-banner {
+      width: 100%; height: 320px; overflow: hidden; position: relative;
+    }
+    #variant-b .hero-ph {
+      width: 100%; height: 320px;
+      background: linear-gradient(135deg, #3d2b1f 0%, #7a5c45 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 6rem;
+    }
+    #variant-b .hero-overlay {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: linear-gradient(transparent, rgba(61,43,31,0.9));
+      padding: 2rem 2rem 1.5rem;
+      color: white;
+    }
+    #variant-b .hero-overlay h1 { font-size: 2.2rem; text-shadow: 0 2px 4px rgba(0,0,0,.3); }
+    #variant-b .hero-overlay .callname { color: var(--color-gold); font-style: italic; font-size: 1rem; }
+    #variant-b .hero-pills { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .6rem; }
+    #variant-b .hero-pill {
+      background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3);
+      border-radius: var(--radius-full); padding: 2px 12px;
+      font-size: .78rem; font-family: var(--font-sans); color: white;
+    }
+
+    #variant-b .content-layout {
+      max-width: 1100px; margin: 0 auto; padding: 1.5rem;
+      display: grid; grid-template-columns: 1fr 300px; gap: 1.5rem; align-items: start;
+    }
+    #variant-b .main-col section { margin-bottom: 2rem; }
+    #variant-b .main-col section h2 {
+      font-size: 1.1rem; color: var(--color-primary);
+      border-left: 4px solid var(--color-gold);
+      padding-left: .75rem; margin-bottom: 1rem;
+    }
+    #variant-b .sidebar { display: flex; flex-direction: column; gap: 1rem; }
+    #variant-b .sidebar-card {
+      background: var(--color-surface); border: 1px solid var(--color-border);
+      border-radius: var(--radius-md); padding: 1rem;
+      box-shadow: var(--shadow-sm);
+    }
+    #variant-b .sidebar-card h3 { font-size: .88rem; color: var(--color-text-muted); font-family: var(--font-sans); text-transform: uppercase; letter-spacing: .06em; margin-bottom: .6rem; }
+    #variant-b .sidebar .info-row { display: flex; justify-content: space-between; font-size: .88rem; padding: .25rem 0; border-bottom: 1px solid var(--color-border); }
+    #variant-b .sidebar .info-row:last-child { border-bottom: none; }
+    #variant-b .sidebar .info-row dt { color: var(--color-text-muted); font-family: var(--font-sans); font-size: .8rem; }
+    #variant-b .sidebar .info-row dd { font-weight: 500; }
+    #variant-b .thumb-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: .4rem; margin-top: .5rem; }
+    #variant-b .thumb-ph { border-radius: var(--radius-sm); overflow: hidden; aspect-ratio: 1; background: var(--color-surface-accent); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
+    #variant-b .comp-list { list-style: none; }
+    #variant-b .comp-list li { padding: .4rem 0; border-bottom: 1px solid var(--color-border); font-size: .88rem; display: flex; gap: .5rem; align-items: center; }
+    #variant-b .comp-list li:last-child { border-bottom: none; }
+    #variant-b .place { background: var(--color-parchment); color: var(--color-accent); border: 1px solid var(--color-border-warm); border-radius: var(--radius-full); padding: 1px 10px; font-size: .75rem; font-family: var(--font-sans); font-weight: 600; flex-shrink: 0; }
+    #variant-b .ped-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+    #variant-b .ped-table th { background: var(--color-surface-accent); color: var(--color-text-muted); padding: .4rem .6rem; font-family: var(--font-sans); font-size: .78rem; text-align: left; border: 1px solid var(--color-border); }
+    #variant-b .ped-cell { border: 1px solid var(--color-border); padding: .4rem .6rem; vertical-align: middle; }
+    #variant-b .ped-cell a { color: var(--color-primary); text-decoration: none; }
+    #variant-b .ped-gen1 { background: var(--color-parchment); font-weight: 600; }
+    #variant-b .ped-gen2 { background: var(--color-surface-accent); }
+
+    /* Kuvauskortti — venyy matchaamaan perustiedot-kortin korkeutta */
+    #variant-b .kuvaus-card {
+      background: var(--color-surface); border: 1px solid var(--color-border);
+      border-radius: var(--radius-md); padding: 1.1rem; box-shadow: var(--shadow-sm);
+      flex: 1; display: flex; flex-direction: column; gap: .75rem;
+    }
+    #variant-b .kuvaus-card h2 {
+      border-left: 4px solid var(--color-gold); padding-left: .75rem;
+      color: var(--color-primary); font-size: 1.1rem; margin: 0;
+    }
+    #variant-b .kuvaus-card p { font-size: .93rem; }
+
+    /* Koko leveyden kisakalenteri variant B:ssä */
+    #variant-b .kisa-full {
+      border-top: 2px solid var(--color-border);
+      background: var(--color-surface-warm);
+    }
+    #variant-b .kisa-full > section {
+      max-width: 1100px; margin: 0 auto; padding: 1.5rem;
+    }
+    #variant-b .kisa-full h2 {
+      border-left: 4px solid var(--color-gold); padding-left: .75rem;
+      color: var(--color-primary); font-size: 1.1rem; margin-bottom: 1rem;
+    }
+    #variant-b .kisa-table { width: 100%; border-collapse: collapse; }
+    #variant-b .kisa-table th, #variant-b .kisa-table td {
+      padding: .55rem .85rem; border: 1px solid var(--color-border); font-size: .88rem; text-align: left;
+    }
+    #variant-b .kisa-table th { background: var(--color-surface-accent); font-family: var(--font-sans); font-size: .8rem; color: var(--color-text-muted); font-weight: 600; }
+    #variant-b .kisa-table tr:hover td { background: var(--color-parchment); }
+    #variant-b .kisa-place { font-weight: 700; color: var(--color-accent); font-family: var(--font-sans); }
+
+    /* ═══════════════════════════════════════
+       VARIANT C — Välilehdet (tabs)
+    ═══════════════════════════════════════ */
+    #variant-c .profile-header {
+      background: var(--color-primary);
+      padding: 1.5rem 2rem;
+      display: flex; gap: 2rem; align-items: center;
+    }
+    #variant-c .profile-avatar {
+      width: 100px; height: 100px;
+      border-radius: 50%; border: 3px solid var(--color-gold);
+      background: var(--color-surface-accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.5rem; flex-shrink: 0;
+    }
+    #variant-c .profile-meta h1 { color: var(--color-cream); font-size: 1.6rem; }
+    #variant-c .profile-meta .callname { color: var(--color-gold); font-style: italic; font-size: .95rem; }
+    #variant-c .profile-pills { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .5rem; }
+    #variant-c .profile-pill {
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(201,184,154,0.3);
+      border-radius: var(--radius-full); padding: 2px 12px;
+      font-size: .78rem; font-family: var(--font-sans); color: var(--color-cream);
+    }
+
+    #variant-c .tab-bar {
+      background: var(--color-surface);
+      border-bottom: 2px solid var(--color-border);
+      display: flex; padding: 0 2rem;
+      position: sticky; top: 46px; z-index: 100;
+    }
+    #variant-c .tab-btn {
+      background: none; border: none; border-bottom: 3px solid transparent;
+      padding: .8rem 1.25rem; font-family: var(--font-sans); font-size: .88rem;
+      color: var(--color-text-muted); cursor: pointer; margin-bottom: -2px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    #variant-c .tab-btn:hover { color: var(--color-primary); }
+    #variant-c .tab-btn.active { color: var(--color-primary); border-bottom-color: var(--color-accent); font-weight: 600; }
+
+    #variant-c .tab-panel { display: none; }
+    #variant-c .tab-panel.active { display: block; }
+    #variant-c .tab-content { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    #variant-c .info-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: .5rem 3rem; }
+    #variant-c .info-row { display: flex; gap: .5rem; padding: .3rem 0; border-bottom: 1px solid var(--color-border); }
+    #variant-c .info-row:last-child { border-bottom: none; }
+    #variant-c .info-row dt { color: var(--color-text-muted); font-family: var(--font-sans); font-size: .82rem; min-width: 120px; }
+    #variant-c .info-row dd { font-weight: 500; font-size: .92rem; }
+
+    #variant-c .comp-table { width: 100%; border-collapse: collapse; }
+    #variant-c .comp-table th, #variant-c .comp-table td { padding: .5rem .75rem; border: 1px solid var(--color-border); font-size: .88rem; text-align: left; }
+    #variant-c .comp-table th { background: var(--color-surface-accent); font-family: var(--font-sans); font-size: .8rem; color: var(--color-text-muted); }
+
+    #variant-c .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 1rem; }
+    #variant-c .gph { border-radius: var(--radius-md); overflow: hidden; aspect-ratio: 4/3; background: var(--color-surface-accent); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; border: 1px solid var(--color-border); }
+
+    #variant-c .ped-table { width: 100%; border-collapse: collapse; }
+    #variant-c .ped-table th { background: var(--color-primary); color: var(--color-cream); padding: .45rem .75rem; font-family: var(--font-sans); font-size: .82rem; }
+    #variant-c .ped-cell { border: 1px solid var(--color-border-warm); padding: .45rem .75rem; font-size: .85rem; vertical-align: middle; background: var(--color-surface); }
+    #variant-c .ped-cell a { color: var(--color-primary); text-decoration: none; }
+    #variant-c .ped-gen1 { background: var(--color-surface-accent); font-weight: 600; }
+    #variant-c .ped-gen2 { background: var(--color-parchment); }
+
+    /* ── Galleria & lightbox ── */
+    #variant-a .gallery .gph,
+    #variant-b .thumb-ph,
+    #variant-c .gph { cursor: pointer; }
+    #variant-a .gallery .gph img,
+    #variant-b .thumb-ph img,
+    #variant-c .gph img { width:100%;height:100%;object-fit:cover;display:block;transition:opacity 0.15s; }
+    #variant-a .gallery .gph:hover img,
+    #variant-b .thumb-ph:hover img,
+    #variant-c .gph:hover img { opacity: 0.8; }
+
+    /* ── Responsiivisuus ── */
+    @media (max-width: 768px) {
+      body { padding-top: 80px; }
+      #variant-nav { flex-wrap: wrap; gap: 6px; }
+
+      .site-header { flex-wrap: wrap; gap: .75rem; padding: .75rem 1rem; }
+      .site-nav { flex-wrap: wrap; gap: .75rem; }
+
+      /* A: Hero-palkki pystysuuntaiseksi */
+      #variant-a .horse-hero { flex-direction: column; padding: 1.25rem 1rem; }
+      #variant-a .horse-hero .main-photo { width: 100%; height: 220px; }
+      #variant-a .info-grid { grid-template-columns: 1fr; gap: 0; }
+      #variant-a main { padding: 1.25rem 1rem; }
+
+      /* B: Sivupalkki pinoon — perustiedot ensin, sitten kuvaus */
+      #variant-b .content-layout { grid-template-columns: 1fr; }
+      #variant-b .sidebar { order: -1; }
+      #variant-b .hero-banner, #variant-b .hero-ph { height: 220px; }
+      #variant-b .kuvaus-card { min-height: unset; }
+      #variant-b .kisa-full > section { padding: 1.25rem 1rem; }
+
+      /* C: Profiiliotsikko pystysuuntaiseksi */
+      #variant-c .profile-header { flex-direction: column; text-align: center; padding: 1.25rem 1rem; }
+      #variant-c .profile-pills { justify-content: center; }
+      #variant-c .info-grid { grid-template-columns: 1fr; gap: 0; }
+      #variant-c .tab-bar { padding: 0 .5rem; overflow-x: auto; white-space: nowrap; }
+      #variant-c .tab-content { padding: 1.25rem 1rem; }
+    }
+
+    /* Taulukot: vaakasuuntainen vieritys kapeilla näytöillä */
+    @media (max-width: 600px) {
+      #variant-a section { overflow-x: auto; }
+      #variant-b .kisa-full > section { overflow-x: auto; }
+      #variant-c .tab-content { overflow-x: auto; }
+
+      #variant-a .comp-table,
+      #variant-a .ped-table,
+      #variant-b .kisa-table,
+      #variant-b .ped-table,
+      #variant-c .comp-table,
+      #variant-c .ped-table { min-width: 520px; }
+
+      #variant-a .horse-hero h1,
+      #variant-b .hero-overlay h1 { font-size: 1.5rem; }
+
+      #variant-c .gallery { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Variant nav -->
+<div id="variant-nav">
+  <span>Luonnos 002</span>
+  <button class="variant-tab active" onclick="showVariant('a', this)">A: Lineaarinen</button>
+  <button class="variant-tab" onclick="showVariant('b', this)">B: Hero + Sidebar ★</button>
+  <button class="variant-tab" onclick="showVariant('c', this)">C: Välilehdet</button>
+</div>
+
+<!-- ═══════════════════════════════ VARIANT A ═══════════════════════════════ -->
+<div id="variant-a" class="variant">
+  <div class="site-header">
+    <a href="#" class="site-title">Tähtihevonen</a>
+    <nav><ul class="site-nav">
+      <li><a href="#">Etusivu</a></li>
+      <li><a href="#" class="active">Hevoset</a></li>
+      <li><a href="#">Kasvatus</a></li>
+    </ul></nav>
+  </div>
+
+  <div class="horse-hero">
+    <div class="main-photo"><img src="https://picsum.photos/seed/sol-hero/260/200" style="width:260px;height:200px;object-fit:cover;border-radius:var(--radius-md);display:block;" alt="Starlite Solaris"></div>
+    <div class="hero-text">
+      <h1>Starlite Solaris</h1>
+      <div class="callname">"Solaris"</div>
+      <div class="hero-pills">
+        <span class="hero-pill">Hanoverilainen</span>
+        <span class="hero-pill">Ori</span>
+        <span class="hero-pill">7 v.</span>
+        <span class="hero-pill">Esteratsastus · Taso L</span>
+      </div>
+      <p style="margin-top:.9rem;color:var(--color-cream);opacity:.85;font-size:.9rem;max-width:460px">Lahjakas ori, joka on voittanut useita alueellisia estekisoja ja edustaa tallia kansallisella tasolla.</p>
+    </div>
+  </div>
+
+  <main>
+    <section>
+      <h2>Perustiedot</h2>
+      <div class="info-grid">
+        <div class="info-row"><dt>Rotu</dt><dd>Hanoverilainen</dd></div>
+        <div class="info-row"><dt>Sukupuoli</dt><dd>Ori</dd></div>
+        <div class="info-row"><dt>Syntymäaika</dt><dd>15.4.2017 (7 v.)</dd></div>
+        <div class="info-row"><dt>Väri</dt><dd>Raudikko</dd></div>
+        <div class="info-row"><dt>Säkäkorkeus</dt><dd>168 cm</dd></div>
+        <div class="info-row"><dt>VH-tunnus</dt><dd>FIN2017HA00042</dd></div>
+        <div class="info-row"><dt>Laji</dt><dd>Esteratsastus</dd></div>
+        <div class="info-row"><dt>Taso</dt><dd>L</dd></div>
+        <div class="info-row"><dt>Omistaja</dt><dd>Tähtihevosen Talli</dd></div>
+        <div class="info-row"><dt>Kasvattaja</dt><dd>Anna Virtanen</dd></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Kisakalenteri</h2>
+      <table class="comp-table">
+        <thead><tr><th>Päivämäärä</th><th>Alaisuus</th><th>Järjestäjä / Paikka</th><th>Tulos</th><th>Huomiot</th></tr></thead>
+        <tbody>
+          <tr><td>12.5.2024</td><td>SRL</td><td>Espoon RS / Espoo</td><td><span class="placement-badge">1. / 25 p</span></td><td>Nollatulos, erinomainen aika</td></tr>
+          <tr><td>3.3.2024</td><td>Uudenmaan alue</td><td>Tampereen RS / Tampere</td><td><span class="placement-badge">3. / 15 p</span></td><td>Yksi kaatuma, muuten puhdas</td></tr>
+          <tr><td>18.11.2023</td><td>SRL</td><td>Helsingin RS / Helsinki</td><td><span class="placement-badge">2. / 20 p</span></td><td></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Kuvagalleria</h2>
+      <div class="gallery">
+        <div class="gph" style="width:160px;height:110px" onclick="openLightbox(0)" title="Avaa suuremmaksi"><img src="https://picsum.photos/seed/sol-1/320/220" alt="Kuva 1"></div>
+        <div class="gph" style="width:160px;height:110px" onclick="openLightbox(1)" title="Avaa suuremmaksi"><img src="https://picsum.photos/seed/sol-2/320/220" alt="Kuva 2"></div>
+        <div class="gph" style="width:160px;height:110px" onclick="openLightbox(2)" title="Avaa suuremmaksi"><img src="https://picsum.photos/seed/sol-3/320/220" alt="Kuva 3"></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Sukutaulu</h2>
+      <table class="ped-table">
+        <thead><tr><th>Vanhemmat</th><th>Isovanhemmat</th><th>Isoisovanhemmat</th></tr></thead>
+        <tbody>
+          <tr><td class="ped-cell ped-gen1" rowspan="4"><a href="#">Starlight Express</a></td><td class="ped-cell ped-gen2" rowspan="2"><a href="#">Grand Master</a></td><td class="ped-cell"><a href="#">Windsor Classic</a></td></tr>
+          <tr><td class="ped-cell">Bella Rosa</td></tr>
+          <tr><td class="ped-cell ped-gen2" rowspan="2">Silver Lining</td><td class="ped-cell">Midnight Star</td></tr>
+          <tr><td class="ped-cell">Lady Fair</td></tr>
+          <tr><td class="ped-cell ped-gen1" rowspan="4"><a href="#">Solar Queen</a></td><td class="ped-cell ped-gen2" rowspan="2">Apollo Rex</td><td class="ped-cell">Sun King</td></tr>
+          <tr><td class="ped-cell">Primavera</td></tr>
+          <tr><td class="ped-cell ped-gen2" rowspan="2">Luna Dream</td><td class="ped-cell">—</td></tr>
+          <tr><td class="ped-cell">—</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</div>
+
+<!-- ═══════════════════════════════ VARIANT B ═══════════════════════════════ -->
+<div id="variant-b" class="variant" style="display:none">
+  <div class="site-header">
+    <a href="#" class="site-title">Tähtihevonen</a>
+    <nav><ul class="site-nav">
+      <li><a href="#">Etusivu</a></li>
+      <li><a href="#" class="active">Hevoset</a></li>
+      <li><a href="#">Kasvatus</a></li>
+    </ul></nav>
+  </div>
+
+  <div class="hero-banner">
+    <img src="https://picsum.photos/seed/sol-hero/1100/320" style="width:100%;height:320px;object-fit:cover;display:block;" alt="Starlite Solaris">
+    <div class="hero-overlay">
+      <h1>Starlite Solaris</h1>
+      <div class="callname">"Solaris"</div>
+      <div class="hero-pills">
+        <span class="hero-pill">Hanoverilainen</span>
+        <span class="hero-pill">Ori · 7 v.</span>
+        <span class="hero-pill">Esteratsastus · Taso L</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-layout">
+    <div class="main-col" style="display:flex;flex-direction:column;gap:1.5rem;">
+      <div class="kuvaus-card">
+        <h2>Kuvaus</h2>
+        <p>Starlite Solaris on hanoverilainen ori, syntynyt 15.4.2017. Hevonen on erottautunut kilpaurallaan poikkeuksellisella liikelaadullaan ja hyppytekniikallaan — erityisesti takajalan käyttö ja sisäinen tasapaino ovat saaneet tuomareilta kiitosta jo nuoresta iästä lähtien.</p>
+        <p>Solariksen temperamentti on energinen mutta luotettava: se antaa kaiken kilpailutilanteessa mutta on maastamisessa rauhallinen ja ihmisläheinen. Hevonen on osoittautunut tarkkaavaiseksi ja oppimishaluiseksi, mikä tekee sen kouluttamisesta mielekästä.</p>
+        <p>Tällä hetkellä Solaris kilpailee esteratsastuksen L-luokassa tavoitteenaan siirtyminen M-luokkaan ensi kaudella. Hevonen edustaa tallia kansallisella tasolla ja on yksi tallin lippulaivoista.</p>
+        <p style="font-size:.82rem;color:var(--color-text-muted)">Omistaja: Tähtihevosen Talli &nbsp;·&nbsp; Kasvattaja: Anna Virtanen, Espoo</p>
+      </div>
+
+    </div>
+
+    <aside class="sidebar">
+      <div class="sidebar-card">
+        <h3>Perustiedot</h3>
+        <dl>
+          <div class="info-row"><dt>Rotu</dt><dd>Hanoverilainen</dd></div>
+          <div class="info-row"><dt>Sukupuoli</dt><dd>Ori</dd></div>
+          <div class="info-row"><dt>Ikä</dt><dd>7 v. (2017)</dd></div>
+          <div class="info-row"><dt>Väri</dt><dd>Raudikko</dd></div>
+          <div class="info-row"><dt>Säkäkorkeus</dt><dd>168 cm</dd></div>
+          <div class="info-row"><dt>VH-tunnus</dt><dd>FIN2017HA00042</dd></div>
+          <div class="info-row"><dt>Omistaja</dt><dd>Tähtihevonen</dd></div>
+          <div class="info-row"><dt>Kasvattaja</dt><dd>Anna Virtanen</dd></div>
+        </dl>
+      </div>
+      <div class="sidebar-card">
+        <h3>Kuvagalleria</h3>
+        <div class="thumb-grid">
+          <div class="thumb-ph" onclick="openLightbox(0)" title="Avaa suuremmaksi"><img src="https://picsum.photos/seed/sol-1/150/150" alt="Kuva 1"></div>
+          <div class="thumb-ph" onclick="openLightbox(1)" title="Avaa suuremmaksi"><img src="https://picsum.photos/seed/sol-2/150/150" alt="Kuva 2"></div>
+          <div class="thumb-ph" onclick="openLightbox(2)" title="Avaa suuremmaksi"><img src="https://picsum.photos/seed/sol-3/150/150" alt="Kuva 3"></div>
+          <div class="thumb-ph" onclick="openLightbox(3)" title="Avaa suuremmaksi"><img src="https://picsum.photos/seed/sol-4/150/150" alt="Kuva 4"></div>
+          <div class="thumb-ph" onclick="openLightbox(4)" title="Avaa suuremmaksi"><img src="https://picsum.photos/seed/sol-5/150/150" alt="Kuva 5"></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Sukutaulu — koko sivun leveys -->
+  <div class="kisa-full">
+    <section>
+      <h2>Sukutaulu</h2>
+      <table class="ped-table" style="width:100%">
+        <thead><tr><th>Vanhemmat</th><th>Isovanhemmat</th><th>Isoisovanhemmat</th></tr></thead>
+        <tbody>
+          <tr><td class="ped-cell ped-gen1" rowspan="4"><a href="#">Starlight Express</a></td><td class="ped-cell ped-gen2" rowspan="2"><a href="#">Grand Master</a></td><td class="ped-cell"><a href="#">Windsor Classic</a></td></tr>
+          <tr><td class="ped-cell">Bella Rosa</td></tr>
+          <tr><td class="ped-cell ped-gen2" rowspan="2">Silver Lining</td><td class="ped-cell">Midnight Star</td></tr>
+          <tr><td class="ped-cell">Lady Fair</td></tr>
+          <tr><td class="ped-cell ped-gen1" rowspan="4"><a href="#">Solar Queen</a></td><td class="ped-cell ped-gen2" rowspan="2">Apollo Rex</td><td class="ped-cell">Sun King</td></tr>
+          <tr><td class="ped-cell">Primavera</td></tr>
+          <tr><td class="ped-cell ped-gen2" rowspan="2">Luna Dream</td><td class="ped-cell">—</td></tr>
+          <tr><td class="ped-cell">—</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+
+  <!-- Kisakalenteri — koko sivun leveys -->
+  <div class="kisa-full">
+    <section>
+      <h2>Kisakalenteri</h2>
+      <table class="kisa-table">
+        <thead><tr><th>Päivämäärä</th><th>Alaisuus</th><th>Järjestäjä / Paikka</th><th>Tulos</th><th>Huomiot</th></tr></thead>
+        <tbody>
+          <tr><td>12.5.2024</td><td>SRL</td><td>Espoon RS / Espoo</td><td><span class="kisa-place">1. / 25 p</span></td><td>Nollatulos, erinomainen aika</td></tr>
+          <tr><td>3.3.2024</td><td>Uudenmaan alue</td><td>Tampereen RS / Tampere</td><td><span class="kisa-place">3. / 15 p</span></td><td>Yksi kaatuma, muuten puhdas</td></tr>
+          <tr><td>18.11.2023</td><td>SRL</td><td>Helsingin RS / Helsinki</td><td><span class="kisa-place">2. / 20 p</span></td><td></td></tr>
+          <tr><td>14.9.2023</td><td>Varsinais-Suomen alue</td><td>Turun RS / Turku</td><td><span class="kisa-place">1. / 25 p</span></td><td>Nollatulos ja paras aika</td></tr>
+          <tr><td>2.6.2023</td><td>SRL</td><td>Hyvinkään RS / Hyvinkää</td><td><span class="kisa-place">4. / 10 p</span></td><td></td></tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════ VARIANT C ═══════════════════════════════ -->
+<div id="variant-c" class="variant" style="display:none">
+  <div class="site-header">
+    <a href="#" class="site-title">Tähtihevonen</a>
+    <nav><ul class="site-nav">
+      <li><a href="#">Etusivu</a></li>
+      <li><a href="#" class="active">Hevoset</a></li>
+      <li><a href="#">Kasvatus</a></li>
+    </ul></nav>
+  </div>
+
+  <div class="profile-header">
+    <div class="profile-avatar" style="overflow:hidden"><img src="https://picsum.photos/seed/sol-hero/200/200" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;" alt="Starlite Solaris"></div>
+    <div class="profile-meta">
+      <h1>Starlite Solaris</h1>
+      <div class="callname">"Solaris"</div>
+      <div class="profile-pills">
+        <span class="profile-pill">Hanoverilainen</span>
+        <span class="profile-pill">Ori · 7 v.</span>
+        <span class="profile-pill">Esteratsastus</span>
+        <span class="profile-pill">Taso L</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="showTab('perustiedot', this)">Perustiedot</button>
+    <button class="tab-btn" onclick="showTab('kilpailut', this)">Kilpailut (3)</button>
+    <button class="tab-btn" onclick="showTab('sukutaulu', this)">Sukutaulu</button>
+    <button class="tab-btn" onclick="showTab('kuvat', this)">Kuvat (3)</button>
+  </div>
+
+  <div id="perustiedot" class="tab-panel active">
+    <div class="tab-content">
+      <div class="info-grid">
+        <div class="info-row"><dt>Rotu</dt><dd>Hanoverilainen</dd></div>
+        <div class="info-row"><dt>Sukupuoli</dt><dd>Ori</dd></div>
+        <div class="info-row"><dt>Syntymäaika</dt><dd>15.4.2017 (7 v.)</dd></div>
+        <div class="info-row"><dt>Väri</dt><dd>Raudikko</dd></div>
+        <div class="info-row"><dt>Säkäkorkeus</dt><dd>168 cm</dd></div>
+        <div class="info-row"><dt>VH-tunnus</dt><dd>FIN2017HA00042</dd></div>
+        <div class="info-row"><dt>Laji</dt><dd>Esteratsastus</dd></div>
+        <div class="info-row"><dt>Taso</dt><dd>L</dd></div>
+        <div class="info-row"><dt>Omistaja</dt><dd>Tähtihevosen Talli</dd></div>
+        <div class="info-row"><dt>Kasvattaja</dt><dd>Anna Virtanen</dd></div>
+      </div>
+      <p style="margin-top:1.5rem;font-size:.95rem;color:var(--color-text)">Lahjakas ori, joka on voittanut useita alueellisia estekisoja ja edustaa tallia kansallisella tasolla.</p>
+    </div>
+  </div>
+
+  <div id="kilpailut" class="tab-panel">
+    <div class="tab-content">
+      <table class="comp-table">
+        <thead><tr><th>Päivämäärä</th><th>Alaisuus</th><th>Järjestäjä / Paikka</th><th>Tulos</th><th>Huomiot</th></tr></thead>
+        <tbody>
+          <tr><td>12.5.2024</td><td>SRL</td><td>Espoon RS / Espoo</td><td>1. / 25 p</td><td>Nollatulos</td></tr>
+          <tr><td>3.3.2024</td><td>Uudenmaan alue</td><td>Tampereen RS / Tampere</td><td>3. / 15 p</td><td>Yksi kaatuma</td></tr>
+          <tr><td>18.11.2023</td><td>SRL</td><td>Helsingin RS / Helsinki</td><td>2. / 20 p</td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="sukutaulu" class="tab-panel">
+    <div class="tab-content">
+      <table class="ped-table">
+        <thead><tr><th>Vanhemmat</th><th>Isovanhemmat</th><th>Isoisovanhemmat</th></tr></thead>
+        <tbody>
+          <tr><td class="ped-cell ped-gen1" rowspan="4"><a href="#">Starlight Express</a></td><td class="ped-cell ped-gen2" rowspan="2"><a href="#">Grand Master</a></td><td class="ped-cell"><a href="#">Windsor Classic</a></td></tr>
+          <tr><td class="ped-cell">Bella Rosa</td></tr>
+          <tr><td class="ped-cell ped-gen2" rowspan="2">Silver Lining</td><td class="ped-cell">Midnight Star</td></tr>
+          <tr><td class="ped-cell">Lady Fair</td></tr>
+          <tr><td class="ped-cell ped-gen1" rowspan="4"><a href="#">Solar Queen</a></td><td class="ped-cell ped-gen2" rowspan="2">Apollo Rex</td><td class="ped-cell">Sun King</td></tr>
+          <tr><td class="ped-cell">Primavera</td></tr>
+          <tr><td class="ped-cell ped-gen2" rowspan="2">Luna Dream</td><td class="ped-cell">—</td></tr>
+          <tr><td class="ped-cell">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="kuvat" class="tab-panel">
+    <div class="tab-content">
+      <div class="gallery">
+        <div class="gph" onclick="openLightbox(0)" title="Avaa suuremmaksi"><img src="https://picsum.photos/seed/sol-1/400/300" alt="Kuva 1"></div>
+        <div class="gph" onclick="openLightbox(1)" title="Avaa suuremmaksi"><img src="https://picsum.photos/seed/sol-2/400/300" alt="Kuva 2"></div>
+        <div class="gph" onclick="openLightbox(2)" title="Avaa suuremmaksi"><img src="https://picsum.photos/seed/sol-3/400/300" alt="Kuva 3"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div id="lightbox" onclick="if(event.target===this)lbClose()" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.92);align-items:center;justify-content:center;gap:1rem;padding:1rem;">
+  <button onclick="lbPrev()" style="background:rgba(255,255,255,0.12);border:none;color:white;font-size:2rem;width:52px;height:52px;border-radius:50%;cursor:pointer;flex-shrink:0;line-height:1;transition:background 0.15s;" onmouseenter="this.style.background='rgba(255,255,255,0.25)'" onmouseleave="this.style.background='rgba(255,255,255,0.12)'">‹</button>
+  <div style="position:relative;">
+    <button onclick="lbClose()" style="position:absolute;top:-14px;right:-14px;background:rgba(40,20,10,0.85);border:1px solid rgba(255,255,255,0.25);color:white;font-size:.85rem;width:30px;height:30px;border-radius:50%;cursor:pointer;z-index:1;line-height:1;">✕</button>
+    <img id="lightbox-img" src="" style="max-width:88vw;max-height:80vh;border-radius:6px;object-fit:contain;display:block;box-shadow:0 8px 40px rgba(0,0,0,.6);">
+    <div id="lightbox-counter" style="text-align:center;color:rgba(255,255,255,0.5);font-family:system-ui;font-size:12px;margin-top:8px;"></div>
+  </div>
+  <button onclick="lbNext()" style="background:rgba(255,255,255,0.12);border:none;color:white;font-size:2rem;width:52px;height:52px;border-radius:50%;cursor:pointer;flex-shrink:0;line-height:1;transition:background 0.15s;" onmouseenter="this.style.background='rgba(255,255,255,0.25)'" onmouseleave="this.style.background='rgba(255,255,255,0.12)'">›</button>
+</div>
+
+<!-- Sketch toolbar -->
+<div id="sketch-tools" style="position:fixed;bottom:12px;right:12px;z-index:9999;font-family:system-ui;font-size:12px;background:rgba(0,0,0,0.75);color:white;padding:8px 12px;border-radius:8px;opacity:0.35;transition:opacity 0.2s;display:flex;gap:10px;align-items:center;" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.35'">
+  <span style="opacity:.7">002 Hevosprofiili</span>
+  <select onchange="document.querySelector('link[href*=themes]').href='../themes/'+this.value+'.css'" style="background:#222;color:white;border:none;border-radius:4px;padding:2px 6px;font-size:11px;">
+    <option value="default">Default</option>
+  </select>
+  <span style="opacity:.5">|</span>
+  <button onclick="setVp(375)" style="background:none;border:1px solid rgba(255,255,255,0.3);color:white;padding:2px 7px;border-radius:3px;font-size:11px;cursor:pointer;">📱</button>
+  <button onclick="setVp(null)" style="background:none;border:1px solid rgba(255,255,255,0.3);color:white;padding:2px 7px;border-radius:3px;font-size:11px;cursor:pointer;">🖥</button>
+</div>
+
+<script>
+function showVariant(id, btn) {
+  document.querySelectorAll('.variant').forEach(v => v.style.display = 'none');
+  document.querySelectorAll('.variant-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('variant-' + id).style.display = 'block';
+  btn.classList.add('active');
+}
+function showTab(id, btn) {
+  const variant = document.querySelector('.variant:not([style*="none"])');
+  variant.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  variant.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+function setVp(w) {
+  const els = document.querySelectorAll('#variant-b .content-layout, #variant-a main, #variant-c .tab-content');
+  els.forEach(el => el.style.maxWidth = w ? w + 'px' : '');
+}
+
+// Lightbox
+const GALLERY = [
+  'https://picsum.photos/seed/sol-1/960/680',
+  'https://picsum.photos/seed/sol-2/960/680',
+  'https://picsum.photos/seed/sol-3/680/960',
+  'https://picsum.photos/seed/sol-4/960/680',
+  'https://picsum.photos/seed/sol-5/960/680',
+];
+let lbIdx = 0;
+
+function openLightbox(idx) {
+  lbIdx = idx;
+  document.getElementById('lightbox-img').src = GALLERY[idx];
+  document.getElementById('lightbox-counter').textContent = (idx + 1) + ' / ' + GALLERY.length;
+  document.getElementById('lightbox').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function lbClose() {
+  document.getElementById('lightbox').style.display = 'none';
+  document.body.style.overflow = '';
+}
+function lbPrev() {
+  lbIdx = (lbIdx - 1 + GALLERY.length) % GALLERY.length;
+  document.getElementById('lightbox-img').src = GALLERY[lbIdx];
+  document.getElementById('lightbox-counter').textContent = (lbIdx + 1) + ' / ' + GALLERY.length;
+}
+function lbNext() {
+  lbIdx = (lbIdx + 1) % GALLERY.length;
+  document.getElementById('lightbox-img').src = GALLERY[lbIdx];
+  document.getElementById('lightbox-counter').textContent = (lbIdx + 1) + ' / ' + GALLERY.length;
+}
+document.addEventListener('keydown', e => {
+  if (document.getElementById('lightbox').style.display === 'flex') {
+    if (e.key === 'Escape') lbClose();
+    if (e.key === 'ArrowLeft') lbPrev();
+    if (e.key === 'ArrowRight') lbNext();
+  }
+});
+</script>
+</body>
+</html>
