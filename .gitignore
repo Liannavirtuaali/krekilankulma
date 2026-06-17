@@ -1,0 +1,13 @@
+# Ympäristömuuttujat (ei versionhallintaan — sisältää salasanoja)
+.env
+
+# Docker-tilavuudet
+docker/data/
+
+# macOS
+.DS_Store
+
+# Uploads (hevosten kuvat — ei versionhallintaan, paitsi README)
+public/uploads/*
+!public/uploads/README.txt
+!public/uploads/.gitkeep

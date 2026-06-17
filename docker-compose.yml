@@ -1,0 +1,68 @@
+services:
+  # PHP 8.2 + Apache — vastaa Altervistan ympäristöä
+  web:
+    build: ./docker
+    container_name: virtuaalitalli-web
+    ports:
+      - "8080:80"
+    volumes:
+      - ./public:/var/www/html
+      - ./docker/php.ini:/usr/local/etc/php/conf.d/custom.ini
+    environment:
+      - DB_HOST=db
+      - DB_NAME=${DB_NAME:-virtuaalitalli}
+      - DB_USER=${DB_USER:-vt_user}
+      - DB_PASS=${DB_PASS:-vt_password}
+      - SITE_URL=http://localhost:8080
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - vt_network
+
+  # MySQL 8 — vastaa Altervistan MySQL-versiota
+  db:
+    image: mysql:8.0
+    container_name: virtuaalitalli-db
+    restart: unless-stopped
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS:-root_password}
+      MYSQL_DATABASE: ${DB_NAME:-virtuaalitalli}
+      MYSQL_USER: ${DB_USER:-vt_user}
+      MYSQL_PASSWORD: ${DB_PASS:-vt_password}
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASS:-root_password}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - vt_network
+
+  # phpMyAdmin — helppo DB-hallinta
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: virtuaalitalli-phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: ${DB_USER:-vt_user}
+      PMA_PASSWORD: ${DB_PASS:-vt_password}
+    depends_on:
+      - db
+    networks:
+      - vt_network
+
+volumes:
+  db_data:
+
+networks:
+  vt_network:
+    driver: bridge

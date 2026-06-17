@@ -1,0 +1,10 @@
+# Estä suora HTTP-pääsy konfiguraatiotiedostoihin
+<Files "config.php">
+    Order Deny,Allow
+    Deny from all
+</Files>
+
+<Files "db.php">
+    Order Deny,Allow
+    Deny from all
+</Files>

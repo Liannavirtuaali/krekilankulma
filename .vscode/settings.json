@@ -1,0 +1,68 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^node \"\\$HOME/\\.copilot/gsd-core/bin/gsd-tools\\.cjs\" query init\\.new-project 2>/dev/null \\| head -80$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "git init": true,
+        "mkdir": true,
+        "git add": true,
+        "git commit": true,
+        "/^node \"\\$HOME/\\.copilot/gsd-core/bin/gsd-tools\\.cjs\" query init\\.plan-phase 1 2>/dev/null$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^node \"\\$HOME/\\.copilot/gsd-core/bin/gsd-tools\\.cjs\" query roadmap\\.get-phase 1 2>/dev/null$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^node \"\\$HOME/\\.copilot/gsd-core/bin/gsd-tools\\.cjs\" query roadmap\\.get-phase 1 --debug 2>&1 \\| head -30$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^node \"\\$HOME/\\.copilot/gsd-core/bin/gsd-tools\\.cjs\" query roadmap\\.list 2>/dev/null$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^node \"\\$HOME/\\.copilot/gsd-core/bin/gsd-tools\\.cjs\" help 2>/dev/null \\| head -40$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^node \"\\$HOME/\\.copilot/gsd-core/bin/gsd-tools\\.cjs\" query init\\.phase-op 1 2>/dev/null$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^ls \\.planning/phases/01-perusta-tietokantarakenne/ 2>/dev/null && echo \"---\" && node \"\\$HOME/\\.copilot/gsd-core/bin/gsd-tools\\.cjs\" query todo\\.match-phase 1 2>/dev/null$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^node \"\\$HOME/\\.copilot/gsd-core/bin/gsd-tools\\.cjs\" query init\\.execute-phase 1 2>/dev/null$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "touch": true,
+        "/^php -l public/src/includes/config\\.php && php -l public/src/includes/nav\\.php && php -l public/src/includes/header\\.php && php -l public/src/includes/footer\\.php && php -l public/src/includes/helpers\\.php && echo \"---\" && cat public/src/includes/\\.htaccess \\| grep \"Deny from all\" && echo \"htaccess OK\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "brew": true,
+        "cp": true,
+        "docker compose": true,
+        "/^_GSD_SHIM_NAME=\"gsd-tools\\.cjs\"; GSD_TOOLS=\"\\$HOME/\\.copilot/gsd-core/bin/\\$\\{_GSD_SHIM_NAME\\}\"; node \"\\$GSD_TOOLS\" query init\\.plan-phase 2$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^mkdir -p \\.planning/phases/02-julkiset-sivut && node \"\\$HOME/\\.copilot/gsd-core/bin/gsd-tools\\.cjs\" query agent-skills gsd-planner$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^node \"\\$HOME/\\.copilot/gsd-core/bin/gsd-tools\\.cjs\" query agent-skills gsd-planner 2>&1 && echo \"---\" && node \"\\$HOME/\\.copilot/gsd-core/bin/gsd-tools\\.cjs\" query agent-skills gsd-plan-checker 2>&1$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^node \"\\$HOME/\\.copilot/gsd-core/bin/gsd-tools\\.cjs\" query init\\.execute-phase 2 2>&1$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

@@ -1,0 +1,13 @@
+# Altervista virtuaalitalli — pääkonfiguraatio
+Options -Indexes
+
+# Estä suora pääsy src/-kansioon
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^src/ - [F,L]
+</IfModule>
+
+# PHP-virheiden piilotus tuotannossa (tietoturva)
+# php_flag display_errors Off
+# php_flag log_errors On
+# (Uncomment the above if your Altervista plan supports php_flag in .htaccess)
