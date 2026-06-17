@@ -13,7 +13,22 @@ Options -Indexes
     RewriteRule ^pages/horse/([^/]+)/?$ /pages/hevonen.php?slug=$1 [L,QSA]
 </IfModule>
 
+# Tietoturva: Estä suora pääsy arkaluonteisiin tiedostoihin
+<FilesMatch "^(config|\.env|\.git|\.htaccess|README|package\.json|composer\.json)">
+    Deny from all
+</FilesMatch>
+
+# Estä PHP:n suoritus ladattujen tiedostojen kansioissa
+<Directory "uploads">
+    <IfModule mod_php.c>
+        php_flag engine off
+    </IfModule>
+    <FilesMatch "\.ph(p[3-7]?|ar|ps)$">
+        Deny from all
+    </FilesMatch>
+</Directory>
+
 # PHP-virheiden piilotus tuotannossa (tietoturva)
-# php_flag display_errors Off
-# php_flag log_errors On
-# (Uncomment the above if your Altervista plan supports php_flag in .htaccess)
+php_flag display_errors Off
+php_flag display_startup_errors Off
+php_value log_errors On
