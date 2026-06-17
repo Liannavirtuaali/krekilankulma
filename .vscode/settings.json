@@ -63,6 +63,19 @@
         "/^node \"\\$HOME/\\.copilot/gsd-core/bin/gsd-tools\\.cjs\" query init\\.execute-phase 2 2>&1$/": {
             "approve": true,
             "matchCommandLine": true
+        },
+        "/^node \"\\$HOME/\\.copilot/gsd-core/bin/gsd-tools\\.cjs\" query init\\.plan-phase 3 2>&1$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^node \"\\$HOME/\\.copilot/gsd-core/bin/gsd-tools\\.cjs\" query init\\.execute-phase 3 2>&1$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "printf": true,
+        "/^php -l public/admin/horses\\.php && php -l public/admin/horse_add\\.php && php -l public/admin/horse_edit\\.php && php -l public/admin/horse_delete\\.php$/": {
+            "approve": true,
+            "matchCommandLine": true
         }
     }
 }
