@@ -1,0 +1,128 @@
+<?php
+require_once __DIR__ . '/../src/includes/db.php';
+requireLogin();
+
+$horse_id = (int)($_GET['horse_id'] ?? 0);
+if ($horse_id <= 0) {
+    redirect(SITE_URL . '/admin/horses.php');
+}
+
+$db = getDB();
+$horseStmt = $db->prepare('SELECT id, name FROM horses WHERE id = :id AND is_deleted = 0');
+$horseStmt->execute([':id' => $horse_id]);
+$horse = $horseStmt->fetch();
+if (!$horse) {
+    redirect(SITE_URL . '/admin/horses.php');
+}
+
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+$error   = '';
+$success = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+        $error = 'Virheellinen pyyntö.';
+    } else {
+        // Tarkista max kuvamäärä
+        $countStmt = $db->prepare('SELECT COUNT(*) FROM horse_photos WHERE horse_id = :horse_id');
+        $countStmt->execute([':horse_id' => $horse_id]);
+        $photoCount = (int)$countStmt->fetchColumn();
+
+        if ($photoCount >= MAX_PHOTOS_PER_HORSE) {
+            $error = 'Hevosella on jo ' . MAX_PHOTOS_PER_HORSE . ' kuvaa. Poista ensin vanha kuva.';
+        } elseif (!isset($_FILES['photo']) || $_FILES['photo']['error'] !== UPLOAD_ERR_OK) {
+            $error = 'Tiedoston lataus epäonnistui. Tarkista tiedosto ja yritä uudelleen.';
+        } elseif ($_FILES['photo']['size'] > MAX_UPLOAD_SIZE) {
+            $error = 'Tiedosto on liian suuri (max 5 Mt).';
+        } else {
+            // MIME-tarkistus finfo_file():llä
+            $finfo = new finfo(FILEINFO_MIME_TYPE);
+            $mime  = $finfo->file($_FILES['photo']['tmp_name']);
+            $ext   = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
+
+            if (!in_array($mime, ALLOWED_MIME_TYPES, true)) {
+                $error = 'Kelpaamaton tiedostotyyppi. Sallitut: JPEG, PNG, GIF, WebP.';
+            } elseif (!in_array($ext, ALLOWED_EXTENSIONS, true)) {
+                $error = 'Kelpaamaton tiedostopääte. Sallitut: jpg, jpeg, png, gif, webp.';
+            } else {
+                $filename = uniqid('img_', true) . '.' . $ext;
+                $dest     = UPLOADS_DIR . $filename;
+
+                if (!move_uploaded_file($_FILES['photo']['tmp_name'], $dest)) {
+                    $error = 'Tiedoston tallentaminen epäonnistui.';
+                } else {
+                    $maxOrderStmt = $db->prepare('SELECT MAX(sort_order) FROM horse_photos WHERE horse_id = :horse_id');
+                    $maxOrderStmt->execute([':horse_id' => $horse_id]);
+                    $nextOrder = (int)$maxOrderStmt->fetchColumn() + 1;
+
+                    $insStmt = $db->prepare(
+                        'INSERT INTO horse_photos (horse_id, filename, original_name, sort_order)
+                         VALUES (:horse_id, :filename, :original_name, :sort_order)'
+                    );
+                    $insStmt->execute([
+                        ':horse_id'      => $horse_id,
+                        ':filename'      => $filename,
+                        ':original_name' => sanitize($_FILES['photo']['name']),
+                        ':sort_order'    => $nextOrder,
+                    ]);
+                    redirect(SITE_URL . '/admin/photos.php?horse_id=' . $horse_id . '&uploaded=1');
+                }
+            }
+        }
+    }
+}
+
+// Hae nykyiset kuvat
+$photosStmt = $db->prepare('SELECT id, filename, original_name, sort_order FROM horse_photos WHERE horse_id = :horse_id ORDER BY sort_order ASC');
+$photosStmt->execute([':horse_id' => $horse_id]);
+$photos = $photosStmt->fetchAll();
+
+if (isset($_GET['uploaded'])) $success = 'Kuva ladattu.';
+if (isset($_GET['deleted']))  $success = 'Kuva poistettu.';
+
+$pageTitle = 'Kuvat — ' . $horse['name'];
+require __DIR__ . '/includes/admin_header.php';
+?>
+<h1>Kuvat — <?= e($horse['name']) ?></h1>
+<p><a href="<?= e(SITE_URL) ?>/admin/horses.php">← Takaisin hevoslistaan</a></p>
+
+<?php if ($error):   ?><p class="flash-err"><?= e($error) ?></p><?php endif; ?>
+<?php if ($success): ?><p class="flash-ok"><?= e($success) ?></p><?php endif; ?>
+
+<?php if ($photos): ?>
+<div style="display:flex;flex-wrap:wrap;gap:1rem;margin:1rem 0">
+  <?php foreach ($photos as $photo): ?>
+    <div style="border:1px solid #e0d5c5;border-radius:4px;padding:0.5rem;text-align:center;max-width:160px">
+      <img src="<?= e(UPLOADS_URL . $photo['filename']) ?>" alt="<?= e($photo['original_name']) ?>"
+           style="max-width:140px;max-height:100px;object-fit:cover;display:block;margin:0 auto 0.4rem">
+      <small style="display:block;color:#888;word-break:break-all"><?= e($photo['original_name']) ?></small>
+      <form method="post" action="<?= e(SITE_URL) ?>/admin/photo_delete.php" style="margin-top:0.4rem">
+        <input type="hidden" name="csrf_token" value="<?= e($_SESSION['csrf_token']) ?>">
+        <input type="hidden" name="photo_id"  value="<?= (int)$photo['id'] ?>">
+        <input type="hidden" name="horse_id"  value="<?= (int)$horse_id ?>">
+        <button type="submit" class="btn-sm btn-danger" onclick="return confirm('Poistetaanko kuva?')">Poista</button>
+      </form>
+    </div>
+  <?php endforeach; ?>
+</div>
+<?php else: ?>
+  <p>Ei kuvia vielä.</p>
+<?php endif; ?>
+
+<?php if (count($photos) < MAX_PHOTOS_PER_HORSE): ?>
+<h3>Lataa uusi kuva</h3>
+<form method="post" enctype="multipart/form-data" action="">
+  <input type="hidden" name="csrf_token" value="<?= e($_SESSION['csrf_token']) ?>">
+  <div class="form-group" style="max-width:400px">
+    <label for="photo">Kuvatiedosto (JPEG, PNG, GIF, WebP — max 5 Mt)</label>
+    <input type="file" id="photo" name="photo" accept="image/*" required>
+  </div>
+  <button type="submit" class="btn">Lataa kuva</button>
+</form>
+<?php else: ?>
+  <p class="flash-err">Hevosella on jo <?= MAX_PHOTOS_PER_HORSE ?> kuvaa. Poista vanha kuva ennen uuden lataamista.</p>
+<?php endif; ?>
+<?php require __DIR__ . '/includes/admin_footer.php'; ?>
