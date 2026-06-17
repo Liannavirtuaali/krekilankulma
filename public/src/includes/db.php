@@ -59,10 +59,22 @@ require_once __DIR__ . '/helpers.php';
 
 // Käynnistä session (jos ei jo käynnissä)
 if (session_status() === PHP_SESSION_NONE) {
+    // Session-asetukset turvallisuuden parantamiseksi
+    
+    // Aseta session timeout 30 minuuttiin
+    ini_set('session.gc_maxlifetime', 1800);
+    
+    // Ota secure-lippu käyttöön HTTPS-yhteydessä
+    // Paikallisesti (localhost) suoritetaan HTTP:lla, joten skip-tarkistus tarvitaan
+    $isProduction = !in_array(
+        $_SERVER['HTTP_HOST'] ?? '',
+        ['localhost', '127.0.0.1', 'localhost:8000', '127.0.0.1:8000']
+    );
+    
     session_name(SESSION_NAME ?? 'vt_session');
     session_start([
-        'cookie_httponly' => true,
-        'cookie_samesite' => 'Strict',
-        // 'cookie_secure' => true, // Ota käyttöön kun HTTPS käytössä
+        'cookie_httponly' => true,           // JavaScript ei pääse käsiksi
+        'cookie_samesite' => 'Strict',       // CSRF-suojaus
+        'cookie_secure' => $isProduction,    // HTTPS-yhteydellä käytetään
     ]);
 }

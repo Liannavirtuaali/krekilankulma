@@ -6,16 +6,11 @@ if (isLoggedIn()) {
     redirect(SITE_URL . '/admin/index.php');
 }
 
-// Generoi CSRF-token jos ei ole
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // CSRF-tarkistus
-    if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+    // CSRF-tarkistus käyttäen helper-funktiota
+    if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
         $error = 'Virheellinen pyyntö.';
     } else {
         $username = sanitize($_POST['username'] ?? '');
@@ -61,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <p class="error"><?= e($error) ?></p>
   <?php endif; ?>
   <form method="post" action="">
-    <input type="hidden" name="csrf_token" value="<?= e($_SESSION['csrf_token']) ?>">
+    <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
     <div class="form-group">
       <label for="username">Käyttäjätunnus</label>
       <input type="text" id="username" name="username" autocomplete="username" required>
