@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS `horses` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   -- Perustiedot
   `name` VARCHAR(150) NOT NULL COMMENT 'Virallinen nimi',
+  `slug` VARCHAR(200) DEFAULT NULL COMMENT 'URL-tunniste (haetaan /pages/horse/slug)',
   `call_name` VARCHAR(100) DEFAULT NULL COMMENT 'Kutsumanimi',
   `breed` VARCHAR(100) DEFAULT NULL COMMENT 'Rotu',
   `birth_date` DATE DEFAULT NULL COMMENT 'Syntymäpäivä',
@@ -69,6 +70,7 @@ CREATE TABLE IF NOT EXISTS `horses` (
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_horses_slug` (`slug`),
   KEY `idx_horses_sire` (`sire_id`),
   KEY `idx_horses_dam` (`dam_id`),
   KEY `idx_horses_deleted` (`is_deleted`),

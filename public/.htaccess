@@ -4,7 +4,13 @@ Options -Indexes
 # Estä suora pääsy src/-kansioon
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    RewriteBase /
+
+    # Estä suora pääsy src/-kansioon
     RewriteRule ^src/ - [F,L]
+
+    # Hevosen profiilisivu kauniin URL:n kautta: /pages/horse/slug
+    RewriteRule ^pages/horse/([^/]+)/?$ /pages/hevonen.php?slug=$1 [L,QSA]
 </IfModule>
 
 # PHP-virheiden piilotus tuotannossa (tietoturva)

@@ -6,7 +6,7 @@ $page_title = 'Etusivu';
 // Hae 3 viimeisintä tallin hevosta ensimmäisellä kuvalla
 $db = getDB();
 $stmt = $db->prepare(
-    'SELECT h.id, h.name, h.breed, h.gender,
+    'SELECT h.id, h.name, h.slug, h.breed, h.gender,
             hp.filename
      FROM horses h
      LEFT JOIN horse_photos hp
@@ -43,7 +43,7 @@ $genderFi = ['ori' => 'Ori', 'tamma' => 'Tamma', 'ruuna' => 'Ruuna', 'käkky' =>
               <div class="horse-card-placeholder">🐴</div>
             <?php endif; ?>
             <div class="horse-card-info">
-              <h3><a href="<?= e(SITE_URL . '/pages/hevonen.php?id=' . (int)$horse['id']) ?>"><?= e($horse['name']) ?></a></h3>
+              <h3><a href="<?= e(horseUrl($horse)) ?>"><?= e($horse['name']) ?></a></h3>
               <?php if ($horse['breed']): ?><p><?= e($horse['breed']) ?></p><?php endif; ?>
               <p><?= e($genderFi[$horse['gender']] ?? $horse['gender']) ?></p>
             </div>

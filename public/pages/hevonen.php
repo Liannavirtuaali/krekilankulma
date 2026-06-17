@@ -1,9 +1,31 @@
 <?php
 require_once __DIR__ . '/../src/includes/db.php';
 
-// Validoi GET-parametri (OWASP A03 — SQL-injektiosuojaus)
-$id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-if ($id <= 0) {
+$db = getDB();
+
+// Hae hevonen slugin tai id:n perusteella
+if (!empty($_GET['slug'])) {
+    $slug = preg_replace('/[^a-z0-9\-]/', '', strtolower(trim($_GET['slug'])));
+    $stmt = $db->prepare(
+        'SELECT h.*, d.name AS discipline_name, l.name AS level_name
+         FROM horses h
+         LEFT JOIN disciplines d ON d.id = h.discipline_id
+         LEFT JOIN levels l ON l.id = h.level_id
+         WHERE h.slug = :slug AND h.is_deleted = 0'
+    );
+    $stmt->execute([':slug' => $slug]);
+} elseif (!empty($_GET['id'])) {
+    // Taaksepäin yhteensopivuus vanhoille linkeille
+    $id = (int)$_GET['id'];
+    $stmt = $db->prepare(
+        'SELECT h.*, d.name AS discipline_name, l.name AS level_name
+         FROM horses h
+         LEFT JOIN disciplines d ON d.id = h.discipline_id
+         LEFT JOIN levels l ON l.id = h.level_id
+         WHERE h.id = :id AND h.is_deleted = 0'
+    );
+    $stmt->execute([':id' => $id]);
+} else {
     http_response_code(404);
     $page_title = 'Hevosta ei löydy';
     require __DIR__ . '/../src/includes/header.php';
@@ -12,16 +34,6 @@ if ($id <= 0) {
     exit;
 }
 
-// Hae hevonen
-$db = getDB();
-$stmt = $db->prepare(
-    'SELECT h.*, d.name AS discipline_name, l.name AS level_name
-     FROM horses h
-     LEFT JOIN disciplines d ON d.id = h.discipline_id
-     LEFT JOIN levels l ON l.id = h.level_id
-     WHERE h.id = :id AND h.is_deleted = 0'
-);
-$stmt->execute([':id' => $id]);
 $horse = $stmt->fetch();
 
 if (!$horse) {
@@ -33,6 +45,7 @@ if (!$horse) {
     exit;
 }
 
+$id = (int)$horse['id'];
 $page_title = $horse['name'];
 
 // Hae kilpailut
@@ -67,7 +80,7 @@ function pedigreeHorseLink(array $h): string {
         }
         return e($h['name']);
     }
-    return '<a href="' . e(SITE_URL . '/pages/hevonen.php?id=' . (int)$h['id']) . '">' . e($h['name']) . '</a>';
+    return '<a href="' . e(horseUrl($h)) . '">' . e($h['name']) . '</a>';
 }
 ?>
 <main>

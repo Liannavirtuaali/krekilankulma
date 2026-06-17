@@ -18,6 +18,26 @@ function sanitize(string $value): string {
 }
 
 /**
+ * Luo URL-turvallisen slugin hevosen nimestä
+ * Esim: "Testiponi Tähti" → "testiponi-tahti"
+ */
+function slugify(string $text): string {
+    $text = mb_strtolower($text, 'UTF-8');
+    $text = strtr($text, ['ä' => 'a', 'ö' => 'o', 'å' => 'a', 'ü' => 'u', 'á' => 'a', 'é' => 'e', 'ó' => 'o']);
+    $text = preg_replace('/[^a-z0-9\s-]/', '', $text);
+    $text = preg_replace('/[\s_]+/', '-', $text);
+    return trim($text, '-');
+}
+
+/**
+ * Palauttaa hevosen profiilisivun URL:n slugin perusteella
+ */
+function horseUrl(array $horse): string {
+    $slug = $horse['slug'] ?? slugify($horse['name']);
+    return SITE_URL . '/pages/horse/' . rawurlencode($slug);
+}
+
+/**
  * Ohjaa käyttäjä toiselle sivulle ja pysäyttää skriptin
  */
 function redirect(string $url): never {

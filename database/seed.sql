@@ -14,16 +14,16 @@ INSERT INTO `admin_users` (`username`, `password`) VALUES
 -- HUOM: Tämä on TESTISALASANA. Generoi uusi tiiviste ennen tuotantoon siirtoa!
 
 -- Hevonen 1: Isoisä (ulkopuolinen, evm=1, asuu muualla)
-INSERT INTO `horses` (`id`, `name`, `call_name`, `breed`, `birth_date`, `gender`, `color`, `evm`, `profile_url`) VALUES
-  (1, 'Testiori Suuri', 'Testi', 'Suomenhevonen', '2005-03-15', 'ori', 'Kirjokirjava', 1, 'https://esimerkki.altervista.org/pages/hevonen.php?id=1');
+INSERT INTO `horses` (`id`, `name`, `slug`, `call_name`, `breed`, `birth_date`, `gender`, `color`, `evm`, `profile_url`) VALUES
+  (1, 'Testiori Suuri', 'testiori-suuri', 'Testi', 'Suomenhevonen', '2005-03-15', 'ori', 'Kirjokirjava', 1, 'https://esimerkki.altervista.org/pages/hevonen.php?id=1');
 
 -- Hevonen 2: Isä (ulkopuolinen, asuu muualla)
-INSERT INTO `horses` (`id`, `name`, `call_name`, `breed`, `birth_date`, `gender`, `color`, `sire_id`, `evm`, `profile_url`) VALUES
-  (2, 'Testijunkkari', 'Junkku', 'Suomenhevonen', '2012-05-22', 'ori', 'Rautias', 1, 1, 'https://esimerkki.altervista.org/pages/hevonen.php?id=2');
+INSERT INTO `horses` (`id`, `name`, `slug`, `call_name`, `breed`, `birth_date`, `gender`, `color`, `sire_id`, `evm`, `profile_url`) VALUES
+  (2, 'Testijunkkari', 'testijunkkari', 'Junkku', 'Suomenhevonen', '2012-05-22', 'ori', 'Rautias', 1, 1, 'https://esimerkki.altervista.org/pages/hevonen.php?id=2');
 
 -- Hevonen 3: Tämän tallin hevonen (jälkeläinen)
-INSERT INTO `horses` (`id`, `name`, `call_name`, `breed`, `birth_date`, `gender`, `color`, `height_cm`, `vh_id`, `discipline_id`, `level_id`, `owner_name`, `owner_email`, `breeder_name`, `sire_id`, `description`, `evm`) VALUES
-  (3, 'Testiponi Tähti', 'Tähti', 'Suomenhevonen', '2018-07-10', 'tamma', 'Ruunikko', 145, 'VH-2018-12345', 1, 1, 'Maija Meikäläinen', 'maija@esimerkki.fi', 'Virtanen Oy', 2, 'Rauhallinen ja luotettava tamma. Sopii hyvin aloittelijoille.', 0);
+INSERT INTO `horses` (`id`, `name`, `slug`, `call_name`, `breed`, `birth_date`, `gender`, `color`, `height_cm`, `vh_id`, `discipline_id`, `level_id`, `owner_name`, `owner_email`, `breeder_name`, `sire_id`, `description`, `evm`) VALUES
+  (3, 'Testiponi Tähti', 'testiponi-tahti', 'Tähti', 'Suomenhevonen', '2018-07-10', 'tamma', 'Ruunikko', 145, 'VH-2018-12345', 1, 1, 'Maija Meikäläinen', 'maija@esimerkki.fi', 'Virtanen Oy', 2, 'Rauhallinen ja luotettava tamma. Sopii hyvin aloittelijoille.', 0);
 
 -- Kilpailu testihevoselle
 INSERT INTO `competitions` (`horse_id`, `competition_name`, `competition_date`, `placement`, `points`, `notes`) VALUES
