@@ -10,7 +10,7 @@ SET CHARACTER SET utf8mb4;
 -- Generoi oikea tiiviste PHP:llä: echo password_hash('oma_salasana', PASSWORD_BCRYPT, ['cost' => 12]);
 -- Alla oleva hash on esimerkki — generoi oma ennen tuotantoon siirtoa.
 INSERT INTO `admin_users` (`username`, `password`) VALUES
-  ('admin', '$2y$12$LGkXiXtV3H8MHKB.ZBKfuOb5N/xLDq5Ek3WK3NQ7nDnv9l0G6lhBe');
+  ('admin', '$2y$12$YMaQagVb65uBPLePlpiX2OMLMzcdjcMF5ytFLzahRjZKiHUGOwfoq');
 -- HUOM: Tämä on TESTISALASANA. Generoi uusi tiiviste ennen tuotantoon siirtoa!
 
 -- Hevonen 1: Isoisä (ulkopuolinen, evm=1, asuu muualla)
