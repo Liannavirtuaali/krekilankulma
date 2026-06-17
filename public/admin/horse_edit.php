@@ -36,6 +36,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($f['name'] === '') {
             $errors[] = 'Nimi on pakollinen.';
         }
+        if ($f['owner_email'] !== '') {
+            $r = validate_email($f['owner_email']);
+            if (!$r['valid']) $errors[] = 'Omistajan ' . strtolower($r['error']);
+            else $f['owner_email'] = $r['value'];
+        }
+        if ($f['breeder_email'] !== '') {
+            $r = validate_email($f['breeder_email']);
+            if (!$r['valid']) $errors[] = 'Kasvattajan ' . strtolower($r['error']);
+            else $f['breeder_email'] = $r['value'];
+        }
+        if ($f['importer_email'] !== '') {
+            $r = validate_email($f['importer_email']);
+            if (!$r['valid']) $errors[] = 'Tuojan ' . strtolower($r['error']);
+            else $f['importer_email'] = $r['value'];
+        }
+        if ($f['profile_url'] !== '' && filter_var($f['profile_url'], FILTER_VALIDATE_URL) === false) {
+            $errors[] = 'Profiililinkki ei ole kelvollinen URL.';
+        }
 
         if (empty($errors)) {
             // Regeneroi slug vain jos nimi muuttui

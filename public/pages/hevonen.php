@@ -75,7 +75,7 @@ $genderFi = ['ori' => 'Ori', 'tamma' => 'Tamma', 'ruuna' => 'Ruuna', 'käkky' =>
 function pedigreeHorseLink(array $h): string {
     if ($h['evm']) {
         if (!empty($h['profile_url'])) {
-            $safeUrl = preg_match('#^https?://#i', $h['profile_url']) ? $h['profile_url'] : '#';
+            $safeUrl = filter_var($h['profile_url'], FILTER_VALIDATE_URL) !== false ? $h['profile_url'] : '#';
             return '<a href="' . e($safeUrl) . '" target="_blank" rel="noopener">' . e($h['name']) . '</a>';
         }
         return e($h['name']);
