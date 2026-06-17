@@ -3,6 +3,9 @@
 -- Aja schema.sql:n jälkeen!
 -- ============================================================
 
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
+
 -- Admin-käyttäjä (salasana: admin123 — vaihda tuotantoon!)
 -- Generoi oikea tiiviste PHP:llä: echo password_hash('oma_salasana', PASSWORD_BCRYPT, ['cost' => 12]);
 -- Alla oleva hash on esimerkki — generoi oma ennen tuotantoon siirtoa.
