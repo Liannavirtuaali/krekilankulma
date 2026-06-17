@@ -15,10 +15,6 @@ if (!$horse) {
     redirect(SITE_URL . '/admin/horses.php');
 }
 
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
 $allHorses   = $db->query('SELECT id, name FROM horses WHERE is_deleted = 0 ORDER BY name')->fetchAll();
 $disciplines = $db->query('SELECT id, name FROM disciplines ORDER BY name')->fetchAll();
 $levels      = $db->query('SELECT id, name FROM levels ORDER BY name')->fetchAll();
@@ -27,7 +23,7 @@ $errors = [];
 $f = $horse; // prefill from DB
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+    if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
         $errors[] = 'Virheellinen pyyntö.';
     } else {
         $fields = ['name','call_name','vh_id','breed','birth_date','gender','color','height_cm',
@@ -107,7 +103,7 @@ require __DIR__ . '/includes/admin_header.php';
   <ul class="flash-err"><?php foreach ($errors as $e_msg): ?><li><?= e($e_msg) ?></li><?php endforeach; ?></ul>
 <?php endif; ?>
 <form method="post" action="">
-  <input type="hidden" name="csrf_token" value="<?= e($_SESSION['csrf_token']) ?>">
+  <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
   <input type="hidden" name="id" value="<?= (int)$id ?>">
 
   <div class="form-row">

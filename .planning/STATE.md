@@ -11,7 +11,7 @@
 | Phase 1 — Perusta & DB | ✅ Complete | 2026-06-17 | 2026-06-17 |
 | Phase 2 — Julkiset sivut | ✅ Complete | 2026-06-17 | 2026-06-17 |
 | Phase 3 — Admin-paneeli | ✅ Complete | 2026-06-17 | 2026-06-17 |
-| Phase 4 — Tietoturva & Deploy | 🔲 Not started | — | — |
+| Phase 4 — Tietoturva & Deploy | ⏳ In progress | 2026-06-17 | — |
 
 ## Configuration
 

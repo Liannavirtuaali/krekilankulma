@@ -15,10 +15,6 @@ if (!$horse) {
     redirect(SITE_URL . '/admin/horses.php');
 }
 
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
 $edit_id = (int)($_GET['edit'] ?? 0);
 $errors  = [];
 $flash   = '';
@@ -28,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action  = $_POST['action'] ?? '';
     $comp_id = (int)($_POST['comp_id'] ?? 0);
 
-    if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+    if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
         $errors[] = 'Virheellinen pyyntö.';
     } else {
         if ($action === 'add') {
@@ -145,7 +141,7 @@ require __DIR__ . '/includes/admin_header.php';
 
 <h3><?= $editComp ? 'Muokkaa kilpailua' : 'Lisää kilpailu' ?></h3>
 <form method="post" action="?horse_id=<?= $horse_id ?>">
-  <input type="hidden" name="csrf_token" value="<?= e($_SESSION['csrf_token']) ?>">
+  <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
   <input type="hidden" name="action"  value="<?= $editComp ? 'edit' : 'add' ?>">
   <?php if ($editComp): ?><input type="hidden" name="comp_id" value="<?= (int)$editComp['id'] ?>"><?php endif; ?>
 

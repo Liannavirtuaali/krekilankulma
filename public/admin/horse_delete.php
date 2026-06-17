@@ -7,7 +7,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     redirect(SITE_URL . '/admin/horses.php');
 }
 
-if (!hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'] ?? '')) {
+// Tarkista CSRF-token
+if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
     redirect(SITE_URL . '/admin/horses.php');
 }
 
