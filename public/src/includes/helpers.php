@@ -303,3 +303,77 @@ function generate_safe_filename(string $extension): string {
     $name = bin2hex(random_bytes(16));
     return $name . '.' . strtolower($extension);
 }
+
+/**
+ * Validoi kuvan latausyrityksen
+ * Tarkistaa tiedostotyypin, koon ja tiedostopääteen
+ *
+ * @param array $file_array $_FILES['fieldname'] array
+ * @param int $max_size_bytes Maksimikoko tavuissa (oletus: 5 MB)
+ * @return array ['valid' => bool, 'error' => string|null]
+ */
+function validate_image_upload(array $file_array, int $max_size_bytes = 5242880): array {
+    // Sallitut MIME-tyypit
+    $allowed_mimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    // Sallitut tiedostopäätteet
+    $allowed_exts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    // Kielletyt PHP-päätteet
+    $blocked_exts = ['php', 'phtml', 'php3', 'php4', 'php5', 'php7', 'phar', 'pht'];
+    
+    // Tarkista upload-virheet
+    if ($file_array['error'] !== UPLOAD_ERR_OK) {
+        return [
+            'valid' => false,
+            'error' => 'Latausvirhe: ' . (
+                $file_array['error'] === UPLOAD_ERR_INI_SIZE ? 'Tiedosto on liian suuri.' :
+                ($file_array['error'] === UPLOAD_ERR_FORM_SIZE ? 'Tiedosto on liian suuri.' :
+                ($file_array['error'] === UPLOAD_ERR_PARTIAL ? 'Lataus keskeytyi.' :
+                'Tuntematon virhe.'))
+            )
+        ];
+    }
+    
+    // Tarkista tiedoston koko
+    if ($file_array['size'] > $max_size_bytes) {
+        return [
+            'valid' => false,
+            'error' => 'Tiedosto on liian suuri (max 5 Mt).'
+        ];
+    }
+    
+    // Tarkista MIME-tyyppi finfo_file():llä (luotettavampi kuin $_FILES['type'])
+    if (function_exists('finfo_file')) {
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $file_array['tmp_name']);
+        finfo_close($finfo);
+        
+        if (!in_array($mime, $allowed_mimes)) {
+            return [
+                'valid' => false,
+                'error' => 'Tiedostotyyppi ei ole kelvollinen kuva.'
+            ];
+        }
+    }
+    
+    // Tarkista tiedostopääte
+    $ext = strtolower(pathinfo($file_array['name'], PATHINFO_EXTENSION));
+    if (!in_array($ext, $allowed_exts)) {
+        return [
+            'valid' => false,
+            'error' => 'Tiedostopääte ei ole kelvollinen (sallitut: ' . implode(', ', $allowed_exts) . ').'
+        ];
+    }
+    
+    // Torju PHP-tiedostot
+    if (in_array($ext, $blocked_exts)) {
+        return [
+            'valid' => false,
+            'error' => 'PHP-tiedostoja ei sallita.'
+        ];
+    }
+    
+    return [
+        'valid' => true,
+        'error' => null
+    ];
+}
