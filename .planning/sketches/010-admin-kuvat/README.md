@@ -6,6 +6,6 @@
 - **A: Ruudukko + latauslaatikko** — Suuri drag-and-drop dropzone ensin, sitten isommat kuvaruudut hover-toiminnoilla ja lightboxilla.
 - **B: Kompakti ruudukko + järjestys** — Tiheämpi 1:1-ruudukko, järjestysnumero näkyvissä, profiilikuvan merkintä, "Lisää kuva" headerissa.
 
-**Voittaja:** TBD
+**Voittaja:** B: Kompakti ruudukko + järjestys ★
 
 **Tagit:** admin, kuvat, photos, upload, dropzone, grid
