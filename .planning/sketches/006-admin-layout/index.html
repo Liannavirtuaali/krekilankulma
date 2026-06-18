@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>006 — Admin Shell Layout</title>
+  <link rel="stylesheet" href="../themes/default.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--color-bg); font-family: var(--font-sans); font-size: var(--text-sm); color: var(--color-text); }
+
+    /* ── VARIANT NAV ────────────────────────────── */
+    #variant-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 9998;
+      background: var(--color-surface); border-bottom: 2px solid var(--color-gold);
+      padding: 8px 16px; display: flex; gap: 8px; align-items: center;
+      box-shadow: var(--shadow-sm);
+    }
+    #variant-nav span { font-size: var(--text-xs); color: var(--color-text-muted); margin-right: 8px; font-weight: 600; }
+    .variant-tab {
+      background: none; border: 1px solid var(--color-border); border-radius: var(--radius-full);
+      padding: 5px 14px; font-size: var(--text-xs); cursor: pointer; color: var(--color-text-muted);
+      transition: all 0.15s ease; font-family: var(--font-sans);
+    }
+    .variant-tab:hover { border-color: var(--color-accent); color: var(--color-accent); }
+    .variant-tab.active { background: var(--color-primary); border-color: var(--color-primary); color: var(--color-cream); }
+    .variant { display: none; }
+    .variant.active { display: block; }
+    body { padding-top: 46px; }
+
+    /* ─── SHARED ELEMENTS ───────────────────────── */
+    .stat-num { font-size: var(--text-3xl); font-family: var(--font-serif); color: var(--color-gold); line-height: 1; }
+    .stat-label { font-size: var(--text-xs); color: var(--color-text-muted); margin-top: var(--space-1); text-transform: uppercase; letter-spacing: 0.06em; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: var(--radius-full); font-size: var(--text-xs); font-weight: 600; }
+    .badge-success { background: #e8f5e8; color: var(--color-success); }
+
+    /* ─── VARIANT A: Left Sidebar ───────────────── */
+    .va-shell { display: flex; height: calc(100vh - 46px); }
+    .va-sidebar {
+      width: 220px; flex-shrink: 0;
+      background: var(--color-primary);
+      display: flex; flex-direction: column;
+      padding: var(--space-4) 0;
+    }
+    .va-sidebar-logo {
+      padding: var(--space-4) var(--space-6) var(--space-6);
+      border-bottom: 1px solid rgba(201,168,76,0.25);
+      margin-bottom: var(--space-4);
+    }
+    .va-sidebar-logo .logo-text { font-family: var(--font-serif); font-size: var(--text-lg); color: var(--color-cream); }
+    .va-sidebar-logo .logo-sub { font-size: var(--text-xs); color: var(--color-gold); opacity: 0.8; margin-top: 2px; }
+    .va-nav-item {
+      display: flex; align-items: center; gap: var(--space-3);
+      padding: var(--space-3) var(--space-6);
+      color: rgba(232,213,183,0.75); font-size: var(--text-sm);
+      cursor: pointer; transition: all 0.15s ease; text-decoration: none;
+    }
+    .va-nav-item:hover { color: var(--color-cream); background: rgba(255,255,255,0.06); }
+    .va-nav-item.active { color: var(--color-gold); background: rgba(201,168,76,0.12); border-right: 3px solid var(--color-gold); }
+    .va-nav-icon { font-size: 16px; width: 18px; text-align: center; }
+    .va-nav-section { font-size: var(--text-xs); color: rgba(201,168,76,0.5); padding: var(--space-4) var(--space-6) var(--space-2); text-transform: uppercase; letter-spacing: 0.08em; margin-top: var(--space-2); }
+    .va-sidebar-footer {
+      margin-top: auto; padding: var(--space-4) var(--space-6);
+      border-top: 1px solid rgba(201,168,76,0.2);
+    }
+    .va-sidebar-footer .user-name { color: var(--color-cream); font-size: var(--text-xs); }
+    .va-sidebar-footer .logout-link { color: var(--color-gold); font-size: var(--text-xs); opacity: 0.7; cursor: pointer; }
+    .va-sidebar-footer .logout-link:hover { opacity: 1; }
+    .va-main { flex: 1; overflow-y: auto; padding: var(--space-8); background: var(--color-bg); }
+    .va-topbar {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: var(--space-8);
+    }
+    .va-topbar h1 { font-family: var(--font-serif); font-size: var(--text-2xl); color: var(--color-primary); font-weight: normal; }
+    .va-topbar .breadcrumb { font-size: var(--text-xs); color: var(--color-text-muted); margin-top: 2px; }
+    .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); margin-bottom: var(--space-8); }
+    .stat-card {
+      background: var(--color-surface); border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg); padding: var(--space-6);
+      box-shadow: var(--shadow-sm); transition: box-shadow 0.15s;
+    }
+    .stat-card:hover { box-shadow: var(--shadow-md); }
+    .stat-card .stat-icon { font-size: 20px; margin-bottom: var(--space-2); }
+    .quick-actions { display: flex; gap: var(--space-3); margin-bottom: var(--space-8); flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--color-primary); color: var(--color-cream);
+      border: none; border-radius: var(--radius-md); padding: var(--space-3) var(--space-6);
+      font-size: var(--text-sm); cursor: pointer; font-family: var(--font-sans);
+      transition: background 0.15s; text-decoration: none; display: inline-block;
+    }
+    .btn-primary:hover { background: var(--color-primary-hover); }
+    .btn-ghost {
+      background: var(--color-surface); color: var(--color-text);
+      border: 1px solid var(--color-border); border-radius: var(--radius-md);
+      padding: var(--space-3) var(--space-6); font-size: var(--text-sm);
+      cursor: pointer; font-family: var(--font-sans); transition: all 0.15s;
+    }
+    .btn-ghost:hover { border-color: var(--color-accent); color: var(--color-accent); }
+    .recent-table { width: 100%; border-collapse: collapse; }
+    .recent-table th { font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-muted); font-weight: 600; padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--color-border); text-align: left; }
+    .recent-table td { padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--color-border); }
+    .recent-table tr:hover td { background: var(--color-surface-warm); }
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); }
+    .section-header h2 { font-family: var(--font-serif); font-size: var(--text-xl); color: var(--color-primary); font-weight: normal; }
+    .section-header .view-all { font-size: var(--text-xs); color: var(--color-accent); cursor: pointer; }
+    .card-section { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-6); box-shadow: var(--shadow-sm); }
+
+    /* ─── VARIANT B: Top Nav ─────────────────────── */
+    .vb-topnav {
+      background: var(--color-primary); 
+      border-bottom: 3px solid var(--color-gold);
+      display: flex; align-items: center; padding: 0 var(--space-8);
+      height: 56px;
+    }
+    .vb-logo { font-family: var(--font-serif); color: var(--color-cream); font-size: var(--text-lg); margin-right: var(--space-8); white-space: nowrap; }
+    .vb-nav-links { display: flex; gap: 2px; flex: 1; }
+    .vb-nav-link {
+      color: rgba(232,213,183,0.75); padding: var(--space-2) var(--space-4);
+      font-size: var(--text-sm); cursor: pointer; border-radius: var(--radius-md);
+      transition: all 0.15s; text-decoration: none; display: flex; align-items: center; gap: var(--space-2);
+    }
+    .vb-nav-link:hover { color: var(--color-cream); background: rgba(255,255,255,0.08); }
+    .vb-nav-link.active { color: var(--color-gold); background: rgba(201,168,76,0.15); }
+    .vb-user { margin-left: auto; display: flex; align-items: center; gap: var(--space-3); color: var(--color-cream); font-size: var(--text-xs); }
+    .vb-avatar { width: 28px; height: 28px; border-radius: var(--radius-full); background: rgba(201,168,76,0.3); display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--color-gold); font-weight: 600; }
+    .vb-subnav {
+      background: var(--color-surface); border-bottom: 1px solid var(--color-border);
+      padding: 0 var(--space-8); display: flex; align-items: center; gap: var(--space-2);
+      height: 40px;
+    }
+    .vb-breadcrumb { font-size: var(--text-xs); color: var(--color-text-muted); }
+    .vb-breadcrumb span { color: var(--color-accent); }
+    .vb-quick-add { margin-left: auto; }
+    .vb-main { padding: var(--space-8); }
+    .vb-page-title { font-family: var(--font-serif); font-size: var(--text-2xl); color: var(--color-primary); font-weight: normal; margin-bottom: var(--space-6); }
+
+    /* ─── VARIANT C: Icon Sidebar + Top Bar ───────── */
+    .vc-shell { display: flex; height: calc(100vh - 46px); }
+    .vc-icon-sidebar {
+      width: 60px; flex-shrink: 0; background: var(--color-primary);
+      display: flex; flex-direction: column; align-items: center;
+      padding: var(--space-4) 0; gap: var(--space-2);
+    }
+    .vc-icon-logo { width: 36px; height: 36px; border-radius: var(--radius-md); background: rgba(201,168,76,0.2); display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: var(--space-4); }
+    .vc-icon-btn {
+      width: 40px; height: 40px; border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; cursor: pointer; transition: all 0.15s;
+      color: rgba(232,213,183,0.6); position: relative;
+    }
+    .vc-icon-btn:hover { background: rgba(255,255,255,0.1); color: var(--color-cream); }
+    .vc-icon-btn.active { background: rgba(201,168,76,0.2); color: var(--color-gold); }
+    .vc-icon-btn .tooltip {
+      position: absolute; left: 52px; top: 50%; transform: translateY(-50%);
+      background: var(--color-primary); color: var(--color-cream);
+      font-size: var(--text-xs); padding: 4px 8px; border-radius: var(--radius-sm);
+      white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.15s;
+      z-index: 100;
+    }
+    .vc-icon-btn:hover .tooltip { opacity: 1; }
+    .vc-icon-divider { width: 30px; height: 1px; background: rgba(201,168,76,0.2); margin: var(--space-2) 0; }
+    .vc-icon-bottom { margin-top: auto; }
+    .vc-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .vc-header {
+      background: var(--color-surface); border-bottom: 1px solid var(--color-border);
+      padding: 0 var(--space-6); height: 56px;
+      display: flex; align-items: center; gap: var(--space-4);
+    }
+    .vc-header h1 { font-family: var(--font-serif); font-size: var(--text-xl); color: var(--color-primary); font-weight: normal; }
+    .vc-header .header-actions { margin-left: auto; display: flex; gap: var(--space-3); align-items: center; }
+    .vc-main { flex: 1; overflow-y: auto; padding: var(--space-6); background: var(--color-bg); }
+    .vc-search {
+      display: flex; align-items: center; gap: var(--space-2);
+      background: var(--color-surface-warm); border: 1px solid var(--color-border);
+      border-radius: var(--radius-full); padding: var(--space-2) var(--space-4);
+      font-size: var(--text-sm); color: var(--color-text-muted); cursor: text;
+      transition: all 0.15s;
+    }
+    .vc-search:hover { border-color: var(--color-accent); }
+    input[type="search"] { background: none; border: none; outline: none; font-size: var(--text-sm); font-family: var(--font-sans); color: var(--color-text); width: 180px; }
+    input[type="search"]::placeholder { color: var(--color-text-muted); }
+
+    /* ─── SKETCH TOOLBAR ────────────────────────── */
+    #sketch-tools {
+      position: fixed; bottom: 12px; right: 12px; z-index: 9999;
+      font-family: system-ui; font-size: 12px;
+      background: rgba(0,0,0,0.75); color: white;
+      padding: 8px 12px; border-radius: 8px;
+      opacity: 0.4; transition: opacity 0.2s;
+      display: flex; gap: 8px; align-items: center;
+    }
+    #sketch-tools:hover { opacity: 1; }
+    #sketch-tools button {
+      background: rgba(255,255,255,0.15); border: none; color: white;
+      padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;
+    }
+    #sketch-tools button:hover { background: rgba(255,255,255,0.3); }
+    #sketch-tools select { background: rgba(255,255,255,0.15); border: none; color: white; font-size: 11px; border-radius: 4px; padding: 2px 4px; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+<!-- ─── VARIANT NAV ─────────────────────── -->
+<div id="variant-nav">
+  <span>006 Admin Layout</span>
+  <button class="variant-tab active" onclick="showVariant('a', this)">A: Sivupalkki</button>
+  <button class="variant-tab" onclick="showVariant('b', this)">B: Ylänavigaatio</button>
+  <button class="variant-tab" onclick="showVariant('c', this)">C: Icon-sidebar + otsikkopalkki</button>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     VARIANT A — Left Sidebar
+═══════════════════════════════════════════ -->
+<div id="variant-a" class="variant active">
+  <div class="va-shell">
+    <!-- Sidebar -->
+    <aside class="va-sidebar">
+      <div class="va-sidebar-logo">
+        <div class="logo-text">🐴 Virtuaalitalli</div>
+        <div class="logo-sub">Hallintapaneeli</div>
+      </div>
+
+      <div class="va-nav-section">Päävalikko</div>
+      <a class="va-nav-item active" href="#" onclick="return false">
+        <span class="va-nav-icon">⊞</span> Dashboard
+      </a>
+      <a class="va-nav-item" href="#" onclick="return false">
+        <span class="va-nav-icon">🐎</span> Hevoset
+      </a>
+      <a class="va-nav-item" href="#" onclick="return false">
+        <span class="va-nav-icon">🌱</span> Kasvatus
+      </a>
+      <a class="va-nav-item" href="#" onclick="return false">
+        <span class="va-nav-icon">🏆</span> Kilpailut
+      </a>
+
+      <div class="va-nav-section">Media</div>
+      <a class="va-nav-item" href="#" onclick="return false">
+        <span class="va-nav-icon">📷</span> Kuvat
+      </a>
+
+      <div class="va-sidebar-footer">
+        <div class="user-name">admin</div>
+        <div class="logout-link" onclick="alert('Kirjaudutaan ulos...')">Kirjaudu ulos</div>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="va-main">
+      <div class="va-topbar">
+        <div>
+          <h1>Dashboard</h1>
+          <div class="breadcrumb">Tervetuloa takaisin, admin</div>
+        </div>
+        <button class="btn-primary" onclick="alert('Lisää hevonen')">+ Lisää hevonen</button>
+      </div>
+
+      <!-- Stats -->
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="stat-icon">🐎</div>
+          <div class="stat-num">12</div>
+          <div class="stat-label">Hevosta</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📷</div>
+          <div class="stat-num">47</div>
+          <div class="stat-label">Kuvaa</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🏆</div>
+          <div class="stat-num">8</div>
+          <div class="stat-label">Kilpailua</div>
+        </div>
+      </div>
+
+      <!-- Recent horses -->
+      <div class="card-section">
+        <div class="section-header">
+          <h2>Viimeksi lisätyt hevoset</h2>
+          <a class="view-all" href="#" onclick="return false">Näytä kaikki →</a>
+        </div>
+        <table class="recent-table">
+          <thead>
+            <tr>
+              <th>Nimi</th>
+              <th>Rotu</th>
+              <th>Sukupuoli</th>
+              <th>VH-tunnus</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Auringon Aatos</strong></td>
+              <td>Suomenhevonen</td>
+              <td>Ori</td>
+              <td><code style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--color-text-muted)">VH00-012-3456</code></td>
+              <td><a href="#" onclick="return false" style="color:var(--color-accent);font-size:var(--text-xs)">Muokkaa</a></td>
+            </tr>
+            <tr>
+              <td><strong>Hopeatähti</strong></td>
+              <td>Puoliverinen</td>
+              <td>Tamma</td>
+              <td><code style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--color-text-muted)">VH00-023-7890</code></td>
+              <td><a href="#" onclick="return false" style="color:var(--color-accent);font-size:var(--text-xs)">Muokkaa</a></td>
+            </tr>
+            <tr>
+              <td><strong>Kultainen Kaiku</strong></td>
+              <td>Welsh-poni</td>
+              <td>Ruuna</td>
+              <td><code style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--color-text-muted)">VH00-034-2345</code></td>
+              <td><a href="#" onclick="return false" style="color:var(--color-accent);font-size:var(--text-xs)">Muokkaa</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     VARIANT B — Top Navigation
+═══════════════════════════════════════════ -->
+<div id="variant-b" class="variant">
+  <!-- Top nav -->
+  <nav class="vb-topnav">
+    <div class="vb-logo">🐴 Virtuaalitalli</div>
+    <div class="vb-nav-links">
+      <a class="vb-nav-link active" href="#" onclick="return false">⊞ Dashboard</a>
+      <a class="vb-nav-link" href="#" onclick="return false">🐎 Hevoset</a>
+      <a class="vb-nav-link" href="#" onclick="return false">🌱 Kasvatus</a>
+      <a class="vb-nav-link" href="#" onclick="return false">🏆 Kilpailut</a>
+      <a class="vb-nav-link" href="#" onclick="return false">📷 Kuvat</a>
+    </div>
+    <div class="vb-user">
+      <div class="vb-avatar">A</div>
+      admin
+      <a href="#" onclick="alert('Ulos');return false" style="color:var(--color-gold);opacity:0.7;text-decoration:none;font-size:var(--text-xs)">Ulos</a>
+    </div>
+  </nav>
+
+  <!-- Sub nav / breadcrumb -->
+  <div class="vb-subnav">
+    <span class="vb-breadcrumb">Admin / <span>Dashboard</span></span>
+    <div class="vb-quick-add">
+      <button class="btn-primary" onclick="alert('Lisää hevonen')" style="padding:4px 12px;font-size:var(--text-xs)">+ Lisää hevonen</button>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="vb-main">
+    <h1 class="vb-page-title">Dashboard</h1>
+
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="stat-icon">🐎</div>
+        <div class="stat-num">12</div>
+        <div class="stat-label">Hevosta</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📷</div>
+        <div class="stat-num">47</div>
+        <div class="stat-label">Kuvaa</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-num">8</div>
+        <div class="stat-label">Kilpailua</div>
+      </div>
+    </div>
+
+    <div class="card-section">
+      <div class="section-header">
+        <h2>Viimeksi lisätyt hevoset</h2>
+        <a class="view-all" href="#" onclick="return false">Näytä kaikki →</a>
+      </div>
+      <table class="recent-table">
+        <thead>
+          <tr>
+            <th>Nimi</th><th>Rotu</th><th>Sukupuoli</th><th>VH-tunnus</th><th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Auringon Aatos</strong></td>
+            <td>Suomenhevonen</td><td>Ori</td>
+            <td><code style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--color-text-muted)">VH00-012-3456</code></td>
+            <td><a href="#" onclick="return false" style="color:var(--color-accent);font-size:var(--text-xs)">Muokkaa</a></td>
+          </tr>
+          <tr>
+            <td><strong>Hopeatähti</strong></td>
+            <td>Puoliverinen</td><td>Tamma</td>
+            <td><code style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--color-text-muted)">VH00-023-7890</code></td>
+            <td><a href="#" onclick="return false" style="color:var(--color-accent);font-size:var(--text-xs)">Muokkaa</a></td>
+          </tr>
+          <tr>
+            <td><strong>Kultainen Kaiku</strong></td>
+            <td>Welsh-poni</td><td>Ruuna</td>
+            <td><code style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--color-text-muted)">VH00-034-2345</code></td>
+            <td><a href="#" onclick="return false" style="color:var(--color-accent);font-size:var(--text-xs)">Muokkaa</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     VARIANT C — Icon Sidebar + Header Bar
+═══════════════════════════════════════════ -->
+<div id="variant-c" class="variant">
+  <div class="vc-shell">
+    <!-- Icon sidebar -->
+    <aside class="vc-icon-sidebar">
+      <div class="vc-icon-logo">🐴</div>
+
+      <button class="vc-icon-btn active" onclick="return false">
+        ⊞
+        <span class="tooltip">Dashboard</span>
+      </button>
+      <button class="vc-icon-btn" onclick="return false">
+        🐎
+        <span class="tooltip">Hevoset</span>
+      </button>
+      <button class="vc-icon-btn" onclick="return false">
+        🌱
+        <span class="tooltip">Kasvatus</span>
+      </button>
+
+      <div class="vc-icon-divider"></div>
+
+      <button class="vc-icon-btn" onclick="return false">
+        🏆
+        <span class="tooltip">Kilpailut</span>
+      </button>
+      <button class="vc-icon-btn" onclick="return false">
+        📷
+        <span class="tooltip">Kuvat</span>
+      </button>
+
+      <div class="vc-icon-bottom">
+        <button class="vc-icon-btn" onclick="alert('Ulos')">
+          ↩
+          <span class="tooltip">Kirjaudu ulos</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Content area -->
+    <div class="vc-content">
+      <!-- Header bar -->
+      <header class="vc-header">
+        <h1>Dashboard</h1>
+        <div class="header-actions">
+          <div class="vc-search">
+            <span>🔍</span>
+            <input type="search" placeholder="Hae hevosta…">
+          </div>
+          <button class="btn-primary" onclick="alert('Lisää')">+ Lisää hevonen</button>
+          <div style="display:flex;align-items:center;gap:6px;font-size:var(--text-xs);color:var(--color-text-muted)">
+            <div style="width:28px;height:28px;border-radius:var(--radius-full);background:var(--color-primary);display:flex;align-items:center;justify-content:center;color:var(--color-gold);font-weight:700;font-size:12px">A</div>
+            admin
+          </div>
+        </div>
+      </header>
+
+      <!-- Main -->
+      <div class="vc-main">
+        <div class="stat-row">
+          <div class="stat-card">
+            <div class="stat-icon">🐎</div>
+            <div class="stat-num">12</div>
+            <div class="stat-label">Hevosta</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📷</div>
+            <div class="stat-num">47</div>
+            <div class="stat-label">Kuvaa</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🏆</div>
+            <div class="stat-num">8</div>
+            <div class="stat-label">Kilpailua</div>
+          </div>
+        </div>
+
+        <div class="card-section">
+          <div class="section-header">
+            <h2>Viimeksi lisätyt hevoset</h2>
+            <a class="view-all" href="#" onclick="return false">Näytä kaikki →</a>
+          </div>
+          <table class="recent-table">
+            <thead>
+              <tr>
+                <th>Nimi</th><th>Rotu</th><th>Sukupuoli</th><th>VH-tunnus</th><th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Auringon Aatos</strong></td>
+                <td>Suomenhevonen</td><td>Ori</td>
+                <td><code style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--color-text-muted)">VH00-012-3456</code></td>
+                <td><a href="#" onclick="return false" style="color:var(--color-accent);font-size:var(--text-xs)">Muokkaa</a></td>
+              </tr>
+              <tr>
+                <td><strong>Hopeatähti</strong></td>
+                <td>Puoliverinen</td><td>Tamma</td>
+                <td><code style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--color-text-muted)">VH00-023-7890</code></td>
+                <td><a href="#" onclick="return false" style="color:var(--color-accent);font-size:var(--text-xs)">Muokkaa</a></td>
+              </tr>
+              <tr>
+                <td><strong>Kultainen Kaiku</strong></td>
+                <td>Welsh-poni</td><td>Ruuna</td>
+                <td><code style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--color-text-muted)">VH00-034-2345</code></td>
+                <td><a href="#" onclick="return false" style="color:var(--color-accent);font-size:var(--text-xs)">Muokkaa</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── SKETCH TOOLBAR ─────────────────── -->
+<div id="sketch-tools"
+  onmouseenter="this.style.opacity='1'"
+  onmouseleave="this.style.opacity='0.4'">
+  <span>🖼 006</span>
+  <select onchange="document.querySelector('link[href*=themes]').href='../themes/'+this.value+'.css'">
+    <option value="default.css">Default</option>
+  </select>
+  <button onclick="document.getElementById('main-content').style.maxWidth='375px'">📱</button>
+  <button onclick="document.getElementById('main-content').style.maxWidth='768px'">💻</button>
+  <button onclick="document.getElementById('main-content').style.maxWidth='100%'">🖥</button>
+</div>
+<div id="main-content"></div>
+
+<script>
+function showVariant(id, btn) {
+  document.querySelectorAll('.variant').forEach(v => {
+    v.classList.remove('active');
+    v.style.display = 'none';
+  });
+  document.querySelectorAll('.variant-tab').forEach(t => t.classList.remove('active'));
+  const el = document.getElementById('variant-' + id);
+  el.classList.add('active');
+  el.style.display = 'block';
+  btn.classList.add('active');
+}
+// Init display
+document.querySelectorAll('.variant').forEach((v, i) => {
+  v.style.display = i === 0 ? 'block' : 'none';
+});
+</script>
+</body>
+</html>
