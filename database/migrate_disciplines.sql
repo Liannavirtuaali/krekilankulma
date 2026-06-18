@@ -7,11 +7,11 @@ SET NAMES utf8mb4;
 
 -- 1. Lisää abbreviation-sarake jos puuttuu
 ALTER TABLE `disciplines`
-  ADD COLUMN `abbreviation` VARCHAR(20) DEFAULT NULL COMMENT 'Lyhenne';
+  ADD COLUMN IF NOT EXISTS `abbreviation` VARCHAR(20) DEFAULT NULL COMMENT 'Lyhenne';
 
--- 2. Poista created_at jos on (ignoroidaan virhe jos ei ole)
-ALTER IGNORE TABLE `disciplines`
-  DROP COLUMN `created_at`;
+-- 2. Poista created_at jos on
+ALTER TABLE `disciplines`
+  DROP COLUMN IF EXISTS `created_at`;
 
 -- 3. Tyhjennä vanha data ja poista AUTO_INCREMENT
 TRUNCATE TABLE `disciplines`;
