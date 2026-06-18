@@ -1,4 +1,4 @@
-# Altervista Deployment Checklist — Virtuaalitalli v1.0
+# Altervista Deployment Checklist — Virtuaalitalli v1.1
 
 ## Pre-Deployment
 
@@ -6,6 +6,47 @@
 - [ ] Database schema at `database/schema.sql` tested locally
 - [ ] Seed data at `database/seed.sql` available for test population
 - [ ] `.planning/` directory and security audit documents committed
+- [ ] GitHub Secrets configured (see Automated Deployment section below)
+
+---
+
+## Automated Deployment (GitHub Actions)
+
+Deployment to Altervista is now **automated**. Every push to the `main` branch
+triggers `.github/workflows/deploy.yml`, which uploads only the `public/` directory
+to the Altervista web root via FTP.
+
+**What gets uploaded:** `public/` contents only — admin, assets, pages, src, uploads, index.php, and .htaccess files.
+
+**What stays out of production:** `.planning/`, `database/`, `.github/`, `.git/` — never uploaded.
+
+### One-time GitHub Secrets setup
+
+Before the first automated deploy, add these three repository secrets in GitHub:
+
+**Where to add them:**
+GitHub repo → Settings → Secrets and variables → Actions → New repository secret
+
+| Secret name    | Value source                                                                 |
+|----------------|------------------------------------------------------------------------------|
+| `FTP_HOST`     | Altervista control panel → FTP details (e.g. `ftp.altervista.org`)          |
+| `FTP_USERNAME` | Altervista FTP username (same as your Altervista account username)           |
+| `FTP_PASSWORD` | Altervista FTP password                                                      |
+
+**Note on `server-dir`:** The workflow uses `server-dir: /` (Altervista web root).
+If your Altervista account places the web root at `/htdocs/` instead of `/`, update
+line `server-dir: /` in `.github/workflows/deploy.yml` to `server-dir: /htdocs/`.
+Check your Altervista control panel → FTP section to confirm the correct path.
+
+### How to trigger a deploy
+
+Simply push to `main`:
+
+```bash
+git push origin main
+```
+
+Monitor the run at: `https://github.com/<your-username>/<repo>/actions`
 
 ---
 
@@ -26,6 +67,8 @@
 
 ## Altervista-Specific Configuration
 
+These steps are one-time manual setup — not automated by GitHub Actions.
+
 - [ ] Log in to Altervista control panel
 - [ ] PHP version confirmed: 8.x (check via phpinfo.php, then delete it)
 - [ ] MySQL database created in Altervista panel
@@ -37,7 +80,7 @@
   - `SITE_URL` → `https://yoursite.altervista.org`
 - [ ] Import `database/schema.sql` via Altervista phpMyAdmin
 - [ ] (Optional) Import `database/seed.sql` for test horses
-- [ ] Upload `public/` directory contents via FTP to Altervista web root
+- [ ] ~~Upload `public/` directory contents via FTP to Altervista web root~~ → **Automated by `.github/workflows/deploy.yml` on push to `main`**
 - [ ] Upload directory exists and is writable: `uploads/` with permissions 755
 - [ ] HTTPS enabled (Altervista offers free Let's Encrypt SSL)
 - [ ] Verify `session.cookie_secure` works under HTTPS
@@ -82,4 +125,4 @@
 
 ---
 
-*Checklist version: v1.0 — created 2026-06-17*
+*Checklist version: v1.1 — updated 2026-06-18 — automated CI/CD deployment via GitHub Actions added*
