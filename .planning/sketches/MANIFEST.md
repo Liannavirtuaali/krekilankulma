@@ -15,4 +15,4 @@ Lämmin, rustiikkinen virtuaalitalli — tuntuu kuin oikeasti kävelisi puiseen 
 | 001 | hevoslista | Miltä hevoslistan pitäisi tuntua? | B: Listakortit (kompakti, ei kuvausta) | layout, listing, horses |
 | 002 | hevonen-profiili | Miten hevosen profiilisivu rakennetaan? | B: Hero + Sidebar (kuvaus+sukutaulu / tiedot, kisakalenteri koko leveys) | layout, horse-profile, detail |
 | 003 | kasvatus | Miten varsat esitetään kasvatus-sivulla? | C: Kompakti lista | layout, foals, breeding |
-| 004 | yhteystiedot | Miten nimimerkki, VRL-tunnus ja sähköposti esitetään selkeästi? | null | layout, contact, simple |
+| 004 | yhteystiedot | Miten nimimerkki, VRL-tunnus ja sähköposti esitetään selkeästi? | A: Korttikortti | layout, contact, simple |

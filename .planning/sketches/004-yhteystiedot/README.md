@@ -2,7 +2,7 @@
 sketch: "004"
 name: yhteystiedot
 question: "Miten nimimerkki, VRL-tunnus ja sähköposti esitetään selkeästi?"
-winner: null
+winner: "A"
 tags: [layout, contact, simple]
 ---
 
