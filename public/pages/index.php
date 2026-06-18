@@ -63,8 +63,8 @@ require __DIR__ . '/../src/includes/header.php';
 
   <?php
   $newsHref = $latestPost
-      ? e(SITE_URL) . '/pages/postaus.php?slug=' . rawurlencode($latestPost['slug'])
-      : e(SITE_URL) . '/pages/blogi.php';
+      ? e(SITE_URL) . '/pages/ajankohtaista/' . rawurlencode($latestPost['slug'])
+      : e(SITE_URL) . '/pages/ajankohtaista.php';
   $newsTitle   = $latestPost ? e($latestPost['title']) : 'Ajankohtaista';
   $newsExcerpt = $latestPost
       ? e(mb_substr($latestPost['content'], 0, 120, 'UTF-8')) . '…'

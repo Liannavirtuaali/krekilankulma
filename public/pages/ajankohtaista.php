@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../src/includes/db.php';
 
-$page_title = 'Blogi';
+$page_title = 'Ajankohtaista';
 $db = getDB();
 
 // Suomalaiset kuukaudet — ei strftime() (deprecated PHP 8.1+)
@@ -60,17 +60,17 @@ require __DIR__ . '/../src/includes/header.php';
 
     <!-- Postauslista -->
     <div>
-      <h1>Blogi</h1>
+      <h1>Ajankohtaista</h1>
 
       <?php if ($yearFilter > 0 && $monthFilter > 0): ?>
         <p style="margin:.75rem 0 1.25rem;">
           Näytetään: <?= e($MONTHS_FI[$monthFilter] ?? (string)$monthFilter) ?> <?= $yearFilter ?>
-          — <a href="blogi.php">Näytä kaikki</a>
+          — <a href="ajankohtaista.php">Näytä kaikki</a>
         </p>
       <?php elseif ($yearFilter > 0): ?>
         <p style="margin:.75rem 0 1.25rem;">
           Näytetään: <?= $yearFilter ?>
-          — <a href="blogi.php">Näytä kaikki</a>
+          — <a href="ajankohtaista.php">Näytä kaikki</a>
         </p>
       <?php endif; ?>
 
@@ -84,7 +84,7 @@ require __DIR__ . '/../src/includes/header.php';
           ?>
           <li>
             <a class="post-list-card"
-               href="<?= e(SITE_URL) ?>/pages/postaus.php?slug=<?= rawurlencode($post['slug']) ?>">
+               href="<?= e(SITE_URL) ?>/pages/ajankohtaista/<?= rawurlencode($post['slug']) ?>">
               <div class="post-list-card__body">
                 <h2 class="post-list-card__title"><?= e($post['title']) ?></h2>
                 <span class="post-list-card__date"><?= formatDate($post['created_at']) ?></span>
@@ -107,7 +107,7 @@ require __DIR__ . '/../src/includes/header.php';
             <ul class="archive-sidebar__months">
               <?php foreach ($months as $mo => $cnt): ?>
                 <li>
-                  <a href="<?= e(SITE_URL) ?>/pages/blogi.php?year=<?= (int)$yr ?>&amp;month=<?= (int)$mo ?>">
+                  <a href="<?= e(SITE_URL) ?>/pages/ajankohtaista.php?year=<?= (int)$yr ?>&amp;month=<?= (int)$mo ?>">
                     <?= e($MONTHS_FI[$mo] ?? (string)$mo) ?> (<?= (int)$cnt ?>)
                   </a>
                 </li>

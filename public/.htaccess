@@ -16,6 +16,9 @@ Options -Indexes
 
     # Hevosen profiilisivu kauniin URL:n kautta: /pages/horse/slug
     RewriteRule ^pages/horse/([^/]+)/?$ /pages/hevonen.php?slug=$1 [L,QSA]
+
+    # Blogijuttu kauniin URL:n kautta: /pages/ajankohtaista/slug
+    RewriteRule ^pages/ajankohtaista/([^/]+)/?$ /pages/postaus.php?slug=$1 [L,QSA]
 </IfModule>
 
 # Tietoturva: Estä suora pääsy arkaluonteisiin tiedostoihin

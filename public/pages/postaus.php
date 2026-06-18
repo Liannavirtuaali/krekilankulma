@@ -93,12 +93,12 @@ require __DIR__ . '/../src/includes/header.php';
       <!-- Prev/next -->
       <nav class="post-prevnext" aria-label="Postausnavigaatio">
         <?php if ($prev): ?>
-          <a href="<?= e(SITE_URL) ?>/pages/postaus.php?slug=<?= rawurlencode($prev['slug']) ?>">
+          <a href="<?= e(SITE_URL) ?>/pages/ajankohtaista/<?= rawurlencode($prev['slug']) ?>">
             ← <?= e($prev['title']) ?>
           </a>
         <?php endif; ?>
         <?php if ($next): ?>
-          <a href="<?= e(SITE_URL) ?>/pages/postaus.php?slug=<?= rawurlencode($next['slug']) ?>">
+          <a href="<?= e(SITE_URL) ?>/pages/ajankohtaista/<?= rawurlencode($next['slug']) ?>">
             → <?= e($next['title']) ?>
           </a>
         <?php endif; ?>
@@ -116,7 +116,7 @@ require __DIR__ . '/../src/includes/header.php';
             <ul class="archive-sidebar__months">
               <?php foreach ($months as $mo => $cnt): ?>
                 <li>
-                  <a href="<?= e(SITE_URL) ?>/pages/blogi.php?year=<?= (int)$yr ?>&amp;month=<?= (int)$mo ?>">
+                  <a href="<?= e(SITE_URL) ?>/pages/ajankohtaista.php?year=<?= (int)$yr ?>&amp;month=<?= (int)$mo ?>">
                     <?= e($MONTHS_FI[$mo] ?? (string)$mo) ?> (<?= (int)$cnt ?>)
                   </a>
                 </li>
