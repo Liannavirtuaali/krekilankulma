@@ -16,4 +16,4 @@ Lämmin, rustiikkinen virtuaalitalli — tuntuu kuin oikeasti kävelisi puiseen 
 | 002 | hevonen-profiili | Miten hevosen profiilisivu rakennetaan? | B: Hero + Sidebar (kuvaus+sukutaulu / tiedot, kisakalenteri koko leveys) | layout, horse-profile, detail |
 | 003 | kasvatus | Miten varsat esitetään kasvatus-sivulla? | C: Kompakti lista | layout, foals, breeding |
 | 004 | yhteystiedot | Miten nimimerkki, VRL-tunnus ja sähköposti esitetään selkeästi? | A: Korttikortti | layout, contact, simple |
-| 005 | etusivu | Miten etusivun osiot (hero, tilastot, esittely, uutinen, kasvatus-CTA) jäsennellään? | null | layout, homepage, hero, stats |
+| 005 | etusivu | Miten etusivun osiot (hero, tilastot, esittely, uutinen, kasvatus-CTA) jäsennellään? | C: Overlay-kortit | layout, homepage, hero, stats |

@@ -2,7 +2,7 @@
 sketch: "005"
 name: etusivu
 question: "Miten etusivun osiot (hero, tilastot, esittely, uutinen, kasvatus-CTA) jäsennellään?"
-winner: null
+winner: "C"
 tags: [layout, homepage, hero, stats]
 ---
 

@@ -62,14 +62,14 @@
     display: flex; align-items: center; justify-content: center;
     text-align: center;
     overflow: hidden;
-    background: linear-gradient(160deg, #2a1a10 0%, #3d2b1f 40%, #5a4030 70%, #7a6050 100%);
+    background:
+      linear-gradient(160deg, rgba(42,26,16,0.82) 0%, rgba(61,43,31,0.72) 45%, rgba(90,64,48,0.60) 100%),
+      url('https://picsum.photos/seed/stable/1600/600') center/cover no-repeat;
   }
   .hero::before {
     content: '';
     position: absolute; inset: 0;
-    background:
-      radial-gradient(ellipse 60% 50% at 70% 50%, rgba(201,168,76,0.08) 0%, transparent 70%),
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Ccircle cx='30' cy='30' r='1' fill='rgba(255,255,255,0.03)'/%3E%3C/svg%3E");
+    background: radial-gradient(ellipse 50% 60% at 30% 50%, rgba(201,168,76,0.07) 0%, transparent 70%);
     pointer-events: none;
   }
   .hero-emoji {
@@ -472,6 +472,13 @@
     padding: 32px;
     box-shadow: var(--shadow-sm);
   }
+  .c-esittely-img {
+    width: 100%; height: 180px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    margin-bottom: 20px;
+    display: block;
+  }
   .c-esittely h2 {
     font-family: var(--font-serif);
     font-size: var(--text-xl);
@@ -514,7 +521,7 @@
   <span>Sketch 005 · Etusivu</span>
   <button class="variant-tab active" onclick="showVariant('a', this)">A: Tilastopalkki</button>
   <button class="variant-tab" onclick="showVariant('b', this)">B: Rinnakkain</button>
-  <button class="variant-tab" onclick="showVariant('c', this)">C: Overlay-kortit</button>
+  <button class="variant-tab" onclick="showVariant('c', this)">C: Overlay-kortit ★</button>
 </div>
 
 <div id="viewport-wrap">
@@ -688,12 +695,14 @@
   <!-- Overlay-kortit -->
   <div class="c-cards-overlay">
     <div class="c-card">
+      <img src="https://picsum.photos/seed/horses1/320/160" alt="Hevoset" style="width:100%;height:120px;object-fit:cover;border-radius:var(--radius-md);margin-bottom:14px;display:block;">
       <div class="c-card-stat" id="c-n-hevoset">12</div>
       <h3>Hevosta tallissa</h3>
       <p>Tammoja, oriita ja kasvavaa nuorta sukupolvea.</p>
       <a class="c-card-link" href="#">Katso kaikki →</a>
     </div>
     <div class="c-card">
+      <img src="https://picsum.photos/seed/foal/320/160" alt="Varsat" style="width:100%;height:120px;object-fit:cover;border-radius:var(--radius-md);margin-bottom:14px;display:block;">
       <div class="c-card-stat" id="c-n-varsat">4</div>
       <h3>Varsaa tänä vuonna</h3>
       <p>Syntyneet ja odotetut varsat — katso kasvatusohjelma.</p>
@@ -711,6 +720,7 @@
   <div class="c-main">
     <div class="c-esittely-uutinen">
       <div class="c-esittely">
+        <img class="c-esittely-img" src="https://picsum.photos/seed/barn/600/200" alt="Talli">
         <h2>Tietoa tallista</h2>
         <p>Virtuaalitalli on perustettu 2018 rakkaudesta hevosiin. Tallin emäntä TallinOmistaja (VRL-12345) pitää huolta jokaisesta tallin asukkaasta. Panostamme laadukkaaseen kasvatukseen ja hyvinvoiviin hevosiin.</p>
         <div style="margin-top:20px;">
