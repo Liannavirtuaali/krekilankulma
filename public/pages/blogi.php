@@ -40,46 +40,88 @@ if ($yearFilter > 0 && $monthFilter > 0) {
 }
 $posts = $stmt->fetchAll();
 
+// Arkistokysely sidebarille
+$stmtArchive = $db->query(
+    'SELECT YEAR(created_at) AS yr, MONTH(created_at) AS mo, COUNT(*) AS cnt
+     FROM posts
+     GROUP BY YEAR(created_at), MONTH(created_at)
+     ORDER BY yr DESC, mo DESC'
+);
+$archive = [];
+foreach ($stmtArchive->fetchAll() as $row) {
+    $archive[$row['yr']][$row['mo']] = (int)$row['cnt'];
+}
+
 require __DIR__ . '/../src/includes/header.php';
 ?>
 
 <main class="container" style="padding: 2rem 1rem;">
-  <h1>Blogi</h1>
+  <div class="post-layout">
 
-  <?php if ($yearFilter > 0 && $monthFilter > 0): ?>
-    <p style="margin:.75rem 0 1.25rem;">
-      Näytetään: <?= e($MONTHS_FI[$monthFilter] ?? (string)$monthFilter) ?> <?= $yearFilter ?>
-      — <a href="blogi.php">Näytä kaikki</a>
-    </p>
-  <?php elseif ($yearFilter > 0): ?>
-    <p style="margin:.75rem 0 1.25rem;">
-      Näytetään: <?= $yearFilter ?>
-      — <a href="blogi.php">Näytä kaikki</a>
-    </p>
-  <?php endif; ?>
+    <!-- Postauslista -->
+    <div>
+      <h1>Blogi</h1>
 
-  <?php if (empty($posts)): ?>
-    <p>Ei vielä postauksia.</p>
-  <?php else: ?>
-    <ul class="post-list">
-      <?php foreach ($posts as $post):
-        // Näytä ensimmäiset ~200 merkkiä tekstistä
-        $excerpt = mb_substr($post['content'], 0, 200, 'UTF-8');
-        if (mb_strlen($post['content'], 'UTF-8') > 200) $excerpt .= '…';
-      ?>
-      <li>
-        <a class="post-list-card"
-           href="<?= e(SITE_URL) ?>/pages/postaus.php?slug=<?= rawurlencode($post['slug']) ?>">
-          <div class="post-list-card__body">
-            <h2 class="post-list-card__title"><?= e($post['title']) ?></h2>
-            <span class="post-list-card__date"><?= formatDate($post['created_at']) ?></span>
-            <p class="post-list-card__excerpt"><?= e($excerpt) ?></p>
-          </div>
-        </a>
-      </li>
-      <?php endforeach; ?>
-    </ul>
-  <?php endif; ?>
+      <?php if ($yearFilter > 0 && $monthFilter > 0): ?>
+        <p style="margin:.75rem 0 1.25rem;">
+          Näytetään: <?= e($MONTHS_FI[$monthFilter] ?? (string)$monthFilter) ?> <?= $yearFilter ?>
+          — <a href="blogi.php">Näytä kaikki</a>
+        </p>
+      <?php elseif ($yearFilter > 0): ?>
+        <p style="margin:.75rem 0 1.25rem;">
+          Näytetään: <?= $yearFilter ?>
+          — <a href="blogi.php">Näytä kaikki</a>
+        </p>
+      <?php endif; ?>
+
+      <?php if (empty($posts)): ?>
+        <p>Ei vielä postauksia.</p>
+      <?php else: ?>
+        <ul class="post-list">
+          <?php foreach ($posts as $post):
+            $excerpt = mb_substr($post['content'], 0, 200, 'UTF-8');
+            if (mb_strlen($post['content'], 'UTF-8') > 200) $excerpt .= '…';
+          ?>
+          <li>
+            <a class="post-list-card"
+               href="<?= e(SITE_URL) ?>/pages/postaus.php?slug=<?= rawurlencode($post['slug']) ?>">
+              <div class="post-list-card__body">
+                <h2 class="post-list-card__title"><?= e($post['title']) ?></h2>
+                <span class="post-list-card__date"><?= formatDate($post['created_at']) ?></span>
+                <p class="post-list-card__excerpt"><?= e($excerpt) ?></p>
+              </div>
+            </a>
+          </li>
+          <?php endforeach; ?>
+        </ul>
+      <?php endif; ?>
+    </div>
+
+    <!-- Sticky sidebar -->
+    <aside class="post-sidebar">
+      <div class="archive-sidebar">
+        <h2 class="archive-sidebar__header">Arkisto</h2>
+        <?php foreach ($archive as $yr => $months): ?>
+          <details>
+            <summary><?= (int)$yr ?></summary>
+            <ul class="archive-sidebar__months">
+              <?php foreach ($months as $mo => $cnt): ?>
+                <li>
+                  <a href="<?= e(SITE_URL) ?>/pages/blogi.php?year=<?= (int)$yr ?>&amp;month=<?= (int)$mo ?>">
+                    <?= e($MONTHS_FI[$mo] ?? (string)$mo) ?> (<?= (int)$cnt ?>)
+                  </a>
+                </li>
+              <?php endforeach; ?>
+            </ul>
+          </details>
+        <?php endforeach; ?>
+        <?php if (empty($archive)): ?>
+          <p style="padding:.75rem 1rem;color:var(--color-cream);font-size:var(--text-sm);">Ei postauksia.</p>
+        <?php endif; ?>
+      </div>
+    </aside>
+
+  </div>
 </main>
 
 <?php require __DIR__ . '/../src/includes/footer.php'; ?>
