@@ -15,6 +15,18 @@ $stmtFoals = $db->prepare('SELECT COUNT(*) FROM foals WHERE birth_year = :y');
 $stmtFoals->execute([':y' => $thisYear]);
 $foalCount = (int)$stmtFoals->fetchColumn();
 
+// Uusin postaus etusivun korttia varten (T-05-07: try/catch graceful degradation)
+$latestPost = null;
+try {
+    $stmtPost = $db->query(
+        'SELECT title, slug, content, created_at FROM posts ORDER BY created_at DESC LIMIT 1'
+    );
+    $latestPost = $stmtPost->fetch() ?: null;
+} catch (PDOException $e) {
+    // Taulu ei vielä olemassa — näytetään placeholder
+    $latestPost = null;
+}
+
 require __DIR__ . '/../src/includes/header.php';
 ?>
 
@@ -49,13 +61,23 @@ require __DIR__ . '/../src/includes/header.php';
     <span class="overlay-card-link">Kasvatussivu →</span>
   </a>
 
-  <a class="overlay-card overlay-card--news" href="#">
+  <?php
+  $newsHref = $latestPost
+      ? e(SITE_URL) . '/pages/postaus.php?slug=' . rawurlencode($latestPost['slug'])
+      : e(SITE_URL) . '/pages/blogi.php';
+  $newsTitle   = $latestPost ? e($latestPost['title']) : 'Ajankohtaista';
+  $newsExcerpt = $latestPost
+      ? e(mb_substr($latestPost['content'], 0, 120, 'UTF-8')) . '…'
+      : 'Lue uusimmat kuulumiset tallin blogista.';
+  $newsDate    = $latestPost ? formatDate($latestPost['created_at']) : '';
+  ?>
+  <a class="overlay-card overlay-card--news" href="<?= $newsHref ?>">
     <img src="https://picsum.photos/seed/winter1/320/160" alt="Ajankohtaista">
     <div class="uutinen-tag" style="margin-bottom:.5rem;">📰 Ajankohtaista</div>
-    <h3>Lumipäivä tallissa — ensimmäinen lumi tuli!</h3>
-    <p>Tänään aamulla herätessämme koko talli oli valkean lumen peitossa. Hevoset olivat innoissaan ja pääsivät ensi kertaa talvitarhaan…</p>
+    <h3><?= $newsTitle ?></h3>
+    <p><?= $newsExcerpt ?></p>
     <div class="uutinen-footer" style="margin-top:auto;padding-top:.75rem;">
-      <span class="card-date"><?= date('j.n.Y') ?></span>
+      <span class="card-date"><?= $newsDate ?></span>
       <span class="overlay-card-link">Lue lisää →</span>
     </div>
   </a>
