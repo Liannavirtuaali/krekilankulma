@@ -75,12 +75,16 @@ $MONTHS_FI = [
 require __DIR__ . '/../src/includes/header.php';
 ?>
 
+<div class="page-title-band">
+  <h1><?= e($post['title']) ?></h1>
+  <div class="breadcrumb">Etusivu › <a href="<?= e(SITE_URL) ?>/pages/ajankohtaista.php">Ajankohtaista</a> › <?= e($post['title']) ?></div>
+</div>
+
 <main class="container" style="padding: 2rem 1rem;">
   <div class="post-layout">
 
     <!-- Artikkeli -->
     <article>
-      <h1 class="post-article__title"><?= e($post['title']) ?></h1>
       <span class="post-article__date"><?= formatDate($post['created_at']) ?></span>
       <div class="post-body">
         <?= nl2br(e($post['content'])) ?>

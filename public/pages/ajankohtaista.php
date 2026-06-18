@@ -55,13 +55,16 @@ foreach ($stmtArchive->fetchAll() as $row) {
 require __DIR__ . '/../src/includes/header.php';
 ?>
 
+<div class="page-title-band">
+  <h1>Ajankohtaista</h1>
+  <div class="breadcrumb">Etusivu › Ajankohtaista</div>
+</div>
+
 <main class="container" style="padding: 2rem 1rem;">
   <div class="post-layout">
 
     <!-- Postauslista -->
     <div>
-      <h1>Ajankohtaista</h1>
-
       <?php if ($yearFilter > 0 && $monthFilter > 0): ?>
         <p style="margin:.75rem 0 1.25rem;">
           Näytetään: <?= e($MONTHS_FI[$monthFilter] ?? (string)$monthFilter) ?> <?= $yearFilter ?>
