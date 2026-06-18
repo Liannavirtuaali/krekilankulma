@@ -96,7 +96,7 @@ Plans:
 Plans:
 
 - [x] PLAN.md: Tietoturva-audit ja korjaukset (SEC-01–SEC-08: SQL-injektio, XSS, CSRF, upload, session, virheet) — completed 2026-06-17
-- [ ] 04-02-PLAN.md: GitHub Actions CI/CD -deployment Altervistaan (deploy.yml + DEPLOYMENT_CHECKLIST päivitys)
+- [x] 04-02-PLAN.md: GitHub Actions CI/CD -deployment Altervistaan (deploy.yml + DEPLOYMENT_CHECKLIST päivitys) — completed 2026-06-18
 
 ---
 *Roadmap created: 2026-06-17*

@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 05
-status: Ready to execute
-last_updated: "2026-06-18T18:46:08.354Z"
+current_phase: 04
+status: Phase 04 Complete
+last_updated: "2026-06-18T00:00:00.000Z"
 progress:
   total_phases: 5
   completed_phases: 5
-  total_plans: 12
-  completed_plans: 12
+  total_plans: 13
+  completed_plans: 13
   percent: 100
 ---
 
@@ -17,7 +17,7 @@ progress:
 
 **Project:** Virtuaalitalli
 **Initialized:** 2026-06-17
-**Current Phase:** 05
+**Current Phase:** 04
 
 ## Workflow Status
 
@@ -43,6 +43,7 @@ progress:
 - Slug generoidaan automaattisesti nimestä (slugify), duplikaatit saavat numeron loppuun
 - horse_edit.php estää itse-viittauksen sire/dam dropdowneissa
 - Kaikki 8 tietoturvavaatimusta (SEC-01–SEC-08) toteutettu koodissa
+- CI/CD: SamKirkland/FTP-Deploy-Action@v4 deployaa public/ Altervistaan push main -triggerillä; FTP-tunnukset GitHub Secretseissä
 
 ## Security Implementation (Phase 4)
 
@@ -55,9 +56,17 @@ progress:
 - **SEC-07** ✅ Session hardening (httponly, secure, samesite, 30min timeout)
 - **SEC-08** ✅ display_errors Off via .htaccess
 
+## CI/CD Deployment (Phase 4 Plan 2)
+
+- **Workflow:** `.github/workflows/deploy.yml` — GitHub Actions FTP deploy on push to main
+- **Action:** SamKirkland/FTP-Deploy-Action@v4
+- **Scope:** Only `public/` → Altervista web root (`/`)
+- **Setup required:** Add `FTP_HOST`, `FTP_USERNAME`, `FTP_PASSWORD` as GitHub repository secrets
+
 ## Next Action
 
-Deploy to Altervista: see `.planning/phases/04-tietoturva-deploy/DEPLOYMENT_CHECKLIST.md`
+Add GitHub Secrets (FTP_HOST, FTP_USERNAME, FTP_PASSWORD) and push to main to trigger first deploy.
+See `.planning/phases/04-tietoturva-deploy/DEPLOYMENT_CHECKLIST.md` for full instructions.
 
 ---
-*Last updated: 2026-06-17 — Phase 4 code complete, all 8 security requirements implemented*
+*Last updated: 2026-06-18 — Phase 4 Plan 2 complete: GitHub Actions CI/CD deployment workflow added*
