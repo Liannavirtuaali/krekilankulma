@@ -101,17 +101,22 @@ require __DIR__ . '/../src/includes/header.php';
     </div>
 
     <!-- Sticky sidebar -->
+    <?php $firstYr = array_key_first($archive); ?>
     <aside class="post-sidebar">
       <div class="archive-sidebar">
-        <h2 class="archive-sidebar__header">Arkisto</h2>
+        <h2 class="archive-sidebar__header">🗓 Arkisto</h2>
         <?php foreach ($archive as $yr => $months): ?>
-          <details>
+          <details<?= ((int)$yr === (int)$firstYr) ? ' open' : '' ?>>
             <summary><?= (int)$yr ?></summary>
             <ul class="archive-sidebar__months">
-              <?php foreach ($months as $mo => $cnt): ?>
+              <?php foreach ($months as $mo => $cnt):
+                $active = ($yearFilter === (int)$yr && $monthFilter === (int)$mo);
+              ?>
                 <li>
-                  <a href="<?= e(SITE_URL) ?>/pages/ajankohtaista.php?year=<?= (int)$yr ?>&amp;month=<?= (int)$mo ?>">
-                    <?= e($MONTHS_FI[$mo] ?? (string)$mo) ?> (<?= (int)$cnt ?>)
+                  <a href="<?= e(SITE_URL) ?>/pages/ajankohtaista.php?year=<?= (int)$yr ?>&amp;month=<?= (int)$mo ?>"
+                     class="<?= $active ? 'active' : '' ?>">
+                    <?= e($MONTHS_FI[$mo] ?? (string)$mo) ?>
+                    <span class="archive-sidebar__cnt"><?= (int)$cnt ?></span>
                   </a>
                 </li>
               <?php endforeach; ?>
