@@ -1,28 +1,82 @@
 /* Virtuaalitalli — perustyyli */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* ── CSS-muuttujat ───────────────────────────────── */
+:root {
+  --color-bg: #f9f7f4;
+  --color-surface: #ffffff;
+  --color-surface-warm: #faf6f0;
+  --color-surface-accent: #f5ede0;
+  --color-border: #e0d5c5;
+  --color-border-warm: #c9b89a;
+
+  --color-text: #2c2c2c;
+  --color-text-muted: #6b5e52;
+  --color-text-light: #9e8e7e;
+
+  --color-primary: #3d2b1f;
+  --color-primary-hover: #5a4030;
+  --color-primary-light: #7a5c45;
+
+  --color-accent: #a0633a;
+  --color-accent-light: #c9874f;
+  --color-gold: #c9a84c;
+  --color-cream: #e8d5b7;
+  --color-parchment: #f5ede0;
+
+  --color-success: #5a8a5a;
+  --color-danger: #8a3030;
+
+  --font-serif: Georgia, 'Times New Roman', serif;
+  --font-sans: 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'Courier New', monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+  --space-6: 24px; --space-8: 32px; --space-12: 48px;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 1px 2px rgba(61,43,31,0.07);
+  --shadow-md: 0 4px 8px rgba(61,43,31,0.10);
+  --shadow-lg: 0 10px 24px rgba(61,43,31,0.14);
+}
+
 body {
-  font-family: Georgia, 'Times New Roman', serif;
-  background: #f9f7f4;
-  color: #2c2c2c;
+  font-family: var(--font-serif);
+  background: var(--color-bg);
+  color: var(--color-text);
   line-height: 1.6;
 }
 
 header {
-  background: #3d2b1f;
-  color: #f9f7f4;
+  background: var(--color-primary);
+  color: var(--color-cream);
   padding: 1rem 2rem;
   display: flex;
   align-items: center;
   gap: 2rem;
   flex-wrap: wrap;
+  border-bottom: 3px solid var(--color-gold);
 }
 
 .site-title {
-  color: #e8d5b7;
+  color: var(--color-gold);
   text-decoration: none;
   font-size: 1.5rem;
   font-weight: bold;
+  font-family: var(--font-serif);
+  letter-spacing: 0.04em;
 }
 
 nav ul {
@@ -32,95 +86,213 @@ nav ul {
 }
 
 nav a {
-  color: #c9b89a;
+  color: var(--color-cream);
   text-decoration: none;
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  font-family: var(--font-sans);
+  opacity: 0.85;
+  transition: opacity 0.15s;
 }
 
 nav a:hover, nav a.active {
-  color: #e8d5b7;
-  text-decoration: underline;
+  opacity: 1;
+  color: var(--color-gold);
+  text-decoration: none;
 }
 
 main {
   max-width: 1100px;
-  margin: 2rem auto;
-  padding: 0 1.5rem;
+  margin: 0 auto;
+  padding: 0 1.5rem 3rem;
 }
 
 footer {
-  background: #3d2b1f;
-  color: #c9b89a;
+  background: var(--color-primary);
+  color: var(--color-cream);
   text-align: center;
   padding: 1rem;
   margin-top: 3rem;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
+  opacity: 0.9;
 }
 
-/* Hero-osio */
-.hero {
-  text-align: center;
-  padding: 2.5rem 1rem;
-  border-bottom: 1px solid #e0d5c5;
+/* ── Sivuotsikkoalue (kaikille sisäsivuille) ──── */
+.page-title-band {
+  background: var(--color-surface-accent);
+  border-bottom: 1px solid var(--color-border-warm);
+  padding: 1.75rem 2rem;
   margin-bottom: 2rem;
 }
-.hero h1 { font-size: 2rem; color: #3d2b1f; margin-bottom: 0.5rem; }
+.page-title-band h1 {
+  font-family: var(--font-serif);
+  font-size: var(--text-2xl);
+  color: var(--color-primary);
+  font-weight: normal;
+}
+.page-title-band .breadcrumb {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  font-family: var(--font-sans);
+  margin-top: 4px;
+}
 
-/* Hevoskortit */
-.horse-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1.5rem;
-  margin: 1.5rem 0;
+/* ── Nappi ───────────────────────────────────── */
+.btn {
+  display: inline-block;
+  background: var(--color-primary);
+  color: var(--color-cream);
+  padding: 0.5rem 1.2rem;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  transition: background 0.15s;
 }
-.horse-card {
-  background: #fff;
-  border: 1px solid #e0d5c5;
-  border-radius: 6px;
+.btn:hover { background: var(--color-primary-hover); }
+
+.btn-gold {
+  display: inline-block;
+  background: var(--color-gold);
+  color: var(--color-primary);
+  padding: 0.5rem 1.2rem;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  font-family: var(--font-sans);
+  transition: background 0.15s;
+  border: none; cursor: pointer;
+}
+.btn-gold:hover { background: #dbb84e; }
+
+/* ── Suodatuspainikkeet (pill) ───────────────── */
+.filter-bar {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+  align-items: center;
+  font-family: var(--font-sans);
+}
+.filter-bar label {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-right: 4px;
+}
+.filter-btn {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 4px 14px;
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  color: var(--color-text-muted);
+  transition: all 0.15s;
+}
+.filter-btn:hover, .filter-btn.active {
+  background: var(--color-primary);
+  color: var(--color-cream);
+  border-color: var(--color-primary);
+}
+
+/* ── Vaakalistakortti (hevoset) ──────────────── */
+.horse-list { display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem; }
+
+.horse-list-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  display: flex;
   overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.15s, transform 0.15s;
+  text-decoration: none;
+  color: inherit;
 }
-.horse-card img {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
+.horse-list-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateX(3px);
 }
-.horse-card-placeholder {
-  width: 100%;
-  height: 180px;
-  background: #e8d5b7;
+.horse-list-card .card-img {
+  width: 160px;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: var(--color-surface-accent);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 3rem;
+  font-size: 2.5rem;
 }
-.horse-card-info {
-  padding: 0.75rem 1rem;
+.horse-list-card .card-img img {
+  width: 160px;
+  height: 100%;
+  min-height: 90px;
+  object-fit: cover;
+  display: block;
 }
-.horse-card-info h3 { margin-bottom: 0.25rem; font-size: 1rem; }
-.horse-card-info h3 a { color: #3d2b1f; text-decoration: none; }
-.horse-card-info h3 a:hover { text-decoration: underline; }
-.horse-card-info p { font-size: 0.85rem; color: #666; margin: 0.1rem 0; }
+.horse-list-card .card-body {
+  padding: 0.75rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.2rem;
+  flex: 1;
+}
+.horse-list-card h3 {
+  font-size: var(--text-lg);
+  color: var(--color-primary);
+  font-family: var(--font-serif);
+  font-weight: normal;
+  margin: 0;
+}
+.horse-list-card h3 a { color: inherit; text-decoration: none; }
+.horse-list-card h3 a:hover { text-decoration: underline; }
+.horse-list-card .meta-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  font-family: var(--font-sans);
+}
+.horse-list-card .meta-row span::before { content: '· '; }
+.horse-list-card .meta-row span:first-child::before { content: ''; }
+.horse-list-card .card-tag {
+  align-self: flex-start;
+  background: var(--color-parchment);
+  color: var(--color-accent);
+  border: 1px solid var(--color-border-warm);
+  border-radius: var(--radius-full);
+  padding: 2px 12px;
+  font-size: var(--text-xs);
+  font-family: var(--font-sans);
+  margin-top: 0.25rem;
+}
 
-/* Nappi */
-.btn {
-  display: inline-block;
-  background: #3d2b1f;
-  color: #e8d5b7;
-  padding: 0.5rem 1.2rem;
-  border-radius: 4px;
-  text-decoration: none;
-  font-size: 0.9rem;
+/* ── Placeholder-kuva ────────────────────────── */
+.card-img-placeholder {
+  width: 160px;
+  min-height: 90px;
+  background: var(--color-surface-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  flex-shrink: 0;
 }
-.btn:hover { background: #5a4030; }
 
-/* Taulukot (kilpailut ym.) */
+/* ── Taulukot (kilpailut ym.) ────────────────── */
 table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
-th, td { padding: 0.5rem 0.75rem; border: 1px solid #e0d5c5; text-align: left; font-size: 0.9rem; }
-th { background: #f0e8dc; }
+th, td { padding: 0.5rem 0.75rem; border: 1px solid var(--color-border); text-align: left; font-size: var(--text-sm); font-family: var(--font-sans); }
+th { background: var(--color-surface-accent); color: var(--color-text-muted); font-weight: 600; font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.05em; }
+tr:hover td { background: var(--color-parchment); }
 
-/* Sukutaulu */
+/* ── Sukutaulu ───────────────────────────────── */
 .pedigree { margin: 1.5rem 0; }
 .ped-table {
   width: 100%;
@@ -128,40 +300,472 @@ th { background: #f0e8dc; }
   table-layout: fixed;
 }
 .ped-table th {
-  background: #3d2b1f;
-  color: #e8d5b7;
+  background: var(--color-primary);
+  color: var(--color-cream);
   padding: 0.5rem 0.75rem;
-  font-size: 0.85rem;
+  font-size: var(--text-xs);
   text-align: left;
   width: 33.33%;
+  font-family: var(--font-sans);
+  letter-spacing: 0.05em;
 }
 .ped-cell {
-  border: 1px solid #c9b89a;
+  border: 1px solid var(--color-border-warm);
   padding: 0.5rem 0.75rem;
   vertical-align: middle;
-  font-size: 0.9rem;
-  background: #fff;
+  font-size: var(--text-sm);
+  background: var(--color-surface);
 }
-.ped-cell a { color: #3d2b1f; text-decoration: none; }
+.ped-cell a { color: var(--color-primary); text-decoration: none; }
 .ped-cell a:hover { text-decoration: underline; }
-.ped-cell.ped-empty { color: #aaa; }
-.ped-gen1 {
-  background: #f5efe6;
-  font-weight: bold;
-}
-.ped-gen2 {
-  background: #faf6f0;
-}
+.ped-cell.ped-empty { color: var(--color-text-light); }
+.ped-gen1 { background: var(--color-surface-accent); font-weight: bold; }
+.ped-gen2 { background: var(--color-parchment); }
 
-/* Galleria */
+/* ── Galleria ────────────────────────────────── */
 .gallery { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1rem 0; }
-.gallery img { max-width: 280px; max-height: 200px; object-fit: cover; border-radius: 4px; border: 1px solid #e0d5c5; }
+.gallery img { max-width: 280px; max-height: 200px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--color-border); }
 
-/* Profiilisivu */
+/* ── Profiilisivu — vanhat tyylit (fallback) ─── */
 .horse-profile-info { display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem 2rem; margin: 1rem 0; }
-.horse-profile-info dt { font-weight: bold; font-size: 0.85rem; color: #666; }
-.horse-profile-info dd { font-size: 0.95rem; margin-bottom: 0.5rem; }
+.horse-profile-info dt { font-weight: bold; font-size: var(--text-sm); color: var(--color-text-muted); font-family: var(--font-sans); }
+.horse-profile-info dd { font-size: var(--text-base); margin-bottom: 0.5rem; }
+
+/* ── Hero-banneri (profiili + etusivu) ───────── */
+.hero-banner {
+  width: 100%;
+  min-height: 300px;
+  overflow: hidden;
+  position: relative;
+  background: linear-gradient(160deg, rgba(42,26,16,0.88) 0%, rgba(61,43,31,0.72) 50%, rgba(90,64,48,0.60) 100%),
+              url('https://picsum.photos/seed/stable/1200/400') center/cover no-repeat;
+  display: flex;
+  align-items: flex-end;
+}
+.hero-overlay {
+  padding: 2rem 2rem 1.5rem;
+  color: white;
+  width: 100%;
+}
+.hero-overlay h1 {
+  font-family: var(--font-serif);
+  font-size: var(--text-3xl);
+  font-weight: normal;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  margin-bottom: 0.25rem;
+}
+.hero-overlay .horse-callname {
+  color: var(--color-gold);
+  font-style: italic;
+  font-size: var(--text-lg);
+  margin-bottom: 0.75rem;
+}
+.hero-pills { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
+.hero-pill {
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: var(--radius-full);
+  padding: 2px 12px;
+  font-size: var(--text-xs);
+  font-family: var(--font-sans);
+  color: white;
+}
+
+/* ── Profiilisivu layout (hero + sidebar) ────── */
+.profile-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 1.5rem;
+  align-items: start;
+  margin-top: 1.5rem;
+}
+.profile-main section { margin-bottom: 2rem; }
+.profile-main section h2 {
+  font-family: var(--font-serif);
+  font-size: var(--text-xl);
+  color: var(--color-primary);
+  font-weight: normal;
+  border-left: 4px solid var(--color-gold);
+  padding-left: 0.75rem;
+  margin-bottom: 1rem;
+}
+.profile-sidebar { display: flex; flex-direction: column; gap: 1rem; }
+.sidebar-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  box-shadow: var(--shadow-sm);
+}
+.sidebar-card h3 {
+  font-family: var(--font-serif);
+  font-size: var(--text-base);
+  color: var(--color-primary);
+  font-weight: normal;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--color-border);
+}
+.info-row {
+  display: flex;
+  gap: 0.5rem;
+  font-size: var(--text-sm);
+  padding: 0.3rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.info-row:last-child { border-bottom: none; }
+.info-row dt {
+  color: var(--color-text-muted);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  min-width: 100px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding-top: 2px;
+}
+.info-row dd { color: var(--color-text); font-weight: 500; }
+
+/* ── Kasvatus-kompaktilista ──────────────────── */
+.foal-list { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 2rem; }
+.foal-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid var(--color-border);
+}
+.foal-section-header.expected { border-bottom-color: var(--color-gold); }
+.foal-section-header h2 { font-family: var(--font-serif); font-size: var(--text-lg); color: var(--color-primary); font-weight: normal; }
+.foal-section-header.expected h2 { color: var(--color-accent); }
+.section-count {
+  background: var(--color-parchment);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border-warm);
+  border-radius: var(--radius-full);
+  padding: 1px 10px;
+  font-size: var(--text-xs);
+  font-family: var(--font-sans);
+}
+.foal-card {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+.foal-card:hover { box-shadow: var(--shadow-md); transform: translateX(3px); }
+.foal-thumb {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: var(--color-surface-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+.foal-thumb img { width: 64px; height: 64px; object-fit: cover; display: block; }
+.foal-info {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.6rem 1rem;
+  flex-wrap: wrap;
+  font-family: var(--font-sans);
+}
+.foal-name { font-size: var(--text-base); font-weight: 600; color: var(--color-primary); }
+.foal-unnamed { font-size: var(--text-base); color: var(--color-text-muted); font-style: italic; }
+.foal-parents { font-size: var(--text-sm); color: var(--color-text-muted); }
+.foal-parents a { color: var(--color-primary); text-decoration: none; }
+.foal-parents a:hover { text-decoration: underline; }
+.foal-year { font-size: var(--text-sm); color: var(--color-text-light); }
+.foal-status { margin-left: auto; padding-right: 1rem; flex-shrink: 0; }
+.status-expected {
+  display: inline-block;
+  background: #fff8e6; color: #8a6500;
+  border: 1px solid #e6c84a;
+  border-radius: var(--radius-full);
+  padding: 2px 10px;
+  font-size: var(--text-xs);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.status-born {
+  display: inline-block;
+  background: #f0f5ef; color: #3d6b38;
+  border: 1px solid #8ab884;
+  border-radius: var(--radius-full);
+  padding: 2px 10px;
+  font-size: var(--text-xs);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.no-photo {
+  width: 64px; height: 64px;
+  background: repeating-linear-gradient(
+    45deg,
+    var(--color-surface-accent), var(--color-surface-accent) 4px,
+    var(--color-parchment) 4px, var(--color-parchment) 8px
+  );
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem; color: var(--color-text-light);
+  font-family: var(--font-sans);
+}
+
+/* ── Yhteystiedot-kortti ─────────────────────── */
+.contact-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: 2.5rem 3rem;
+  text-align: center;
+  max-width: 520px;
+  margin: 3rem auto;
+}
+.contact-card-icon {
+  width: 56px; height: 56px;
+  background: var(--color-surface-accent);
+  border: 2px solid var(--color-border-warm);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 1.25rem;
+  font-size: 1.5rem;
+}
+.contact-card h2 {
+  font-family: var(--font-serif);
+  font-size: var(--text-xl);
+  color: var(--color-primary);
+  font-weight: normal;
+  margin-bottom: 0.25rem;
+}
+.vrl-badge {
+  display: inline-block;
+  background: var(--color-parchment);
+  border: 1px solid var(--color-border-warm);
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  margin-bottom: 1.5rem;
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+}
+.contact-divider { border: none; border-top: 1px solid var(--color-border); margin: 1.5rem 0; }
+.contact-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+}
+.contact-row:last-of-type { border-bottom: none; }
+.contact-icon {
+  width: 32px; height: 32px;
+  background: var(--color-surface-accent);
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+.contact-label {
+  font-size: var(--text-xs);
+  color: var(--color-text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 2px;
+  font-family: var(--font-sans);
+}
+.contact-value { font-size: var(--text-base); color: var(--color-text); }
+.contact-value a { color: var(--color-accent); text-decoration: none; font-weight: 500; }
+.contact-value a:hover { text-decoration: underline; }
+.contact-value .mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  background: var(--color-parchment);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-warm);
+}
+
+/* ── Etusivu hero ────────────────────────────── */
+.frontpage-hero {
+  position: relative;
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+  background:
+    linear-gradient(160deg, rgba(42,26,16,0.85) 0%, rgba(61,43,31,0.72) 45%, rgba(90,64,48,0.60) 100%),
+    url('https://picsum.photos/seed/stablehorse/1600/600') center/cover no-repeat;
+}
+.frontpage-hero-content {
+  position: relative;
+  z-index: 1;
+  padding: 4rem 2rem;
+  max-width: 680px;
+}
+.frontpage-hero-content h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 5vw, 3rem);
+  color: var(--color-gold);
+  font-weight: normal;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+.frontpage-hero-content p {
+  font-size: var(--text-lg);
+  color: var(--color-cream);
+  opacity: 0.9;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+/* ── Overlay-kortit (etusivu) ────────────────── */
+.overlay-cards {
+  max-width: 1000px;
+  margin: -70px auto 0;
+  padding: 0 2rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  position: relative;
+  z-index: 2;
+}
+.overlay-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.15s, box-shadow 0.15s;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.overlay-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 32px rgba(61,43,31,0.18);
+}
+.overlay-card img {
+  width: 100%;
+  height: 110px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.75rem;
+  display: block;
+}
+.overlay-card-stat {
+  font-family: var(--font-serif);
+  font-size: 2.5rem;
+  color: var(--color-gold);
+  line-height: 1;
+  margin-bottom: 0.3rem;
+}
+.overlay-card h3 {
+  font-family: var(--font-serif);
+  font-size: var(--text-lg);
+  color: var(--color-primary);
+  font-weight: normal;
+  margin-bottom: 0.4rem;
+}
+.overlay-card p { font-size: var(--text-sm); color: var(--color-text-muted); line-height: 1.5; }
+.overlay-card .card-date { font-size: var(--text-xs); color: var(--color-text-light); margin-top: 0.5rem; font-family: var(--font-sans); }
+.overlay-card-link {
+  display: inline-block;
+  margin-top: 0.75rem;
+  font-size: var(--text-sm);
+  color: var(--color-accent);
+  text-decoration: none;
+  font-weight: 600;
+  font-family: var(--font-sans);
+}
+.overlay-card-link:hover { text-decoration: underline; }
+
+/* ── Etusivun sisältöosiot ───────────────────── */
+.frontpage-content {
+  max-width: 1000px;
+  margin: 3rem auto 0;
+  padding: 0 2rem 3rem;
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 1.75rem;
+}
+.frontpage-esittely {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-sm);
+}
+.frontpage-esittely img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  margin-bottom: 1.25rem;
+  display: block;
+}
+.frontpage-esittely h2 {
+  font-family: var(--font-serif);
+  font-size: var(--text-xl);
+  color: var(--color-primary);
+  font-weight: normal;
+  margin-bottom: 0.75rem;
+}
+.frontpage-esittely p {
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+  line-height: 1.75;
+  margin-bottom: 1.25rem;
+}
+.frontpage-uutinen {
+  background: var(--color-surface-warm);
+  border: 1px solid var(--color-border-warm);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  box-shadow: var(--shadow-sm);
+}
+.frontpage-uutinen .uutinen-tag {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-gold);
+  font-weight: 700;
+  font-family: var(--font-sans);
+  margin-bottom: 0.6rem;
+}
+.frontpage-uutinen h3 {
+  font-family: var(--font-serif);
+  font-size: var(--text-lg);
+  color: var(--color-primary);
+  font-weight: normal;
+  margin-bottom: 0.6rem;
+}
+.frontpage-uutinen p { font-size: var(--text-sm); color: var(--color-text-muted); line-height: 1.65; }
+.frontpage-uutinen .uutinen-pvm { font-size: var(--text-xs); color: var(--color-text-light); margin-top: 0.75rem; font-family: var(--font-sans); }
+
+/* ── Responsive ──────────────────────────────── */
+@media (max-width: 700px) {
+  .overlay-cards { grid-template-columns: 1fr; margin-top: 0; }
+  .frontpage-content { grid-template-columns: 1fr; }
+  .profile-layout { grid-template-columns: 1fr; }
+  .horse-list-card .card-img { width: 100px; }
+  .horse-list-card .card-img img { width: 100px; }
+}
 @media (max-width: 600px) {
   .horse-profile-info { grid-template-columns: 1fr; }
-  .pedigree-grid { grid-template-columns: 1fr; }
+  .contact-card { padding: 1.5rem 1.25rem; }
 }

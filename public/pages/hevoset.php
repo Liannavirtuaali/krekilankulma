@@ -6,8 +6,10 @@ $page_title = 'Hevoset';
 $db = getDB();
 $stmt = $db->prepare(
     'SELECT h.id, h.name, h.slug, h.breed, h.gender, h.birth_date,
+            d.name AS discipline_name,
             hp.filename
      FROM horses h
+     LEFT JOIN disciplines d ON d.id = h.discipline_id
      LEFT JOIN horse_photos hp
             ON hp.horse_id = h.id
            AND hp.sort_order = (SELECT MIN(sort_order) FROM horse_photos WHERE horse_id = h.id)
@@ -21,31 +23,69 @@ require __DIR__ . '/../src/includes/header.php';
 
 $genderFi = ['ori' => 'Ori', 'tamma' => 'Tamma', 'ruuna' => 'Ruuna', 'käkky' => 'Käkky'];
 ?>
-<main>
-  <h1>Tallin hevoset</h1>
 
+<div class="page-title-band">
+  <h1>Tallin hevoset</h1>
+  <div class="breadcrumb">Etusivu › Hevoset</div>
+</div>
+
+<main>
   <?php if (empty($horses)): ?>
-    <p>Tallissa ei ole vielä hevosia.</p>
+    <p style="color:var(--color-text-muted);font-family:var(--font-sans);">Tallissa ei ole vielä hevosia.</p>
   <?php else: ?>
-    <div class="horse-cards">
+
+    <!-- Suodatuspainikkeet -->
+    <div class="filter-bar">
+      <label>Sukupuoli:</label>
+      <button class="filter-btn active" data-filter="kaikki">Kaikki</button>
+      <button class="filter-btn" data-filter="tamma">Tammat</button>
+      <button class="filter-btn" data-filter="ori">Oriit</button>
+      <button class="filter-btn" data-filter="ruuna">Ruunat</button>
+      <button class="filter-btn" data-filter="käkky">Käkyt</button>
+    </div>
+
+    <!-- Listakorteista -->
+    <div class="horse-list" id="horse-list">
       <?php foreach ($horses as $horse): ?>
-        <div class="horse-card">
+        <div class="horse-list-card" data-gender="<?= e($horse['gender']) ?>">
           <?php if ($horse['filename']): ?>
-            <img src="<?= e(UPLOADS_URL . $horse['filename']) ?>" alt="<?= e($horse['name']) ?>">
+            <div class="card-img">
+              <img src="<?= e(UPLOADS_URL . $horse['filename']) ?>" alt="<?= e($horse['name']) ?>">
+            </div>
           <?php else: ?>
-            <div class="horse-card-placeholder">🐴</div>
+            <div class="card-img">🐴</div>
           <?php endif; ?>
-          <div class="horse-card-info">
+          <div class="card-body">
             <h3><a href="<?= e(horseUrl($horse)) ?>"><?= e($horse['name']) ?></a></h3>
-            <?php if ($horse['breed']): ?><p><?= e($horse['breed']) ?></p><?php endif; ?>
-            <p><?= e($genderFi[$horse['gender']] ?? $horse['gender']) ?></p>
-            <?php if ($horse['birth_date']): ?>
-              <p><?= e((string)calculateAge($horse['birth_date'])) ?> v.</p>
+            <div class="meta-row">
+              <?php if ($horse['breed']): ?><span><?= e($horse['breed']) ?></span><?php endif; ?>
+              <span><?= e($genderFi[$horse['gender']] ?? $horse['gender']) ?></span>
+              <?php if ($horse['birth_date']): ?>
+                <span><?= e((string)calculateAge($horse['birth_date'])) ?> v.</span>
+              <?php endif; ?>
+            </div>
+            <?php if ($horse['discipline_name']): ?>
+              <span class="card-tag"><?= e($horse['discipline_name']) ?></span>
             <?php endif; ?>
           </div>
         </div>
       <?php endforeach; ?>
     </div>
+
   <?php endif; ?>
 </main>
+
+<script>
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    const filter = this.dataset.filter;
+    document.querySelectorAll('.horse-list-card').forEach(card => {
+      card.style.display = (filter === 'kaikki' || card.dataset.gender === filter) ? '' : 'none';
+    });
+  });
+});
+</script>
+
 <?php require __DIR__ . '/../src/includes/footer.php'; ?>

@@ -3,55 +3,96 @@ require_once __DIR__ . '/../src/includes/db.php';
 
 $page_title = 'Etusivu';
 
-// Hae 3 viimeisintä tallin hevosta ensimmäisellä kuvalla
 $db = getDB();
-$stmt = $db->prepare(
-    'SELECT h.id, h.name, h.slug, h.breed, h.gender,
-            hp.filename
-     FROM horses h
-     LEFT JOIN horse_photos hp
-            ON hp.horse_id = h.id
-           AND hp.sort_order = (SELECT MIN(sort_order) FROM horse_photos WHERE horse_id = h.id)
-     WHERE h.is_deleted = 0 AND h.evm = 0
-     ORDER BY h.id DESC
-     LIMIT 3'
-);
-$stmt->execute();
-$latestHorses = $stmt->fetchAll();
+
+// Hevosmäärä
+$stmtCount = $db->query('SELECT COUNT(*) FROM horses WHERE is_deleted = 0 AND evm = 0');
+$horseCount = (int)$stmtCount->fetchColumn();
+
+// Varsoja tänä vuonna
+$thisYear = (int)date('Y');
+$stmtFoals = $db->prepare('SELECT COUNT(*) FROM foals WHERE birth_year = :y');
+$stmtFoals->execute([':y' => $thisYear]);
+$foalCount = (int)$stmtFoals->fetchColumn();
 
 require __DIR__ . '/../src/includes/header.php';
-
-$genderFi = ['ori' => 'Ori', 'tamma' => 'Tamma', 'ruuna' => 'Ruuna', 'käkky' => 'Käkky'];
 ?>
-<main>
-  <section class="hero">
+
+<!-- Hero -->
+<div class="frontpage-hero">
+  <div class="frontpage-hero-content">
     <h1>Tervetuloa <?= e(SITE_NAME) ?>on</h1>
     <p>Täällä asuvat rakkaimmat hevosemme. Tutustu talliimme ja sen asukkaisiin!</p>
-  </section>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a class="btn-gold" href="<?= e(SITE_URL) ?>/pages/hevoset.php">Hevoset →</a>
+      <a href="<?= e(SITE_URL) ?>/pages/kasvatus.php"
+         style="color:var(--color-cream);text-decoration:none;font-size:var(--text-sm);opacity:.85;align-self:center;font-family:var(--font-sans);">Kasvatus →</a>
+    </div>
+  </div>
+</div>
 
-  <section class="horses-preview">
-    <h2>Tallin hevoset</h2>
-    <?php if (empty($latestHorses)): ?>
-      <p>Tallissa ei ole vielä hevosia.</p>
-    <?php else: ?>
-      <div class="horse-cards">
-        <?php foreach ($latestHorses as $horse): ?>
-          <div class="horse-card">
-            <?php if ($horse['filename']): ?>
-              <img src="<?= e(UPLOADS_URL . $horse['filename']) ?>" alt="<?= e($horse['name']) ?>">
-            <?php else: ?>
-              <div class="horse-card-placeholder">🐴</div>
-            <?php endif; ?>
-            <div class="horse-card-info">
-              <h3><a href="<?= e(horseUrl($horse)) ?>"><?= e($horse['name']) ?></a></h3>
-              <?php if ($horse['breed']): ?><p><?= e($horse['breed']) ?></p><?php endif; ?>
-              <p><?= e($genderFi[$horse['gender']] ?? $horse['gender']) ?></p>
-            </div>
-          </div>
-        <?php endforeach; ?>
-      </div>
-    <?php endif; ?>
-    <p style="margin-top:1.5rem;"><a href="<?= e(SITE_URL . '/pages/hevoset.php') ?>" class="btn">Katso kaikki hevoset &rarr;</a></p>
-  </section>
-</main>
+<!-- Overlay-kortit -->
+<div class="overlay-cards">
+  <a class="overlay-card" href="<?= e(SITE_URL) ?>/pages/hevoset.php">
+    <img src="https://picsum.photos/seed/horses1/320/160" alt="Hevoset">
+    <div class="overlay-card-stat" id="stat-hevoset"><?= $horseCount ?></div>
+    <h3>Hevosta tallissa</h3>
+    <p>Tammoja, oriita ja kasvavaa nuorta sukupolvea.</p>
+    <span class="overlay-card-link">Katso kaikki →</span>
+  </a>
+
+  <a class="overlay-card" href="<?= e(SITE_URL) ?>/pages/kasvatus.php">
+    <img src="https://picsum.photos/seed/foal2024/320/160" alt="Varsat">
+    <div class="overlay-card-stat" id="stat-varsat"><?= $foalCount ?></div>
+    <h3>Varsaa <?= $thisYear ?></h3>
+    <p>Syntyneet ja odotetut varsat — katso kasvatusohjelma.</p>
+    <span class="overlay-card-link">Kasvatussivu →</span>
+  </a>
+
+  <div class="overlay-card" style="cursor:default;">
+    <div style="font-size:2rem;margin-bottom:.75rem;">📰</div>
+    <h3>Ajankohtaista</h3>
+    <p>Tallin viimeisin uutinen ja tapahtumat löydät täältä.</p>
+    <div class="card-date"><?= date('j.n.Y') ?></div>
+  </div>
+</div>
+
+<!-- Esittely + uutinen -->
+<div class="frontpage-content">
+  <div class="frontpage-esittely">
+    <img src="https://picsum.photos/seed/barn2/600/200" alt="Talli">
+    <h2>Tietoa tallista</h2>
+    <p><?= e(SITE_NAME) ?> on perustettu rakkaudesta hevosiin ja virtuaaliseen hevosmaailmaan.
+       Pidämme huolta jokaisesta tallin asukkaasta ja panostamme laadukkaaseen kasvatukseen.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:1.25rem;">
+      <a class="btn" href="<?= e(SITE_URL) ?>/pages/hevoset.php">Tutustu hevosiin →</a>
+      <a class="btn-gold" href="<?= e(SITE_URL) ?>/pages/kasvatus.php">Kasvatus →</a>
+    </div>
+  </div>
+
+  <div class="frontpage-uutinen">
+    <div class="uutinen-tag">📰 Ajankohtaista</div>
+    <h3>Tervetuloa tallin sivuille!</h3>
+    <p>Sivusto on juuri avattu. Löydät täältä kaikki tallin hevoset, kasvatusohjelman ja yhteystiedot.</p>
+    <div class="uutinen-pvm"><?= date('j.n.Y') ?></div>
+  </div>
+</div>
+
+<script>
+function animateCount(el, target, duration) {
+  if (!el || target === 0) return;
+  let start = 0;
+  const step = target / (duration / 16);
+  const timer = setInterval(() => {
+    start = Math.min(start + step, target);
+    el.textContent = Math.round(start);
+    if (start >= target) clearInterval(timer);
+  }, 16);
+}
+setTimeout(() => {
+  animateCount(document.getElementById('stat-hevoset'), <?= $horseCount ?>, 800);
+  animateCount(document.getElementById('stat-varsat'),  <?= $foalCount ?>,  600);
+}, 150);
+</script>
+
 <?php require __DIR__ . '/../src/includes/footer.php'; ?>

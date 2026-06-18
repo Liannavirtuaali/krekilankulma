@@ -82,165 +82,199 @@ function pedigreeHorseLink(array $h): string {
     }
     return '<a href="' . e(horseUrl($h)) . '">' . e($h['name']) . '</a>';
 }
-?>
-<main>
-  <h1><?= e($horse['name']) ?></h1>
-  <?php if ($horse['call_name']): ?>
-    <p class="call-name">"<?= e($horse['call_name']) ?>"</p>
-  <?php endif; ?>
 
-  <!-- Perustiedot -->
-  <section>
-    <h2>Perustiedot</h2>
-    <dl class="horse-profile-info">
-      <?php if ($horse['breed']): ?>
-        <dt>Rotu</dt><dd><?= e($horse['breed']) ?></dd>
-      <?php endif; ?>
-      <dt>Sukupuoli</dt><dd><?= e($genderFi[$horse['gender']] ?? $horse['gender']) ?></dd>
+// Ensimmäinen kuva hero-banneria varten
+$heroPhoto = !empty($photos) ? $photos[0]['filename'] : null;
+$heroStyle = $heroPhoto
+    ? 'background-image: linear-gradient(160deg,rgba(42,26,16,.85) 0%,rgba(61,43,31,.65) 50%,rgba(90,64,48,.50) 100%), url(' . e(UPLOADS_URL . $heroPhoto) . ');background-size:cover;background-position:center;'
+    : '';
+?>
+
+<!-- Hero-banneri -->
+<div class="hero-banner" style="<?= $heroStyle ?>">
+  <div class="hero-overlay">
+    <h1><?= e($horse['name']) ?></h1>
+    <?php if ($horse['call_name']): ?>
+      <div class="horse-callname">"<?= e($horse['call_name']) ?>"</div>
+    <?php endif; ?>
+    <div class="hero-pills">
+      <?php if ($horse['breed']): ?><span class="hero-pill"><?= e($horse['breed']) ?></span><?php endif; ?>
+      <span class="hero-pill"><?= e($genderFi[$horse['gender']] ?? $horse['gender']) ?></span>
       <?php if ($horse['birth_date']): ?>
-        <dt>Syntymäaika</dt><dd><?= e(formatDate($horse['birth_date'])) ?> (<?= e((string)calculateAge($horse['birth_date'])) ?> v.)</dd>
-      <?php endif; ?>
-      <?php if ($horse['color']): ?>
-        <dt>Väri</dt><dd><?= e($horse['color']) ?></dd>
-      <?php endif; ?>
-      <?php if ($horse['height_cm']): ?>
-        <dt>Säkäkorkeus</dt><dd><?= e((string)$horse['height_cm']) ?> cm</dd>
-      <?php endif; ?>
-      <?php if ($horse['vh_id']): ?>
-        <dt>VH-tunnus</dt><dd><?= e($horse['vh_id']) ?></dd>
+        <span class="hero-pill"><?= e((string)calculateAge($horse['birth_date'])) ?> v.</span>
       <?php endif; ?>
       <?php if ($horse['discipline_name']): ?>
-        <dt>Laji</dt><dd><?= e($horse['discipline_name']) ?></dd>
+        <span class="hero-pill"><?= e($horse['discipline_name']) ?></span>
       <?php endif; ?>
-      <?php if ($horse['level_name']): ?>
-        <dt>Taso</dt><dd><?= e($horse['level_name']) ?></dd>
-      <?php endif; ?>
-      <?php if ($horse['owner_name']): ?>
-        <dt>Omistaja</dt><dd><?= e($horse['owner_name']) ?></dd>
-      <?php endif; ?>
-      <?php if ($horse['breeder_name']): ?>
-        <dt>Kasvattaja</dt><dd><?= e($horse['breeder_name']) ?></dd>
-      <?php endif; ?>
-      <?php if ($horse['importer_name']): ?>
-        <dt>Tuoja</dt><dd><?= e($horse['importer_name']) ?></dd>
-      <?php endif; ?>
-    </dl>
-    <?php if ($horse['description']): ?>
-      <h3>Kuvaus</h3>
-      <p><?= nl2br(e($horse['description'])) ?></p>
-    <?php endif; ?>
-  </section>
+    </div>
+  </div>
+</div>
 
-  <!-- Sukutaulu -->
-  <section class="pedigree">
-    <h2>Sukutaulu</h2>
-    <?php
-    // Haetaan sukupolvien viittaukset selkeästi
-    $sire     = $pedigree['sire'] ?? null;          // Isä
-    $dam      = $pedigree['dam']  ?? null;           // Emä
-    $ss       = $sire['sire']     ?? null;           // Isän isä
-    $sd       = $sire['dam']      ?? null;           // Isän emä
-    $ds       = $dam['sire']      ?? null;           // Emän isä
-    $dd       = $dam['dam']       ?? null;           // Emän emä
-    $sss      = $ss['sire']       ?? null;           // Isän isän isä
-    $ssd      = $ss['dam']        ?? null;           // Isän isän emä
-    $sds      = $sd['sire']       ?? null;           // Isän emän isä
-    $sdd      = $sd['dam']        ?? null;           // Isän emän emä
-    $dss      = $ds['sire']       ?? null;           // Emän isän isä
-    $dsd      = $ds['dam']        ?? null;           // Emän isän emä
-    $dds      = $dd['sire']       ?? null;           // Emän emän isä
-    $ddd      = $dd['dam']        ?? null;           // Emän emän emä
+<main style="max-width:1100px;margin:0 auto;padding:0 1.5rem 3rem;">
+  <div class="profile-layout">
 
-    function pedigreeCell(?array $h): string {
-        if (!$h) return '<td class="ped-cell ped-empty">—</td>';
-        return '<td class="ped-cell">' . pedigreeHorseLink($h) . '</td>';
-    }
-    ?>
-    <table class="ped-table">
-      <thead>
-        <tr>
-          <th>Vanhemmat</th>
-          <th>Isovanhemmat</th>
-          <th>Isoisovanhemmat</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Rivi 1: Isä / Isän isä / Isän isän isä -->
-        <tr>
-          <td class="ped-cell ped-gen1" rowspan="4"><?= $sire ? pedigreeHorseLink($sire) : '—' ?></td>
-          <td class="ped-cell ped-gen2" rowspan="2"><?= $ss ? pedigreeHorseLink($ss) : '—' ?></td>
-          <?= pedigreeCell($sss) ?>
-        </tr>
-        <!-- Rivi 2: Isän isän emä -->
-        <tr><?= pedigreeCell($ssd) ?></tr>
-        <!-- Rivi 3: Isän emä / Isän emän isä -->
-        <tr>
-          <td class="ped-cell ped-gen2" rowspan="2"><?= $sd ? pedigreeHorseLink($sd) : '—' ?></td>
-          <?= pedigreeCell($sds) ?>
-        </tr>
-        <!-- Rivi 4: Isän emän emä -->
-        <tr><?= pedigreeCell($sdd) ?></tr>
-        <!-- Rivi 5: Emä / Emän isä / Emän isän isä -->
-        <tr>
-          <td class="ped-cell ped-gen1" rowspan="4"><?= $dam ? pedigreeHorseLink($dam) : '—' ?></td>
-          <td class="ped-cell ped-gen2" rowspan="2"><?= $ds ? pedigreeHorseLink($ds) : '—' ?></td>
-          <?= pedigreeCell($dss) ?>
-        </tr>
-        <!-- Rivi 6: Emän isän emä -->
-        <tr><?= pedigreeCell($dsd) ?></tr>
-        <!-- Rivi 7: Emän emä / Emän emän isä -->
-        <tr>
-          <td class="ped-cell ped-gen2" rowspan="2"><?= $dd ? pedigreeHorseLink($dd) : '—' ?></td>
-          <?= pedigreeCell($dds) ?>
-        </tr>
-        <!-- Rivi 8: Emän emän emä -->
-        <tr><?= pedigreeCell($ddd) ?></tr>
-      </tbody>
-    </table>
-    <?php if ($horse['pedigree_notes']): ?>
-      <h3>Sukuselvitys</h3>
-      <p><?= nl2br(e($horse['pedigree_notes'])) ?></p>
-    <?php endif; ?>
-  </section>
+    <!-- Pääsisältö -->
+    <div class="profile-main">
 
-  <!-- Kisakalenteri -->
-  <section>
-    <h2>Kisakalenteri</h2>
-    <?php if (empty($competitions)): ?>
-      <p>Ei kilpailutuloksia.</p>
-    <?php else: ?>
-      <table>
-        <thead>
-          <tr><th>Päivämäärä</th><th>Kilpailu</th><th>Sijoitus</th><th>Pisteet</th><th>Huomiot</th></tr>
-        </thead>
-        <tbody>
-          <?php foreach ($competitions as $comp): ?>
+      <?php if ($horse['description']): ?>
+      <section>
+        <h2>Kuvaus</h2>
+        <p style="font-size:var(--text-base);color:var(--color-text-muted);line-height:1.75;"><?= nl2br(e($horse['description'])) ?></p>
+      </section>
+      <?php endif; ?>
+
+      <!-- Sukutaulu -->
+      <section class="pedigree">
+        <h2>Sukutaulu</h2>
+        <?php
+        $sire = $pedigree['sire'] ?? null;
+        $dam  = $pedigree['dam']  ?? null;
+        $ss   = $sire['sire']     ?? null;
+        $sd   = $sire['dam']      ?? null;
+        $ds   = $dam['sire']      ?? null;
+        $dd   = $dam['dam']       ?? null;
+        $sss  = $ss['sire']       ?? null;
+        $ssd  = $ss['dam']        ?? null;
+        $sds  = $sd['sire']       ?? null;
+        $sdd  = $sd['dam']        ?? null;
+        $dss  = $ds['sire']       ?? null;
+        $dsd  = $ds['dam']        ?? null;
+        $dds  = $dd['sire']       ?? null;
+        $ddd  = $dd['dam']        ?? null;
+
+        function pedigreeCell(?array $h): string {
+            if (!$h) return '<td class="ped-cell ped-empty">—</td>';
+            return '<td class="ped-cell">' . pedigreeHorseLink($h) . '</td>';
+        }
+        ?>
+        <table class="ped-table">
+          <thead>
             <tr>
-              <td><?= e(formatDate($comp['competition_date'])) ?></td>
-              <td><?= e($comp['competition_name']) ?></td>
-              <td><?= e($comp['placement'] ?? '—') ?></td>
-              <td><?= $comp['points'] !== null ? e((string)$comp['points']) : '—' ?></td>
-              <td><?= e($comp['notes'] ?? '') ?></td>
+              <th>Vanhemmat</th>
+              <th>Isovanhemmat</th>
+              <th>Isoisovanhemmat</th>
             </tr>
-          <?php endforeach; ?>
-        </tbody>
-      </table>
-    <?php endif; ?>
-  </section>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="ped-cell ped-gen1" rowspan="4"><?= $sire ? pedigreeHorseLink($sire) : '—' ?></td>
+              <td class="ped-cell ped-gen2" rowspan="2"><?= $ss ? pedigreeHorseLink($ss) : '—' ?></td>
+              <?= pedigreeCell($sss) ?>
+            </tr>
+            <tr><?= pedigreeCell($ssd) ?></tr>
+            <tr>
+              <td class="ped-cell ped-gen2" rowspan="2"><?= $sd ? pedigreeHorseLink($sd) : '—' ?></td>
+              <?= pedigreeCell($sds) ?>
+            </tr>
+            <tr><?= pedigreeCell($sdd) ?></tr>
+            <tr>
+              <td class="ped-cell ped-gen1" rowspan="4"><?= $dam ? pedigreeHorseLink($dam) : '—' ?></td>
+              <td class="ped-cell ped-gen2" rowspan="2"><?= $ds ? pedigreeHorseLink($ds) : '—' ?></td>
+              <?= pedigreeCell($dss) ?>
+            </tr>
+            <tr><?= pedigreeCell($dsd) ?></tr>
+            <tr>
+              <td class="ped-cell ped-gen2" rowspan="2"><?= $dd ? pedigreeHorseLink($dd) : '—' ?></td>
+              <?= pedigreeCell($dds) ?>
+            </tr>
+            <tr><?= pedigreeCell($ddd) ?></tr>
+          </tbody>
+        </table>
+        <?php if ($horse['pedigree_notes']): ?>
+          <p style="margin-top:.75rem;font-size:var(--text-sm);color:var(--color-text-muted);"><?= nl2br(e($horse['pedigree_notes'])) ?></p>
+        <?php endif; ?>
+      </section>
 
-  <!-- Kuvagalleria -->
-  <section>
-    <h2>Kuvagalleria</h2>
-    <?php if (empty($photos)): ?>
-      <p>Ei kuvia.</p>
-    <?php else: ?>
-      <div class="gallery">
-        <?php foreach ($photos as $photo): ?>
-          <img src="<?= e(UPLOADS_URL . $photo['filename']) ?>"
-               alt="<?= e($photo['original_name'] ?? $horse['name']) ?>">
-        <?php endforeach; ?>
+      <!-- Kisakalenteri -->
+      <section>
+        <h2>Kisakalenteri</h2>
+        <?php if (empty($competitions)): ?>
+          <p style="color:var(--color-text-muted);font-family:var(--font-sans);font-size:var(--text-sm);">Ei kilpailutuloksia.</p>
+        <?php else: ?>
+          <table>
+            <thead>
+              <tr><th>Päivämäärä</th><th>Kilpailu</th><th>Sijoitus</th><th>Pisteet</th><th>Huomiot</th></tr>
+            </thead>
+            <tbody>
+              <?php foreach ($competitions as $comp): ?>
+                <tr>
+                  <td><?= e(formatDate($comp['competition_date'])) ?></td>
+                  <td><?= e($comp['competition_name']) ?></td>
+                  <td><?= e($comp['placement'] ?? '—') ?></td>
+                  <td><?= $comp['points'] !== null ? e((string)$comp['points']) : '—' ?></td>
+                  <td><?= e($comp['notes'] ?? '') ?></td>
+                </tr>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+        <?php endif; ?>
+      </section>
+
+      <!-- Kuvagalleria -->
+      <?php if (!empty($photos)): ?>
+      <section>
+        <h2>Kuvagalleria</h2>
+        <div class="gallery">
+          <?php foreach ($photos as $photo): ?>
+            <img src="<?= e(UPLOADS_URL . $photo['filename']) ?>"
+                 alt="<?= e($photo['original_name'] ?? $horse['name']) ?>">
+          <?php endforeach; ?>
+        </div>
+      </section>
+      <?php endif; ?>
+
+    </div><!-- /.profile-main -->
+
+    <!-- Sivupalkki -->
+    <aside class="profile-sidebar">
+
+      <div class="sidebar-card">
+        <h3>Perustiedot</h3>
+        <dl>
+          <?php if ($horse['breed']): ?>
+            <div class="info-row"><dt>Rotu</dt><dd><?= e($horse['breed']) ?></dd></div>
+          <?php endif; ?>
+          <div class="info-row"><dt>Sukupuoli</dt><dd><?= e($genderFi[$horse['gender']] ?? $horse['gender']) ?></dd></div>
+          <?php if ($horse['birth_date']): ?>
+            <div class="info-row"><dt>Syntymäaika</dt><dd><?= e(formatDate($horse['birth_date'])) ?></dd></div>
+          <?php endif; ?>
+          <?php if ($horse['color']): ?>
+            <div class="info-row"><dt>Väri</dt><dd><?= e($horse['color']) ?></dd></div>
+          <?php endif; ?>
+          <?php if ($horse['height_cm']): ?>
+            <div class="info-row"><dt>Säkäkorkeus</dt><dd><?= e((string)$horse['height_cm']) ?> cm</dd></div>
+          <?php endif; ?>
+          <?php if ($horse['vh_id']): ?>
+            <div class="info-row"><dt>VH-tunnus</dt><dd style="font-family:var(--font-mono);font-size:var(--text-xs);"><?= e($horse['vh_id']) ?></dd></div>
+          <?php endif; ?>
+          <?php if ($horse['discipline_name']): ?>
+            <div class="info-row"><dt>Laji</dt><dd><?= e($horse['discipline_name']) ?></dd></div>
+          <?php endif; ?>
+          <?php if ($horse['level_name']): ?>
+            <div class="info-row"><dt>Taso</dt><dd><?= e($horse['level_name']) ?></dd></div>
+          <?php endif; ?>
+        </dl>
       </div>
-    <?php endif; ?>
-  </section>
+
+      <?php if ($horse['owner_name'] || $horse['breeder_name'] || $horse['importer_name']): ?>
+      <div class="sidebar-card">
+        <h3>Omistus & kasvatus</h3>
+        <dl>
+          <?php if ($horse['owner_name']): ?>
+            <div class="info-row"><dt>Omistaja</dt><dd><?= e($horse['owner_name']) ?></dd></div>
+          <?php endif; ?>
+          <?php if ($horse['breeder_name']): ?>
+            <div class="info-row"><dt>Kasvattaja</dt><dd><?= e($horse['breeder_name']) ?></dd></div>
+          <?php endif; ?>
+          <?php if ($horse['importer_name']): ?>
+            <div class="info-row"><dt>Tuoja</dt><dd><?= e($horse['importer_name']) ?></dd></div>
+          <?php endif; ?>
+        </dl>
+      </div>
+      <?php endif; ?>
+
+    </aside>
+
+  </div><!-- /.profile-layout -->
 </main>
 <?php require __DIR__ . '/../src/includes/footer.php'; ?>
