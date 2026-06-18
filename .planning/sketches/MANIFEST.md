@@ -17,5 +17,8 @@ Lämmin, rustiikkinen virtuaalitalli — tuntuu kuin oikeasti kävelisi puiseen 
 | 003 | kasvatus | Miten varsat esitetään kasvatus-sivulla? | C: Kompakti lista | layout, foals, breeding |
 | 004 | yhteystiedot | Miten nimimerkki, VRL-tunnus ja sähköposti esitetään selkeästi? | A: Korttikortti | layout, contact, simple |
 | 005 | etusivu | Miten etusivun osiot (hero, tilastot, esittely, uutinen, kasvatus-CTA) jäsennellään? | C: Overlay-kortit | layout, homepage, hero, stats |
-| 006 | admin-layout | Miltä admin-navigaation rakenne tuntuu? | TBD | admin, layout, navigation, dashboard |
-| 007 | horse-list | Miten hevosten lista esitetään admin-hallinnassa? | TBD | admin, horse-list, table, cards, management |
+| 006 | admin-layout | Miltä admin-navigaation rakenne tuntuu? | A: Sivupalkki ★ | admin, layout, navigation, dashboard |
+| 007 | horse-list | Miten hevosten lista esitetään admin-hallinnassa? | C: Kompakti + laajennettava ★ | admin, horse-list, table, cards, management |
+| 008 | admin-kasvatus | Inline lisäyspaneeli vai slide-in lomake varsahallinnassa? | TBD | admin, kasvatus, foals, inline-form, slide-panel |
+| 009 | admin-kilpailut | Kompakti lista vai aikajana kilpailutuloksille? | TBD | admin, kilpailut, competitions, timeline |
+| 010 | admin-kuvat | Latauslaatikko+ruudukko vai kompakti kuvaruudukko järjestyksellä? | TBD | admin, kuvat, photos, upload, grid |

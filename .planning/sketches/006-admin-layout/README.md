@@ -7,6 +7,6 @@
 - **B: Ylänavigaatio** — Koko leveyden yläpalkki linkeillä. Mahdollistaa suuremman sisältöalueen. Tuttu PHP-admin-tunne mutta uusittuna.
 - **C: Icon-sidebar + otsikkopalkki** — Kapeampi 60px ikonipalkki + sisältöalueen oma yläpalkki hakuineen. Linearin kaltainen, tilaa säästävä.
 
-**Voittaja:** TBD
+**Voittaja:** A: Sivupalkki ★
 
 **Tagit:** admin, layout, navigation, dashboard

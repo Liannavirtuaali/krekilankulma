@@ -7,6 +7,6 @@
 - **B: Korttirivit** — Horisontaaliset kortit kuten käyttäjäpuolella. Enemmän tilaa, hevosen nimi isommin, kuvamäärä näkyvissä. Tuttu SaaS-lista.
 - **C: Kompakti + laajennettava** — Tiivis rivistö, toiminnot avautuvat riville klikkaamalla. Maksimoi näkyvien hevosten määrä per näyttö.
 
-**Voittaja:** TBD
+**Voittaja:** C: Kompakti + laajennettava ★
 
 **Tagit:** admin, horse-list, table, cards, management
