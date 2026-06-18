@@ -2,7 +2,7 @@
 sketch: "003"
 name: kasvatus
 question: "Miten varsat esitetään kasvatus-sivulla?"
-winner: null
+winner: "C"
 tags: [layout, foals, breeding]
 ---
 
