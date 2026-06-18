@@ -48,7 +48,7 @@ require __DIR__ . '/includes/admin_header.php';
     </div>
     <div><span class="gbadge <?= $gClass ?>"><?= e($horse['gender']) ?></span></div>
     <div class="cl-meta"><?= $horse['birth_date'] ? formatDate($horse['birth_date']) : '—' ?></div>
-    <div class="cl-mono"><?= e($horse['vh_id']) ?></div>
+    <div class="cl-mono"><?= e($horse['vh_id'] ?? '') ?></div>
     <div>
       <button class="cl-expand-btn" id="cl-btn-<?= (int)$horse['id'] ?>"
               onclick="event.stopPropagation();adminToggleExpand(<?= (int)$horse['id'] ?>)">▸</button>

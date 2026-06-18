@@ -41,4 +41,9 @@ if (file_exists($filepath)) {
 $del = $db->prepare('DELETE FROM horse_photos WHERE id = :photo_id');
 $del->execute([':photo_id' => $photo_id]);
 
-redirect(SITE_URL . '/admin/photos.php?horse_id=' . $horse_id . '&deleted=1');
+$redirect = $_POST['redirect'] ?? '';
+if ($redirect === 'kuvat_all') {
+    redirect(SITE_URL . '/admin/kuvat_all.php?deleted=1');
+} else {
+    redirect(SITE_URL . '/admin/photos.php?horse_id=' . $horse_id . '&deleted=1');
+}

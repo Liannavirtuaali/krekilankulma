@@ -246,13 +246,13 @@ $_activePage = basename($_SERVER['PHP_SELF'], '.php');
          href="<?= e(SITE_URL) ?>/admin/">⊞ Dashboard</a>
       <a class="admin-nav-item <?= in_array($_activePage, ['horses','horse_add','horse_edit','horse_delete']) ? 'active' : '' ?>"
          href="<?= e(SITE_URL) ?>/admin/horses.php">🐎 Hevoset</a>
-      <a class="admin-nav-item <?= $_activePage === 'foals' ? 'active' : '' ?>"
-         href="#" onclick="return false">🌱 Kasvatus</a>
-      <a class="admin-nav-item <?= $_activePage === 'competitions' ? 'active' : '' ?>"
-         href="#" onclick="return false">🏆 Kilpailut</a>
+      <a class="admin-nav-item <?= in_array($_activePage, ['kasvatus_all','foals']) ? 'active' : '' ?>"
+         href="<?= e(SITE_URL) ?>/admin/kasvatus_all.php">🌱 Kasvatus</a>
+      <a class="admin-nav-item <?= in_array($_activePage, ['kilpailut_all','competitions']) ? 'active' : '' ?>"
+         href="<?= e(SITE_URL) ?>/admin/kilpailut_all.php">🏆 Kilpailut</a>
       <div class="admin-nav-section">Media</div>
-      <a class="admin-nav-item <?= in_array($_activePage, ['photos','photo_delete']) ? 'active' : '' ?>"
-         href="#" onclick="return false">📷 Kuvat</a>
+      <a class="admin-nav-item <?= in_array($_activePage, ['kuvat_all','photos','photo_delete']) ? 'active' : '' ?>"
+         href="<?= e(SITE_URL) ?>/admin/kuvat_all.php">📷 Kuvat</a>
       <div class="admin-nav-section">Sivusto</div>
       <a class="admin-nav-item" href="<?= e(SITE_URL) ?>/" target="_blank">🔗 Julkinen sivu</a>
     </nav>
