@@ -8,12 +8,35 @@ SET FOREIGN_KEY_CHECKS = 0;
 SET NAMES utf8mb4;
 
 -- ------------------------------------------------------------
+-- Rodut (breeds) — lookup-taulu
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `breeds` (
+  `id` INT UNSIGNED NOT NULL,
+  `name` VARCHAR(150) NOT NULL,
+  `abbreviation` VARCHAR(100) DEFAULT NULL COMMENT 'Lyhenne',
+  `is_rare` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '1 = harvinainen rotu',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_breed_name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ------------------------------------------------------------
+-- Värit (colors) — lookup-taulu
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `colors` (
+  `id` INT UNSIGNED NOT NULL,
+  `name` VARCHAR(150) NOT NULL,
+  `abbreviation` VARCHAR(100) DEFAULT NULL COMMENT 'Lyhenne',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_color_name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ------------------------------------------------------------
 -- Lajit (disciplines) — lookup-taulu
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `disciplines` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id` INT UNSIGNED NOT NULL,
   `name` VARCHAR(100) NOT NULL,
-  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `abbreviation` VARCHAR(20) DEFAULT NULL COMMENT 'Lyhenne',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_discipline_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -38,10 +61,10 @@ CREATE TABLE IF NOT EXISTS `horses` (
   `name` VARCHAR(150) NOT NULL COMMENT 'Virallinen nimi',
   `slug` VARCHAR(200) DEFAULT NULL COMMENT 'URL-tunniste (haetaan /pages/horse/slug)',
   `call_name` VARCHAR(100) DEFAULT NULL COMMENT 'Kutsumanimi',
-  `breed` VARCHAR(100) DEFAULT NULL COMMENT 'Rotu',
+  `breed_id` INT UNSIGNED DEFAULT NULL COMMENT 'Rotu (breeds.id)',
   `birth_date` DATE DEFAULT NULL COMMENT 'Syntymäpäivä',
   `gender` ENUM('ori','tamma','ruuna','käkky') NOT NULL DEFAULT 'tamma',
-  `color` VARCHAR(100) DEFAULT NULL COMMENT 'Väri',
+  `color_id` INT UNSIGNED DEFAULT NULL COMMENT 'Väri (colors.id)',
   `height_cm` SMALLINT UNSIGNED DEFAULT NULL COMMENT 'Säkäkorkeus cm',
   `vh_id` VARCHAR(50) DEFAULT NULL COMMENT 'VH-tunnus',
   -- Painotus
@@ -74,6 +97,8 @@ CREATE TABLE IF NOT EXISTS `horses` (
   KEY `idx_horses_sire` (`sire_id`),
   KEY `idx_horses_dam` (`dam_id`),
   KEY `idx_horses_deleted` (`is_deleted`),
+  CONSTRAINT `fk_horses_breed` FOREIGN KEY (`breed_id`) REFERENCES `breeds` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_horses_color` FOREIGN KEY (`color_id`) REFERENCES `colors` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_horses_discipline` FOREIGN KEY (`discipline_id`) REFERENCES `disciplines` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_horses_level` FOREIGN KEY (`level_id`) REFERENCES `levels` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_horses_sire` FOREIGN KEY (`sire_id`) REFERENCES `horses` (`id`) ON DELETE SET NULL,
@@ -150,9 +175,20 @@ CREATE TABLE IF NOT EXISTS `admin_users` (
 -- ------------------------------------------------------------
 -- Perustiedot lookup-tauluihin
 -- ------------------------------------------------------------
-INSERT IGNORE INTO `disciplines` (`name`) VALUES
-  ('Dressage'),('Esteratsastus'),('Lännenratsastus'),('Kenttäratsastus'),
-  ('Valjakkourheilu'),('Vikellys'),('Matkaratsastus'),('Vapaa');
+INSERT IGNORE INTO `disciplines` (`id`,`name`,`abbreviation`) VALUES
+  (1,'esteratsastus','re.'),
+  (2,'kouluratsastus','ko.'),
+  (3,'kenttäratsastus','kent.'),
+  (4,'matkaratsastus','matk.'),
+  (5,'lännenratsastus','länn.'),
+  (6,'valjakkoajo','valj.'),
+  (7,'askellajiratsastus','askel'),
+  (8,'ravit','ravit'),
+  (9,'työhevosajo','työh.'),
+  (10,'laukat','lauk.'),
+  (11,'poniravit','pora'),
+  (12,'maastoeste','me'),
+  (13,'näyttelyt','n.');
 
 INSERT IGNORE INTO `levels` (`name`) VALUES
   ('Harrastaja'),('Alkeis'),('Helppo'),('Keskiluokka'),

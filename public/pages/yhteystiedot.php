@@ -1,6 +1,20 @@
 <?php
 require_once __DIR__ . '/../src/includes/db.php';
 
+// Haetaan asetukset tietokannasta
+$db   = getDB();
+$rows = $db->query('SELECT setting_key, setting_value FROM settings')->fetchAll();
+$s    = [];
+foreach ($rows as $row) {
+    $s[$row['setting_key']] = $row['setting_value'] ?? '';
+}
+
+$stable_name = $s['stable_name'] !== '' ? $s['stable_name'] : SITE_NAME;
+$nickname    = $s['owner_nickname']  ?? '';
+$vrl_id      = $s['owner_vrl_id']    ?? '';
+$email       = $s['owner_email']     ?? '';
+$forum_url   = $s['owner_forum_url'] ?? '';
+
 $page_title = 'Yhteystiedot';
 
 require __DIR__ . '/../src/includes/header.php';
@@ -14,40 +28,62 @@ require __DIR__ . '/../src/includes/header.php';
 <main>
   <div class="contact-card">
     <div class="contact-card-icon">👤</div>
-    <h2><?= e(SITE_NAME) ?></h2>
-    <div class="vrl-badge">VRL-00000</div>
+    <h2><?= e($stable_name) ?></h2>
+    <?php if ($vrl_id !== ''): ?>
+      <div class="vrl-badge"><?= e($vrl_id) ?></div>
+    <?php endif; ?>
 
     <hr class="contact-divider">
 
+    <?php if ($email !== ''): ?>
     <div class="contact-row">
       <div class="contact-icon">✉️</div>
       <div>
         <div class="contact-label">Sähköposti</div>
         <div class="contact-value">
-          <a href="mailto:talli@example.com">talli@example.com</a>
+          <a href="mailto:<?= e($email) ?>"><?= e($email) ?></a>
         </div>
       </div>
     </div>
+    <?php endif; ?>
 
+    <?php if ($nickname !== ''): ?>
     <div class="contact-row">
       <div class="contact-icon">🏷️</div>
       <div>
         <div class="contact-label">Nimimerkki</div>
-        <div class="contact-value">TallinOmistaja</div>
+        <div class="contact-value"><?= e($nickname) ?></div>
       </div>
     </div>
+    <?php endif; ?>
 
+    <?php if ($vrl_id !== ''): ?>
     <div class="contact-row">
       <div class="contact-icon">🔖</div>
       <div>
         <div class="contact-label">VRL-tunnus</div>
-        <div class="contact-value"><span class="mono">VRL-00000</span></div>
+        <div class="contact-value"><span class="mono"><?= e($vrl_id) ?></span></div>
       </div>
     </div>
+    <?php endif; ?>
 
-    <div style="margin-top:1.75rem;">
-      <a class="btn" href="mailto:talli@example.com">✉ Lähetä sähköpostia</a>
+    <?php if ($forum_url !== ''): ?>
+    <div class="contact-row">
+      <div class="contact-icon">💬</div>
+      <div>
+        <div class="contact-label">Foorumi</div>
+        <div class="contact-value">
+          <a href="<?= e($forum_url) ?>" target="_blank" rel="noopener noreferrer">Profiili</a>
+        </div>
+      </div>
     </div>
+    <?php endif; ?>
+
+    <?php if ($email !== ''): ?>
+    <div style="margin-top:1.75rem;">
+      <a class="btn" href="mailto:<?= e($email) ?>">✉ Lähetä sähköpostia</a>
+    </div>
+    <?php endif; ?>
   </div>
 </main>
 

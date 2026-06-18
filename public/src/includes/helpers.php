@@ -94,10 +94,15 @@ function getHorsePedigree(int $horseId, int $depth = 0, int $maxDepth = 3): ?arr
 
     $db = getDB();
     $stmt = $db->prepare(
-        'SELECT id, name, call_name, breed, birth_date, gender, color,
-                sire_id, dam_id, evm, profile_url
-         FROM horses
-         WHERE id = :id AND is_deleted = 0'
+        'SELECT h.id, h.name, h.call_name, h.birth_date, h.gender,
+                h.sire_id, h.dam_id, h.evm, h.ancestor, h.profile_url,
+                h.height_cm,
+                b.name AS breed, COALESCE(b.abbreviation, b.name) AS breed_abbr,
+                c.name AS color, COALESCE(c.abbreviation, c.name) AS color_abbr
+         FROM horses h
+         LEFT JOIN breeds b ON b.id = h.breed_id
+         LEFT JOIN colors c ON c.id = h.color_id
+         WHERE h.id = :id AND h.is_deleted = 0'
     );
     $stmt->execute([':id' => $horseId]);
     $horse = $stmt->fetch();

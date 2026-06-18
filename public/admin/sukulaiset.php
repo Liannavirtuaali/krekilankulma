@@ -4,33 +4,31 @@ requireLogin();
 
 $db = getDB();
 $horses = $db->query(
-    'SELECT h.id, h.name, h.slug, h.gender, h.birth_date, h.vh_id,
+    'SELECT h.id, h.name, h.slug, h.gender, h.birth_date, h.vh_id, h.profile_url,
             b.name AS breed_name
      FROM horses h
      LEFT JOIN breeds b ON b.id = h.breed_id
-     WHERE h.is_deleted = 0 AND h.ancestor = 0
+     WHERE h.is_deleted = 0 AND h.ancestor = 1
      ORDER BY h.name ASC'
 )->fetchAll();
 
 $flash = '';
-if (isset($_GET['added']))   $flash = '<p class="flash-ok">Hevonen lisätty.</p>';
 if (isset($_GET['updated'])) $flash = '<p class="flash-ok">Muutokset tallennettu.</p>';
 if (isset($_GET['deleted'])) $flash = '<p class="flash-ok">Hevonen poistettu.</p>';
 
-$pageTitle = 'Hevoset';
+$pageTitle = 'Sukulaiset';
 require __DIR__ . '/includes/admin_header.php';
 ?>
 <div class="admin-page-header">
-  <h1>Hevoset</h1>
+  <h1>Sukulaiset</h1>
   <div class="page-actions">
-    <a href="<?= e(SITE_URL) ?>/admin/horse_import_vrl.php" class="btn-ghost">📥 Tuo VRL:stä</a>
-    <a href="<?= e(SITE_URL) ?>/admin/horse_add.php" class="btn">+ Lisää hevonen</a>
+    <span style="font-size:0.78rem;color:var(--color-text-muted,#6b5e52)">Tallin ulkopuolella asuvat hevoset</span>
   </div>
 </div>
 <div class="admin-body">
 <?= $flash ?>
 <?php if (empty($horses)): ?>
-  <p>Ei hevosia. <a href="<?= e(SITE_URL) ?>/admin/horse_add.php">Lisää ensimmäinen hevonen.</a></p>
+  <p>Ei sukulaishevosia. Sukulaiset lisätään automaattisesti VRL-tuonnin yhteydessä.</p>
 <?php else: ?>
 <div class="compact-list">
   <div class="compact-list-header" style="grid-template-columns:2fr 1.2fr 80px 140px 28px">
@@ -60,10 +58,9 @@ require __DIR__ . '/includes/admin_header.php';
   <div class="cl-expanded" id="cl-exp-<?= (int)$horse['id'] ?>">
     <div class="cl-expanded-actions">
       <a href="<?= e(SITE_URL) ?>/admin/horse_edit.php?id=<?= (int)$horse['id'] ?>" class="btn-sm btn-edit">✏️ Muokkaa</a>
-      <a href="<?= e(horseUrl($horse)) ?>" class="btn-sm btn-view" target="_blank">🔗 Näytä</a>
-      <a href="<?= e(SITE_URL) ?>/admin/photos.php?horse_id=<?= (int)$horse['id'] ?>" class="btn-sm btn-photos">📷 Kuvat</a>
-      <a href="<?= e(SITE_URL) ?>/admin/foals.php?horse_id=<?= (int)$horse['id'] ?>" class="btn-sm">🌱 Kasvatus</a>
-      <a href="<?= e(SITE_URL) ?>/admin/competitions.php?horse_id=<?= (int)$horse['id'] ?>" class="btn-sm">🏆 Kilpailut</a>
+      <?php if (!empty($horse['profile_url'])): ?>
+        <a href="<?= e($horse['profile_url']) ?>" class="btn-sm btn-view" target="_blank" rel="noopener noreferrer">🔗 Ulkopuolinen profiili</a>
+      <?php endif; ?>
       <form method="post" action="<?= e(SITE_URL) ?>/admin/horse_delete.php" style="display:inline">
         <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
         <input type="hidden" name="id" value="<?= (int)$horse['id'] ?>">

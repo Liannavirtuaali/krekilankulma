@@ -18,6 +18,8 @@ if (!$horse) {
 $allHorses   = $db->query('SELECT id, name FROM horses WHERE is_deleted = 0 ORDER BY name')->fetchAll();
 $disciplines = $db->query('SELECT id, name FROM disciplines ORDER BY name')->fetchAll();
 $levels      = $db->query('SELECT id, name FROM levels ORDER BY name')->fetchAll();
+$breeds      = $db->query('SELECT id, name FROM breeds ORDER BY name')->fetchAll();
+$colors      = $db->query('SELECT id, name FROM colors ORDER BY name')->fetchAll();
 
 $errors = [];
 $f = $horse; // prefill from DB
@@ -26,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
         $errors[] = 'Virheellinen pyyntö.';
     } else {
-        $fields = ['name','call_name','vh_id','breed','birth_date','gender','color','height_cm',
+        $fields = ['name','call_name','vh_id','breed_id','birth_date','gender','color_id','height_cm',
                    'discipline_id','level_id','owner_name','owner_email','breeder_name','breeder_email',
                    'importer_name','importer_email','sire_id','dam_id','evm','profile_url',
                    'description','pedigree_notes'];
@@ -72,8 +74,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $stmt = $db->prepare(
                 'UPDATE horses SET
-                 name=:name, call_name=:call_name, vh_id=:vh_id, breed=:breed,
-                 birth_date=:birth_date, gender=:gender, color=:color, height_cm=:height_cm,
+                 name=:name, call_name=:call_name, vh_id=:vh_id, breed_id=:breed_id,
+                 birth_date=:birth_date, gender=:gender, color_id=:color_id, height_cm=:height_cm,
                  discipline_id=:discipline_id, level_id=:level_id,
                  owner_name=:owner_name, owner_email=:owner_email,
                  breeder_name=:breeder_name, breeder_email=:breeder_email,
@@ -86,10 +88,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':name'           => $f['name'],
                 ':call_name'      => $f['call_name'] ?: null,
                 ':vh_id'          => $f['vh_id'] ?: null,
-                ':breed'          => $f['breed'] ?: null,
+                ':breed_id'       => $f['breed_id'] !== '' ? (int)$f['breed_id'] : null,
                 ':birth_date'     => $f['birth_date'] ?: null,
                 ':gender'         => $f['gender'] ?: null,
-                ':color'          => $f['color'] ?: null,
+                ':color_id'       => $f['color_id'] !== '' ? (int)$f['color_id'] : null,
                 ':height_cm'      => $f['height_cm'] !== '' ? (int)$f['height_cm'] : null,
                 ':discipline_id'  => $f['discipline_id'] !== '' ? (int)$f['discipline_id'] : null,
                 ':level_id'       => $f['level_id'] !== '' ? (int)$f['level_id'] : null,
@@ -114,6 +116,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $pageTitle = 'Muokkaa: ' . $horse['name'];
+$breedsJson = json_encode(array_map(fn($b) => ['id' => $b['id'], 'label' => $b['name']], $breeds), JSON_UNESCAPED_UNICODE);
+$colorsJson = json_encode(array_map(fn($c) => ['id' => $c['id'], 'label' => $c['name']], $colors), JSON_UNESCAPED_UNICODE);
+$disciplinesJson = json_encode(array_map(fn($d) => ['id' => $d['id'], 'label' => $d['name']], $disciplines), JSON_UNESCAPED_UNICODE);
+// Hevoset isä/emä-hakuun — suodatetaan nykyinen hevonen pois
+$horsesJson = json_encode(
+    array_values(array_map(
+        fn($h) => ['id' => $h['id'], 'label' => $h['name']],
+        array_filter($allHorses, fn($h) => (int)$h['id'] !== $id)
+    )), JSON_UNESCAPED_UNICODE
+);
+// Hae nykyiset nimet näytölle
+$currentSireLabel = '';
+if (!empty($f['sire_id'])) {
+    foreach ($allHorses as $h) { if ((int)$h['id'] === (int)$f['sire_id']) { $currentSireLabel = $h['name']; break; } }
+}
+$currentDamLabel = '';
+if (!empty($f['dam_id'])) {
+    foreach ($allHorses as $h) { if ((int)$h['id'] === (int)$f['dam_id']) { $currentDamLabel = $h['name']; break; } }
+}
+// Hae nykyisen rodun, värin ja lajin nimet näytöllä
+$currentBreedLabel = '';
+if (!empty($f['breed_id'])) {
+    foreach ($breeds as $b) { if ((int)$b['id'] === (int)$f['breed_id']) { $currentBreedLabel = $b['name']; break; } }
+}
+$currentColorLabel = '';
+if (!empty($f['color_id'])) {
+    foreach ($colors as $c) { if ((int)$c['id'] === (int)$f['color_id']) { $currentColorLabel = $c['name']; break; } }
+}
+$currentDisciplineLabel = '';
+if (!empty($f['discipline_id'])) {
+    foreach ($disciplines as $d) { if ((int)$d['id'] === (int)$f['discipline_id']) { $currentDisciplineLabel = $d['name']; break; } }
+}
 require __DIR__ . '/includes/admin_header.php';
 ?>
 <div class="admin-page-header">
@@ -146,8 +180,14 @@ require __DIR__ . '/includes/admin_header.php';
       <input type="text" id="vh_id" name="vh_id" value="<?= e($f['vh_id'] ?? '') ?>">
     </div>
     <div class="form-group">
-      <label for="breed">Rotu</label>
-      <input type="text" id="breed" name="breed" value="<?= e($f['breed'] ?? '') ?>">
+      <label for="breed_id_text">Rotu</label>
+      <div class="ac-wrap"
+           data-items='<?= htmlspecialchars($breedsJson, ENT_QUOTES) ?>'
+           data-input-id="breed_id"
+           data-hidden-name="breed_id"
+           data-current-id="<?= (int)($f['breed_id'] ?? 0) ?>"
+           data-current-label="<?= e($currentBreedLabel) ?>"
+           data-placeholder="Hae rotua..."></div>
     </div>
   </div>
 
@@ -169,8 +209,14 @@ require __DIR__ . '/includes/admin_header.php';
 
   <div class="form-row">
     <div class="form-group">
-      <label for="color">Väri</label>
-      <input type="text" id="color" name="color" value="<?= e($f['color'] ?? '') ?>">
+      <label for="color_id_text">Väri</label>
+      <div class="ac-wrap"
+           data-items='<?= htmlspecialchars($colorsJson, ENT_QUOTES) ?>'
+           data-input-id="color_id"
+           data-hidden-name="color_id"
+           data-current-id="<?= (int)($f['color_id'] ?? 0) ?>"
+           data-current-label="<?= e($currentColorLabel) ?>"
+           data-placeholder="Hae väriä..."></div>
     </div>
     <div class="form-group">
       <label for="height_cm">Säkäkorkeus (cm)</label>
@@ -180,13 +226,14 @@ require __DIR__ . '/includes/admin_header.php';
 
   <div class="form-row">
     <div class="form-group">
-      <label for="discipline_id">Laji</label>
-      <select id="discipline_id" name="discipline_id">
-        <option value="">— ei valittu —</option>
-        <?php foreach ($disciplines as $d): ?>
-          <option value="<?= (int)$d['id'] ?>" <?= (int)($f['discipline_id'] ?? 0) === (int)$d['id'] ? 'selected' : '' ?>><?= e($d['name']) ?></option>
-        <?php endforeach; ?>
-      </select>
+      <label for="discipline_id_text">Laji</label>
+      <div class="ac-wrap"
+           data-items='<?= htmlspecialchars($disciplinesJson, ENT_QUOTES) ?>'
+           data-input-id="discipline_id"
+           data-hidden-name="discipline_id"
+           data-current-id="<?= (int)($f['discipline_id'] ?? 0) ?>"
+           data-current-label="<?= e($currentDisciplineLabel) ?>"
+           data-placeholder="Hae lajia..."></div>
     </div>
     <div class="form-group">
       <label for="level_id">Taso</label>
@@ -202,24 +249,24 @@ require __DIR__ . '/includes/admin_header.php';
   <h3 style="margin-top:1.5rem">Sukutaulu</h3>
   <div class="form-row">
     <div class="form-group">
-      <label for="sire_id">Isä (ori)</label>
-      <select id="sire_id" name="sire_id">
-        <option value="">— ei valittu —</option>
-        <?php foreach ($allHorses as $ah): ?>
-          <?php if ((int)$ah['id'] === $id) continue; // älä salli itse-viittausta ?>
-          <option value="<?= (int)$ah['id'] ?>" <?= (int)($f['sire_id'] ?? 0) === (int)$ah['id'] ? 'selected' : '' ?>><?= e($ah['name']) ?></option>
-        <?php endforeach; ?>
-      </select>
+      <label for="sire_id_text">Isä (ori)</label>
+      <div class="ac-wrap"
+           data-items='<?= htmlspecialchars($horsesJson, ENT_QUOTES) ?>'
+           data-input-id="sire_id"
+           data-hidden-name="sire_id"
+           data-current-id="<?= (int)($f['sire_id'] ?? 0) ?>"
+           data-current-label="<?= e($currentSireLabel) ?>"
+           data-placeholder="Hae ori..."></div>
     </div>
     <div class="form-group">
-      <label for="dam_id">Emä (tamma)</label>
-      <select id="dam_id" name="dam_id">
-        <option value="">— ei valittu —</option>
-        <?php foreach ($allHorses as $ah): ?>
-          <?php if ((int)$ah['id'] === $id) continue; ?>
-          <option value="<?= (int)$ah['id'] ?>" <?= (int)($f['dam_id'] ?? 0) === (int)$ah['id'] ? 'selected' : '' ?>><?= e($ah['name']) ?></option>
-        <?php endforeach; ?>
-      </select>
+      <label for="dam_id_text">Emä (tamma)</label>
+      <div class="ac-wrap"
+           data-items='<?= htmlspecialchars($horsesJson, ENT_QUOTES) ?>'
+           data-input-id="dam_id"
+           data-hidden-name="dam_id"
+           data-current-id="<?= (int)($f['dam_id'] ?? 0) ?>"
+           data-current-label="<?= e($currentDamLabel) ?>"
+           data-placeholder="Hae tamma..."></div>
     </div>
   </div>
 

@@ -7,13 +7,10 @@ $db = getDB();
 $stmt = $db->prepare(
     'SELECT f.*,
             sire.name AS sire_name, sire.slug AS sire_slug,
-            dam.name  AS dam_name,  dam.slug  AS dam_slug,
-            hp.filename AS foal_photo
+            dam.name  AS dam_name,  dam.slug  AS dam_slug
      FROM foals f
      LEFT JOIN horses sire ON sire.id = f.sire_id AND sire.is_deleted = 0
      LEFT JOIN horses dam  ON dam.id  = f.dam_id  AND dam.is_deleted = 0
-     LEFT JOIN horse_photos hp ON hp.horse_id = f.foal_horse_id
-            AND hp.sort_order = (SELECT MIN(sort_order) FROM horse_photos WHERE horse_id = f.foal_horse_id)
      ORDER BY FIELD(f.status, \'expected\', \'born\'), f.birth_year DESC'
 );
 $stmt->execute();
@@ -24,7 +21,7 @@ $born     = array_filter($allFoals, fn($f) => $f['status'] === 'born');
 
 require __DIR__ . '/../src/includes/header.php';
 
-$genderFi = ['stallion' => 'Ori', 'mare' => 'Tamma', 'gelding' => 'Ruuna'];
+$genderFi = ['ori' => 'Ori', 'tamma' => 'Tamma', 'ruuna' => 'Ruuna', 'tuntematon' => ''];  
 ?>
 
 <div class="page-title-band">
@@ -56,11 +53,7 @@ $genderFi = ['stallion' => 'Ori', 'mare' => 'Tamma', 'gelding' => 'Ruuna'];
           <?php foreach ($expected as $foal): ?>
             <div class="foal-card" data-status="expected">
               <div class="foal-thumb">
-                <?php if (!empty($foal['foal_photo'])): ?>
-                  <img src="<?= e(UPLOADS_URL . $foal['foal_photo']) ?>" alt="">
-                <?php else: ?>
-                  <div class="no-photo">?</div>
-                <?php endif; ?>
+                <div class="no-photo">🐴</div>
               </div>
               <div class="foal-info">
                 <?php if ($foal['foal_name']): ?>
@@ -98,11 +91,7 @@ $genderFi = ['stallion' => 'Ori', 'mare' => 'Tamma', 'gelding' => 'Ruuna'];
           <?php foreach ($born as $foal): ?>
             <div class="foal-card" data-status="born">
               <div class="foal-thumb">
-                <?php if (!empty($foal['foal_photo'])): ?>
-                  <img src="<?= e(UPLOADS_URL . $foal['foal_photo']) ?>" alt="">
-                <?php else: ?>
-                  <div class="no-photo">🐴</div>
-                <?php endif; ?>
+                <div class="no-photo">🐴</div>
               </div>
               <div class="foal-info">
                 <?php if ($foal['foal_name']): ?>

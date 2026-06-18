@@ -14,6 +14,7 @@ Projekti rakentaa PHP/MySQL-pohjaisen virtuaalitallin kokonaan uudelleen: ensin 
 - [x] **Phase 2: Julkiset sivut** - Kaikki 5 julkista sivua live-datalla tietokannasta
 - [ ] **Phase 3: Admin-paneeli** - Hevosten hallinta, kirjautuminen, kuvat, kilpailut
 - [ ] **Phase 4: Tietoturva & Viimeistely** - OWASP, CSRF, XSS ja Altervista-deployment
+- [ ] **Phase 5: Blogi** - Postausten hallinta adminissa, julkinen postauslista ja yksittäinen postaussivu arkistosidebarilla
 
 ## Phase Details
 
@@ -83,4 +84,16 @@ Plans:
 
 ---
 *Roadmap created: 2026-06-17*
-*Last updated: 2026-06-17 — reformatted to GSD standard format*
+*Last updated: 2026-06-18 — Phase 5 Blogi lisätty*
+
+### Phase 5: Blogi
+**Goal**: Tallinpitäjä voi kirjoittaa blogipostauksia adminissa; vierailijat lukevat ne julkisella puolella postauslistalta tai yksittäiseltä sivulta sticky sidebar -arkistolla.
+**Depends on**: Phase 2, Phase 3
+**Requirements**: [BLOG-01, BLOG-02, BLOG-03, BLOG-04, BLOG-05, BLOG-06]
+**Success Criteria** (what must be TRUE):
+  1. `posts`-taulukko luotu ja migraatio ajettavissa
+  2. Julkinen postauslista (`/pages/blogi.php`) näyttää kaikki postaukset uusimmasta vanhimpaan
+  3. Yksittäinen postaussivu (`/pages/postaus.php`) näyttää artikkelin sticky sidebar -arkistolla (vuosi→kuukausi accordion)
+  4. Etusivun overlay-kortti linkittää uusimpaan postaukseen
+  5. Admin voi lisätä, muokata ja poistaa postauksia (`/admin/posts.php`)
+**Plans**: 0 plans

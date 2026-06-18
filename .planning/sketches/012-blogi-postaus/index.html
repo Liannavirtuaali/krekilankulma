@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sketch 012 — Blogipostauksen sivu</title>
+  <link rel="stylesheet" href="../themes/default.css">
+  <style>
+    body {
+      background: var(--color-bg);
+      color: var(--color-text);
+      font-family: var(--font-serif);
+      margin: 0;
+      padding-top: 56px;
+    }
+
+    /* ── Variant nav ──────────────────────────── */
+    #variant-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 9998;
+      background: var(--color-surface);
+      border-bottom: 2px solid var(--color-border);
+      padding: 8px 16px;
+      display: flex; gap: 8px; align-items: center;
+      font-family: var(--font-sans); font-size: 13px;
+    }
+    .variant-tab {
+      padding: 5px 14px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-full);
+      background: transparent; cursor: pointer;
+      font-family: var(--font-sans); font-size: 13px;
+      color: var(--color-text-muted); transition: all 0.15s;
+    }
+    .variant-tab.active { background: var(--color-primary); color: var(--color-cream); border-color: var(--color-primary); }
+    .variant-tab:hover:not(.active) { background: var(--color-surface-warm); }
+    .nav-label { font-size: 11px; color: var(--color-text-light); margin-left: auto; font-family: var(--font-sans); }
+
+    /* ── Site header ──────────────────────────── */
+    .site-header {
+      background: var(--color-primary); color: var(--color-cream);
+      padding: 1rem 2rem; display: flex; align-items: center; gap: 2rem;
+      border-bottom: 3px solid var(--color-gold);
+    }
+    .site-title { color: var(--color-gold); text-decoration: none; font-size: 1.4rem; font-family: var(--font-serif); }
+    .site-nav { display: flex; gap: 1.5rem; }
+    .site-nav a { color: var(--color-cream); text-decoration: none; font-family: var(--font-sans); font-size: var(--text-sm); opacity: .85; }
+    .site-nav a:hover { color: var(--color-gold); opacity: 1; }
+
+    /* ── Sivuotsikkopalkki ────────────────────── */
+    .page-header {
+      background: var(--color-surface-accent);
+      border-bottom: 1px solid var(--color-border-warm);
+      padding: var(--space-4) var(--space-8);
+    }
+    .page-header-inner { max-width: 1100px; margin: 0 auto; }
+    .breadcrumb {
+      font-family: var(--font-sans); font-size: var(--text-xs);
+      color: var(--color-text-muted); margin-bottom: var(--space-2);
+    }
+    .breadcrumb a { color: var(--color-accent); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .page-header h1 {
+      font-family: var(--font-serif); font-size: var(--text-2xl);
+      font-weight: normal; color: var(--color-primary); line-height: 1.3;
+    }
+    .post-meta {
+      font-family: var(--font-sans); font-size: var(--text-xs);
+      color: var(--color-text-light); margin-top: var(--space-2);
+    }
+
+    /* ── Artikkelin sisältö ───────────────────── */
+    .post-body { line-height: 1.8; font-size: var(--text-base); color: var(--color-text); }
+    .post-body p { margin-bottom: 1.25rem; }
+    .post-body p:first-child::first-letter {
+      font-size: 3.2rem; font-family: var(--font-serif);
+      color: var(--color-primary); float: left;
+      line-height: 1; margin-right: 6px; margin-top: 4px;
+    }
+    .post-body img {
+      width: 100%; border-radius: var(--radius-md);
+      margin: var(--space-6) 0;
+      box-shadow: var(--shadow-md);
+    }
+    .post-body blockquote {
+      border-left: 4px solid var(--color-gold);
+      padding: var(--space-3) var(--space-6);
+      margin: var(--space-6) 0;
+      background: var(--color-surface-warm);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      font-style: italic;
+      color: var(--color-text-muted);
+    }
+
+    /* ── Edellinen / seuraava ─────────────────── */
+    .post-nav {
+      display: flex; justify-content: space-between; gap: var(--space-4);
+      margin-top: var(--space-8); padding-top: var(--space-6);
+      border-top: 1px solid var(--color-border);
+    }
+    .post-nav a {
+      display: flex; flex-direction: column; gap: 4px;
+      text-decoration: none; flex: 1;
+      padding: var(--space-4); border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+      background: var(--color-surface);
+      transition: box-shadow 0.15s, transform 0.15s;
+    }
+    .post-nav a:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .post-nav a.prev { align-items: flex-start; }
+    .post-nav a.next { align-items: flex-end; text-align: right; }
+    .post-nav .nav-dir {
+      font-family: var(--font-sans); font-size: var(--text-xs);
+      color: var(--color-text-light); text-transform: uppercase; letter-spacing: .06em;
+    }
+    .post-nav .nav-title {
+      font-family: var(--font-serif); font-size: var(--text-base);
+      color: var(--color-primary); font-weight: normal;
+    }
+
+    /* ── Arkistosidebar ───────────────────────── */
+    .archive-sidebar {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .archive-sidebar-title {
+      background: var(--color-primary); color: var(--color-cream);
+      padding: var(--space-3) var(--space-4);
+      font-family: var(--font-sans); font-size: var(--text-sm);
+      font-weight: 600; letter-spacing: .03em;
+      border-bottom: 2px solid var(--color-gold);
+    }
+    .archive-year {
+      border-bottom: 1px solid var(--color-border);
+    }
+    .archive-year:last-child { border-bottom: none; }
+    .archive-year-btn {
+      width: 100%; text-align: left;
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-surface-warm);
+      border: none; cursor: pointer;
+      font-family: var(--font-sans); font-size: var(--text-sm);
+      font-weight: 600; color: var(--color-primary);
+      display: flex; justify-content: space-between; align-items: center;
+      transition: background 0.12s;
+    }
+    .archive-year-btn:hover { background: var(--color-parchment); }
+    .archive-year-btn .chevron { transition: transform 0.2s; font-size: 10px; }
+    .archive-year-btn.open .chevron { transform: rotate(90deg); }
+    .archive-months { display: none; }
+    .archive-months.open { display: block; }
+    .archive-month {
+      display: flex; justify-content: space-between;
+      padding: var(--space-2) var(--space-6);
+      text-decoration: none; color: var(--color-text-muted);
+      font-family: var(--font-sans); font-size: var(--text-sm);
+      border-bottom: 1px solid var(--color-border);
+      transition: background 0.12s, color 0.12s;
+    }
+    .archive-month:last-child { border-bottom: none; }
+    .archive-month:hover { background: var(--color-surface-warm); color: var(--color-primary); }
+    .archive-month.active { color: var(--color-accent); font-weight: 600; }
+    .archive-month .count {
+      font-size: var(--text-xs); color: var(--color-text-light);
+      background: var(--color-bg); border-radius: var(--radius-full);
+      padding: 1px 7px; border: 1px solid var(--color-border);
+    }
+
+    /* ── Sketch toolbar ───────────────────────── */
+    #sketch-tools {
+      position: fixed; bottom: 12px; right: 12px; z-index: 9999;
+      font-family: system-ui; font-size: 12px;
+      background: rgba(0,0,0,0.7); color: white;
+      padding: 8px 12px; border-radius: 8px;
+      opacity: 0.4; transition: opacity 0.2s;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    #sketch-tools:hover { opacity: 1; }
+    #sketch-tools button {
+      font-size: 11px; background: rgba(255,255,255,0.15); color: white;
+      border: 1px solid rgba(255,255,255,0.3); border-radius: 4px;
+      padding: 3px 7px; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div id="variant-nav">
+  <span style="font-weight:600;color:var(--color-text-muted);margin-right:4px;font-family:system-ui;">012</span>
+  <button class="variant-tab active" onclick="showVariant('a',this)">A: Artikkeli + staattinen sidebar</button>
+  <button class="variant-tab" onclick="showVariant('b',this)">B: Koko leveys + arkisto alla</button>
+  <button class="variant-tab" onclick="showVariant('c',this)">C: Artikkeli + sticky sidebar ★ Valittu</button>
+  <span class="nav-label">Blogipostauksen sivu</span>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     VARIANTTI A — Artikkeli (2/3) + staattinen arkistosidebar (1/3)
+     Klassinen blogi-layout, arkisto aina näkyvissä.
+     ════════════════════════════════════════════════════ -->
+<div id="variant-a" class="variant">
+  <header class="site-header">
+    <a class="site-title" href="#">🐴 Virtuaalitalli</a>
+    <nav class="site-nav"><a href="#">Hevoset</a><a href="#">Kasvatus</a><a href="#">Ajankohtaista</a></nav>
+  </header>
+
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div class="breadcrumb"><a href="#">Etusivu</a> › <a href="#">Ajankohtaista</a> › Lumipäivä tallissa</div>
+      <h1>Lumipäivä tallissa — ensimmäinen lumi tuli!</h1>
+      <div class="post-meta">18. kesäkuuta 2026</div>
+    </div>
+  </div>
+
+  <div style="max-width:1100px;margin:0 auto;padding:var(--space-8) var(--space-6);display:grid;grid-template-columns:1fr 280px;gap:var(--space-8);align-items:start;">
+
+    <!-- Artikkeli -->
+    <article>
+      <img src="https://picsum.photos/seed/winter1/800/360" alt="Lumi tallissa">
+      <div class="post-body">
+        <p>Tänään aamulla herätessämme koko talli oli valkean lumen peitossa. Hevoset olivat innoissaan ja pääsivät ensi kertaa talvitarhaan. Erityisesti nuori Tähti-tamma leikki lumessa kuin varsa — oli ilo katsella.</p>
+        <p>Talvi on vihdoin tullut ja tallin arki saa uuden, kauniin sävyn. Aamuruokinta tuntuu erilaiselta lumisessa hiljaisuudessa — hevosten höyry nousee kylmässä ilmassa ja heinäseimi tuoksuu tutulta.</p>
+        <blockquote>Parasta on katsella, kun hevonen pörhistelee lumessa ensi kerran — siinä hetken lapsellisuus ja ilo ovat palauttamattomia.</blockquote>
+        <p>Iltapäivällä teimme pitkän ulkoilutuslenkin läheiseen metsään. Polut olivat jo tallaantuneet, mutta puiden oksilta putosi paksuja lumipalttoja aina välillä. Aamu-Hilkka koki ensilumilenkkinsä stoalaisesti — pysähtyi, haisteli, jatkoi.</p>
+        <img src="https://picsum.photos/seed/horses-snow/800/300" alt="Hevoset lumessa">
+        <p>Illalla tallissa oli poikkeuksellisen rauhallista. Hevoset söivät hitaasti ja tarkastelivat pihaa ikkunan kautta. Huomenna on luvassa lisää lunta — odotamme innolla!</p>
+      </div>
+
+      <!-- Edellinen / seuraava -->
+      <nav class="post-nav">
+        <a href="#" class="prev">
+          <span class="nav-dir">← Edellinen</span>
+          <span class="nav-title">Syysmessut Tampereella — raportti</span>
+        </a>
+        <a href="#" class="next">
+          <span class="nav-dir">Seuraava →</span>
+          <span class="nav-title">Tähti-tamman ensimmäinen kilpailu</span>
+        </a>
+      </nav>
+    </article>
+
+    <!-- Arkistosidebar -->
+    <aside>
+      <div class="archive-sidebar">
+        <div class="archive-sidebar-title">📅 Arkisto</div>
+
+        <div class="archive-year">
+          <button class="archive-year-btn open" onclick="toggleYear(this)">
+            2026 <span class="chevron">▶</span>
+          </button>
+          <div class="archive-months open">
+            <a href="#" class="archive-month active">Kesäkuu <span class="count">3</span></a>
+            <a href="#" class="archive-month">Toukokuu <span class="count">5</span></a>
+            <a href="#" class="archive-month">Huhtikuu <span class="count">2</span></a>
+            <a href="#" class="archive-month">Maaliskuu <span class="count">4</span></a>
+            <a href="#" class="archive-month">Helmikuu <span class="count">3</span></a>
+            <a href="#" class="archive-month">Tammikuu <span class="count">6</span></a>
+          </div>
+        </div>
+
+        <div class="archive-year">
+          <button class="archive-year-btn" onclick="toggleYear(this)">
+            2025 <span class="chevron">▶</span>
+          </button>
+          <div class="archive-months">
+            <a href="#" class="archive-month">Joulukuu <span class="count">4</span></a>
+            <a href="#" class="archive-month">Marraskuu <span class="count">3</span></a>
+            <a href="#" class="archive-month">Lokakuu <span class="count">5</span></a>
+            <a href="#" class="archive-month">Syyskuu <span class="count">2</span></a>
+          </div>
+        </div>
+
+        <div class="archive-year">
+          <button class="archive-year-btn" onclick="toggleYear(this)">
+            2024 <span class="chevron">▶</span>
+          </button>
+          <div class="archive-months">
+            <a href="#" class="archive-month">Joulukuu <span class="count">2</span></a>
+            <a href="#" class="archive-month">Marraskuu <span class="count">1</span></a>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     VARIANTTI B — Koko leveys artikkeli, arkisto alla accordion-blokkina
+     Leveä, helppolukuinen. Arkisto löytyy scrollaamalla.
+     ════════════════════════════════════════════════════ -->
+<div id="variant-b" class="variant" style="display:none">
+  <header class="site-header">
+    <a class="site-title" href="#">🐴 Virtuaalitalli</a>
+    <nav class="site-nav"><a href="#">Hevoset</a><a href="#">Kasvatus</a><a href="#">Ajankohtaista</a></nav>
+  </header>
+
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div class="breadcrumb"><a href="#">Etusivu</a> › <a href="#">Ajankohtaista</a> › Lumipäivä tallissa</div>
+      <h1>Lumipäivä tallissa — ensimmäinen lumi tuli!</h1>
+      <div class="post-meta">18. kesäkuuta 2026</div>
+    </div>
+  </div>
+
+  <div style="max-width:720px;margin:0 auto;padding:var(--space-8) var(--space-6);">
+    <article>
+      <img src="https://picsum.photos/seed/winter1/800/360" alt="Lumi tallissa" style="width:100%;border-radius:var(--radius-md);margin-bottom:var(--space-6);box-shadow:var(--shadow-md);">
+      <div class="post-body">
+        <p>Tänään aamulla herätessämme koko talli oli valkean lumen peitossa. Hevoset olivat innoissaan ja pääsivät ensi kertaa talvitarhaan. Erityisesti nuori Tähti-tamma leikki lumessa kuin varsa — oli ilo katsella.</p>
+        <p>Talvi on vihdoin tullut ja tallin arki saa uuden, kauniin sävyn. Aamuruokinta tuntuu erilaiselta lumisessa hiljaisuudessa — hevosten höyry nousee kylmässä ilmassa ja heinäseimi tuoksuu tutulta.</p>
+        <blockquote>Parasta on katsella, kun hevonen pörhistelee lumessa ensi kerran — siinä hetken lapsellisuus ja ilo ovat palauttamattomia.</blockquote>
+        <p>Iltapäivällä teimme pitkän ulkoilutuslenkin läheiseen metsään. Polut olivat jo tallaantuneet, mutta puiden oksilta putosi paksuja lumipalttoja aina välillä. Aamu-Hilkka koki ensilumilenkkinsä stoalaisesti — pysähtyi, haisteli, jatkoi.</p>
+        <img src="https://picsum.photos/seed/horses-snow/800/300" alt="Hevoset lumessa">
+        <p>Illalla tallissa oli poikkeuksellisen rauhallista. Hevoset söivät hitaasti ja tarkastelivat pihaa ikkunan kautta. Huomenna on luvassa lisää lunta — odotamme innolla!</p>
+      </div>
+
+      <!-- Edellinen / seuraava -->
+      <nav class="post-nav">
+        <a href="#" class="prev">
+          <span class="nav-dir">← Edellinen</span>
+          <span class="nav-title">Syysmessut Tampereella — raportti</span>
+        </a>
+        <a href="#" class="next">
+          <span class="nav-dir">Seuraava →</span>
+          <span class="nav-title">Tähti-tamman ensimmäinen kilpailu</span>
+        </a>
+      </nav>
+    </article>
+
+    <!-- Arkisto alapuolella, accordion -->
+    <div style="margin-top:var(--space-8);">
+      <div class="archive-sidebar">
+        <div class="archive-sidebar-title">📅 Kaikki postaukset</div>
+
+        <div class="archive-year">
+          <button class="archive-year-btn open" onclick="toggleYear(this)">
+            2026 <span class="chevron">▶</span>
+          </button>
+          <div class="archive-months open" style="display:grid;grid-template-columns:repeat(3,1fr);">
+            <a href="#" class="archive-month active" style="border-right:1px solid var(--color-border);">Kesäkuu <span class="count">3</span></a>
+            <a href="#" class="archive-month" style="border-right:1px solid var(--color-border);">Toukokuu <span class="count">5</span></a>
+            <a href="#" class="archive-month">Huhtikuu <span class="count">2</span></a>
+            <a href="#" class="archive-month" style="border-right:1px solid var(--color-border);">Maaliskuu <span class="count">4</span></a>
+            <a href="#" class="archive-month" style="border-right:1px solid var(--color-border);">Helmikuu <span class="count">3</span></a>
+            <a href="#" class="archive-month">Tammikuu <span class="count">6</span></a>
+          </div>
+        </div>
+
+        <div class="archive-year">
+          <button class="archive-year-btn" onclick="toggleYear(this)">
+            2025 <span class="chevron">▶</span>
+          </button>
+          <div class="archive-months" style="display:none;grid-template-columns:repeat(3,1fr);">
+            <a href="#" class="archive-month" style="border-right:1px solid var(--color-border);">Joulukuu <span class="count">4</span></a>
+            <a href="#" class="archive-month" style="border-right:1px solid var(--color-border);">Marraskuu <span class="count">3</span></a>
+            <a href="#" class="archive-month">Lokakuu <span class="count">5</span></a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     VARIANTTI C — Artikkeli + STICKY sidebar
+     Sidebar kiinnittyy scrollatessa — arkisto + nav pysyvät näkyvissä.
+     ════════════════════════════════════════════════════ -->
+<div id="variant-c" class="variant" style="display:none">
+  <header class="site-header">
+    <a class="site-title" href="#">🐴 Virtuaalitalli</a>
+    <nav class="site-nav"><a href="#">Hevoset</a><a href="#">Kasvatus</a><a href="#">Ajankohtaista</a></nav>
+  </header>
+
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div class="breadcrumb"><a href="#">Etusivu</a> › <a href="#">Ajankohtaista</a> › Lumipäivä tallissa</div>
+      <h1>Lumipäivä tallissa — ensimmäinen lumi tuli!</h1>
+      <div class="post-meta">18. kesäkuuta 2026</div>
+    </div>
+  </div>
+
+  <div style="max-width:1100px;margin:0 auto;padding:var(--space-8) var(--space-6);display:grid;grid-template-columns:1fr 260px;gap:var(--space-8);align-items:start;">
+
+    <!-- Artikkeli -->
+    <article>
+      <img src="https://picsum.photos/seed/winter1/800/360" alt="Lumi tallissa" style="width:100%;border-radius:var(--radius-md);margin-bottom:var(--space-6);box-shadow:var(--shadow-md);">
+      <div class="post-body">
+        <p>Tänään aamulla herätessämme koko talli oli valkean lumen peitossa. Hevoset olivat innoissaan ja pääsivät ensi kertaa talvitarhaan. Erityisesti nuori Tähti-tamma leikki lumessa kuin varsa — oli ilo katsella.</p>
+        <p>Talvi on vihdoin tullut ja tallin arki saa uuden, kauniin sävyn. Aamuruokinta tuntuu erilaiselta lumisessa hiljaisuudessa — hevosten höyry nousee kylmässä ilmassa ja heinäseimi tuoksuu tutulta.</p>
+        <blockquote>Parasta on katsella, kun hevonen pörhistelee lumessa ensi kerran — siinä hetken lapsellisuus ja ilo ovat palauttamattomia.</blockquote>
+        <p>Iltapäivällä teimme pitkän ulkoilutuslenkin läheiseen metsään. Polut olivat jo tallaantuneet, mutta puiden oksilta putosi paksuja lumipalttoja aina välillä. Aamu-Hilkka koki ensilumilenkkinsä stoalaisesti — pysähtyi, haisteli, jatkoi.</p>
+        <img src="https://picsum.photos/seed/horses-snow/800/300" alt="Hevoset lumessa">
+        <p>Illalla tallissa oli poikkeuksellisen rauhallista. Hevoset söivät hitaasti ja tarkastelivat pihaa ikkunan kautta. Huomenna on luvassa lisää lunta — odotamme innolla!</p>
+        <p>Huomenna on luvassa vielä enemmän lunta — meteoädin mukaan jopa 10 cm lisää. Tallin hiekkakenttä on jo nyt valkoinen, ja kengitysvuoro on siirtynyt viikolla eteenpäin.</p>
+      </div>
+
+      <!-- Edellinen / seuraava -->
+      <nav class="post-nav">
+        <a href="#" class="prev">
+          <span class="nav-dir">← Edellinen</span>
+          <span class="nav-title">Syysmessut Tampereella — raportti</span>
+        </a>
+        <a href="#" class="next">
+          <span class="nav-dir">Seuraava →</span>
+          <span class="nav-title">Tähti-tamman ensimmäinen kilpailu</span>
+        </a>
+      </nav>
+    </article>
+
+    <!-- Sticky sidebar -->
+    <aside style="position:sticky;top:68px;">
+      <!-- Edellinen / seuraava kompaktina -->
+      <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);margin-bottom:var(--space-4);">
+        <div style="font-family:var(--font-sans);font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.06em;color:var(--color-gold);font-weight:700;margin-bottom:var(--space-3);">Navigointi</div>
+        <a href="#" style="display:flex;gap:var(--space-3);align-items:flex-start;text-decoration:none;padding:var(--space-2) 0;border-bottom:1px solid var(--color-border);">
+          <span style="font-family:var(--font-sans);font-size:1rem;color:var(--color-text-light);">←</span>
+          <span style="font-family:var(--font-sans);font-size:var(--text-xs);color:var(--color-text-muted);line-height:1.4;">Syysmessut Tampereella — raportti</span>
+        </a>
+        <a href="#" style="display:flex;gap:var(--space-3);align-items:flex-start;text-decoration:none;padding:var(--space-2) 0;justify-content:flex-end;text-align:right;">
+          <span style="font-family:var(--font-sans);font-size:var(--text-xs);color:var(--color-text-muted);line-height:1.4;">Tähti-tamman ensimmäinen kilpailu</span>
+          <span style="font-family:var(--font-sans);font-size:1rem;color:var(--color-text-light);">→</span>
+        </a>
+      </div>
+
+      <!-- Arkisto -->
+      <div class="archive-sidebar">
+        <div class="archive-sidebar-title">📅 Arkisto</div>
+
+        <div class="archive-year">
+          <button class="archive-year-btn open" onclick="toggleYear(this)">
+            2026 <span class="chevron">▶</span>
+          </button>
+          <div class="archive-months open">
+            <a href="#" class="archive-month active">Kesäkuu <span class="count">3</span></a>
+            <a href="#" class="archive-month">Toukokuu <span class="count">5</span></a>
+            <a href="#" class="archive-month">Huhtikuu <span class="count">2</span></a>
+            <a href="#" class="archive-month">Maaliskuu <span class="count">4</span></a>
+            <a href="#" class="archive-month">Helmikuu <span class="count">3</span></a>
+            <a href="#" class="archive-month">Tammikuu <span class="count">6</span></a>
+          </div>
+        </div>
+
+        <div class="archive-year">
+          <button class="archive-year-btn" onclick="toggleYear(this)">
+            2025 <span class="chevron">▶</span>
+          </button>
+          <div class="archive-months">
+            <a href="#" class="archive-month">Joulukuu <span class="count">4</span></a>
+            <a href="#" class="archive-month">Marraskuu <span class="count">3</span></a>
+            <a href="#" class="archive-month">Lokakuu <span class="count">5</span></a>
+            <a href="#" class="archive-month">Syyskuu <span class="count">2</span></a>
+          </div>
+        </div>
+
+        <div class="archive-year">
+          <button class="archive-year-btn" onclick="toggleYear(this)">
+            2024 <span class="chevron">▶</span>
+          </button>
+          <div class="archive-months">
+            <a href="#" class="archive-month">Joulukuu <span class="count">2</span></a>
+            <a href="#" class="archive-month">Marraskuu <span class="count">1</span></a>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<!-- Sketch toolbar -->
+<div id="sketch-tools" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.4'">
+  <div style="font-size:10px;opacity:.6;margin-bottom:2px">Sketch 012</div>
+  <div style="display:flex;gap:6px;">
+    <button onclick="setWidth('375px')">📱 375</button>
+    <button onclick="setWidth('768px')">💻 768</button>
+    <button onclick="setWidth('100%')">🖥 Full</button>
+  </div>
+</div>
+
+<script>
+  function showVariant(id, btn) {
+    document.querySelectorAll('.variant').forEach(v => v.style.display = 'none');
+    document.querySelectorAll('.variant-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('variant-' + id).style.display = 'block';
+    btn.classList.add('active');
+  }
+
+  function toggleYear(btn) {
+    btn.classList.toggle('open');
+    const months = btn.nextElementSibling;
+    if (months.classList.contains('open')) {
+      months.classList.remove('open');
+      months.style.display = 'none';
+    } else {
+      months.classList.add('open');
+      months.style.display = months.style.gridTemplateColumns ? 'grid' : 'block';
+    }
+  }
+
+  // Init: open months that have .open class
+  document.querySelectorAll('.archive-months.open').forEach(el => {
+    el.style.display = el.style.gridTemplateColumns ? 'grid' : 'block';
+  });
+
+  function setWidth(w) {
+    document.querySelectorAll('.variant').forEach(v => {
+      v.style.maxWidth = w; v.style.margin = '0 auto';
+    });
+  }
+</script>
+</body>
+</html>

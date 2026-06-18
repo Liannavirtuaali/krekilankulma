@@ -49,12 +49,16 @@ require __DIR__ . '/../src/includes/header.php';
     <span class="overlay-card-link">Kasvatussivu →</span>
   </a>
 
-  <div class="overlay-card" style="cursor:default;">
-    <div style="font-size:2rem;margin-bottom:.75rem;">📰</div>
-    <h3>Ajankohtaista</h3>
-    <p>Tallin viimeisin uutinen ja tapahtumat löydät täältä.</p>
-    <div class="card-date"><?= date('j.n.Y') ?></div>
-  </div>
+  <a class="overlay-card overlay-card--news" href="#">
+    <img src="https://picsum.photos/seed/winter1/320/160" alt="Ajankohtaista">
+    <div class="uutinen-tag" style="margin-bottom:.5rem;">📰 Ajankohtaista</div>
+    <h3>Lumipäivä tallissa — ensimmäinen lumi tuli!</h3>
+    <p>Tänään aamulla herätessämme koko talli oli valkean lumen peitossa. Hevoset olivat innoissaan ja pääsivät ensi kertaa talvitarhaan…</p>
+    <div class="uutinen-footer" style="margin-top:auto;padding-top:.75rem;">
+      <span class="card-date"><?= date('j.n.Y') ?></span>
+      <span class="overlay-card-link">Lue lisää →</span>
+    </div>
+  </a>
 </div>
 
 <!-- Esittely + uutinen -->
@@ -70,12 +74,6 @@ require __DIR__ . '/../src/includes/header.php';
     </div>
   </div>
 
-  <div class="frontpage-uutinen">
-    <div class="uutinen-tag">📰 Ajankohtaista</div>
-    <h3>Tervetuloa tallin sivuille!</h3>
-    <p>Sivusto on juuri avattu. Löydät täältä kaikki tallin hevoset, kasvatusohjelman ja yhteystiedot.</p>
-    <div class="uutinen-pvm"><?= date('j.n.Y') ?></div>
-  </div>
 </div>
 
 <script>

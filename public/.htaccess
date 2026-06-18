@@ -9,6 +9,11 @@ Options -Indexes
     # Estä suora pääsy src/-kansioon
     RewriteRule ^src/ - [F,L]
 
+    # Sivut ilman .php-päätettä
+    RewriteRule ^hevoset/?$ /pages/hevoset.php [L,QSA]
+    RewriteRule ^kasvatus/?$ /pages/kasvatus.php [L,QSA]
+    RewriteRule ^yhteystiedot/?$ /pages/yhteystiedot.php [L,QSA]
+
     # Hevosen profiilisivu kauniin URL:n kautta: /pages/horse/slug
     RewriteRule ^pages/horse/([^/]+)/?$ /pages/hevonen.php?slug=$1 [L,QSA]
 </IfModule>

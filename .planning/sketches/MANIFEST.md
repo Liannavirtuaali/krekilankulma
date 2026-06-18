@@ -22,3 +22,5 @@ Lämmin, rustiikkinen virtuaalitalli — tuntuu kuin oikeasti kävelisi puiseen 
 | 008 | admin-kasvatus | Inline lisäyspaneeli vai slide-in lomake varsahallinnassa? | B: Slide-in paneeli ★ | admin, kasvatus, foals, slide-panel |
 | 009 | admin-kilpailut | Kompakti lista vai aikajana kilpailutuloksille? | A: Kompakti lista + modal ★ | admin, kilpailut, competitions, compact-list |
 | 010 | admin-kuvat | Latauslaatikko+ruudukko vai kompakti kuvaruudukko järjestyksellä? | B: Kompakti ruudukko + järjestys ★ | admin, kuvat, photos, compact-grid |
+| 011 | ajankohtaista-homepage | Missä ja miten uusin blogipostaus näytetään etusivulla? | C: Editoriaalinen nostokortti ★ | homepage, blog, news, ajankohtaista |
+| 012 | blogi-postaus | Miten blogipostauksen sivu (artikkeli + arkistosidebar) jäsennellään? | C: Artikkeli + sticky sidebar ★ | blog, post, sidebar, archive, reading |

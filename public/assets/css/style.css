@@ -292,39 +292,142 @@ th, td { padding: 0.5rem 0.75rem; border: 1px solid var(--color-border); text-al
 th { background: var(--color-surface-accent); color: var(--color-text-muted); font-weight: 600; font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.05em; }
 tr:hover td { background: var(--color-parchment); }
 
+.profile-fullwidth { margin-top: 2rem; }
+
 /* ── Sukutaulu ───────────────────────────────── */
 .pedigree { margin: 1.5rem 0; }
-.ped-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-}
-.ped-table th {
+.ped-tree { width: 100%; }
+.ped-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
   background: var(--color-primary);
   color: var(--color-cream);
+}
+.ped-header > div {
   padding: 0.5rem 0.75rem;
   font-size: var(--text-xs);
-  text-align: left;
-  width: 33.33%;
   font-family: var(--font-sans);
   letter-spacing: 0.05em;
 }
-.ped-cell {
+.ped-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: repeat(8, minmax(2.5rem, 1fr));
+  gap: 1px;
+  background: var(--color-border-warm);
   border: 1px solid var(--color-border-warm);
+}
+.ped-cell {
   padding: 0.5rem 0.75rem;
-  vertical-align: middle;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
   font-size: var(--text-sm);
   background: var(--color-surface);
 }
+.ped-meta {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  font-family: var(--font-sans);
+  margin-top: 0.15rem;
+}
+.ped-gen1 { grid-row: span 4; }
+.ped-gen2 { grid-row: span 2; }
 .ped-cell a { color: var(--color-primary); text-decoration: none; }
 .ped-cell a:hover { text-decoration: underline; }
 .ped-cell.ped-empty { color: var(--color-text-light); }
 .ped-gen1 { background: var(--color-surface-accent); font-weight: bold; }
 .ped-gen2 { background: var(--color-parchment); }
 
+/* ── Kisakalenteri ───────────────────────────── */
+.comp-list { border: 1px solid var(--color-border-warm); border-radius: var(--radius-sm); overflow: hidden; }
+.comp-header {
+  display: grid;
+  grid-template-columns: 7rem 1fr 5rem 5rem 1fr;
+  background: var(--color-primary);
+  color: var(--color-cream);
+  font-size: var(--text-xs);
+  font-family: var(--font-sans);
+  letter-spacing: 0.05em;
+}
+.comp-header > div { padding: 0.5rem 0.75rem; }
+.comp-row {
+  display: grid;
+  grid-template-columns: 7rem 1fr 5rem 5rem 1fr;
+  border-top: 1px solid var(--color-border-warm);
+  font-size: var(--text-sm);
+}
+.comp-row:hover { background: var(--color-parchment); }
+.comp-cell { padding: 0.5rem 0.75rem; }
+@media (max-width: 600px) {
+  .comp-header { display: none; }
+  .comp-row { grid-template-columns: 1fr; }
+  .comp-cell::before { content: attr(data-label) ': '; font-weight: bold; font-size: var(--text-xs); color: var(--color-text-muted); }
+}
+
 /* ── Galleria ────────────────────────────────── */
-.gallery { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 1rem 0; }
-.gallery img { max-width: 280px; max-height: 200px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--color-border); }
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+.gallery-item {
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  aspect-ratio: 4/3;
+}
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.15s;
+}
+.gallery-item:hover img { opacity: 0.8; }
+.gallery-placeholder {
+  background: var(--color-surface-accent);
+  border: 1px dashed var(--color-border-warm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-light);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  letter-spacing: 0.05em;
+}
+
+/* ── Lightbox ────────────────────────────────── */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.lightbox img {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+}
+.lightbox-close {
+  position: absolute;
+  top: 1rem;
+  right: 1.5rem;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+  line-height: 1;
+}
 
 /* ── Profiilisivu — vanhat tyylit (fallback) ─── */
 .horse-profile-info { display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem 2rem; margin: 1rem 0; }
@@ -683,6 +786,8 @@ tr:hover td { background: var(--color-parchment); }
 }
 .overlay-card p { font-size: var(--text-sm); color: var(--color-text-muted); line-height: 1.5; }
 .overlay-card .card-date { font-size: var(--text-xs); color: var(--color-text-light); margin-top: 0.5rem; font-family: var(--font-sans); }
+.overlay-card--news { display: flex; flex-direction: column; border-top: 3px solid var(--color-gold); }
+.overlay-card--news .uutinen-footer { display: flex; justify-content: space-between; align-items: center; }
 .overlay-card-link {
   display: inline-block;
   margin-top: 0.75rem;
@@ -755,7 +860,10 @@ tr:hover td { background: var(--color-parchment); }
   margin-bottom: 0.6rem;
 }
 .frontpage-uutinen p { font-size: var(--text-sm); color: var(--color-text-muted); line-height: 1.65; }
-.frontpage-uutinen .uutinen-pvm { font-size: var(--text-xs); color: var(--color-text-light); margin-top: 0.75rem; font-family: var(--font-sans); }
+.frontpage-uutinen .uutinen-pvm { font-size: var(--text-xs); color: var(--color-text-light); font-family: var(--font-sans); }
+.frontpage-uutinen .uutinen-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 0.75rem; }
+.frontpage-uutinen .uutinen-lue-lisaa { font-family: var(--font-sans); font-size: var(--text-sm); color: var(--color-accent); font-weight: 600; text-decoration: none; border: 1px solid var(--color-accent); padding: 4px 13px; border-radius: var(--radius-full); transition: all 0.15s; }
+.frontpage-uutinen .uutinen-lue-lisaa:hover { background: var(--color-accent); color: #fff; }
 
 /* ── Responsive ──────────────────────────────── */
 @media (max-width: 700px) {
@@ -768,4 +876,17 @@ tr:hover td { background: var(--color-parchment); }
 @media (max-width: 600px) {
   .horse-profile-info { grid-template-columns: 1fr; }
   .contact-card { padding: 1.5rem 1.25rem; }
+}
+
+/* ── Ulkoiset linkit (target=_blank) ──────────── */
+a[target="_blank"]::after,
+.ext-link::after {
+  content: '⧉';
+  display: inline;
+  font-size: 1em;
+  margin-left: 0.2em;
+  opacity: 0.75;
+  line-height: 1;
+  font-style: normal;
+  font-weight: bold;
 }

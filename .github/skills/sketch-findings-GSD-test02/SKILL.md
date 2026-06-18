@@ -15,6 +15,7 @@ Tunnelma: arvokas, maanläheinen, yhteisöllinen.
 **Referenssit:** Olemassa oleva style.css, rustiikkinen horse community -sivusto.
 
 Sketch-sessiot: 2024-06-18, 2026-06-18
+Wrap-up: 2026-06-18
 </context>
 
 <design_direction>
@@ -48,10 +49,11 @@ Nostokorteissa `translateY(-3px)` hover. Suodatinpainikkeet: pill-muoto (`border
 | Alue | Referenssi | Pääpäätös |
 |------|-----------|-----------|
 | Listaus & Suodatus | references/listaus-suodatus.md | Vaakasuuntainen listakortti (160×90px kuva), pill-suodattimet, translateX hover |
-| Hero & Etusivu | references/hero-etusivu.md | Koko leveyden hero kuvapohjalla + gradient-overlay; etusivulla overlay-kortit heroon |
+| Hero & Etusivu | references/hero-etusivu.md | Koko leveyden hero kuvapohjalla + gradient-overlay; etusivulla overlay-kortit heroon; Ajankohtaista-blogi editoriaalinen nostokortti |
 | Yksinkertaiset tietosivut | references/yksinkertaiset-sivut.md | Yksi kortti sivun keskellä, ikonirivirakenne yhteystiedoille |
 | Admin Shell & Navigaatio | references/admin-shell.md | 220px tummanruskea sivupalkki; kompakti+laajennettava -lista hevosille |
 | Admin Hallintasivut | references/admin-hallintasivut.md | Slide-in paneeli lomakkeille; kilpailut kompaktilista+modal; kuvat 1:1-ruudukko |
+| Blogi & Sisältösivut | references/blogi-sisaltosivu.md | Artikkeli + sticky sidebar (260px); arkisto accordion vuosi→kuukausi; dropcap; blockquote kultareunalla |
 
 ## Teematiedosto
 
@@ -233,4 +235,6 @@ Alkuperäiset sketch-HTML-tiedostot: `.planning/sketches/`
 - 008-admin-kasvatus (voittaja B: Slide-in paneeli)
 - 009-admin-kilpailut (voittaja A: Kompakti lista + modal)
 - 010-admin-kuvat (voittaja B: Kompakti ruudukko)
+- 011-ajankohtaista-homepage (voittaja C: Editoriaalinen nostokortti)
+- 012-blogi-postaus (voittaja C: Artikkeli + sticky sidebar)
 </metadata>

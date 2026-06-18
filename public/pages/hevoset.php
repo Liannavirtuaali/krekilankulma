@@ -5,15 +5,17 @@ $page_title = 'Hevoset';
 
 $db = getDB();
 $stmt = $db->prepare(
-    'SELECT h.id, h.name, h.slug, h.breed, h.gender, h.birth_date,
+    'SELECT h.id, h.name, h.slug, h.gender, h.birth_date,
+            b.name AS breed_name,
             d.name AS discipline_name,
             hp.filename
      FROM horses h
+     LEFT JOIN breeds b ON b.id = h.breed_id
      LEFT JOIN disciplines d ON d.id = h.discipline_id
      LEFT JOIN horse_photos hp
             ON hp.horse_id = h.id
            AND hp.sort_order = (SELECT MIN(sort_order) FROM horse_photos WHERE horse_id = h.id)
-     WHERE h.is_deleted = 0 AND h.evm = 0
+     WHERE h.is_deleted = 0 AND h.evm = 0 AND h.ancestor = 0
      ORDER BY h.name ASC'
 );
 $stmt->execute();
@@ -58,7 +60,7 @@ $genderFi = ['ori' => 'Ori', 'tamma' => 'Tamma', 'ruuna' => 'Ruuna', 'käkky' =>
           <div class="card-body">
             <h3><a href="<?= e(horseUrl($horse)) ?>"><?= e($horse['name']) ?></a></h3>
             <div class="meta-row">
-              <?php if ($horse['breed']): ?><span><?= e($horse['breed']) ?></span><?php endif; ?>
+              <?php if ($horse['breed_name']): ?><span><?= e($horse['breed_name']) ?></span><?php endif; ?>
               <span><?= e($genderFi[$horse['gender']] ?? $horse['gender']) ?></span>
               <?php if ($horse['birth_date']): ?>
                 <span><?= e((string)calculateAge($horse['birth_date'])) ?> v.</span>

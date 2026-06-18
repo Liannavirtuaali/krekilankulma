@@ -207,6 +207,18 @@ $_activePage = basename($_SERVER['PHP_SELF'], '.php');
     .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--color-accent, #a0633a); }
     .form-group textarea { min-height: 80px; resize: vertical; }
 
+    /* ── AUTOCOMPLETE ──────────────────────────── */
+    .ac-wrap { position: relative; }
+    .ac-wrap .ac-text { width: 100%; }
+    .ac-list { display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 200;
+      background: var(--color-surface,#fff); border: 1px solid var(--color-accent,#a0633a);
+      border-top: none; border-radius: 0 0 6px 6px; max-height: 220px; overflow-y: auto;
+      margin: 0; padding: 0; list-style: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .ac-list.open { display: block; }
+    .ac-item { padding: 0.4rem 0.6rem; font-size: 0.875rem; cursor: pointer; color: var(--color-text,#2c2c2c); }
+    .ac-item:hover, .ac-item.ac-active { background: var(--color-accent-light,#f5ede4); }
+    .ac-item strong { color: var(--color-accent,#a0633a); font-weight: 700; }
+
     /* ── FLASH MESSAGES ────────────────────────── */
     .flash-ok  { background: #e8f5e8; border: 1px solid #c3e6c3; color: #2b6b2b; padding: 0.6rem 1rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.875rem; }
     .flash-err { background: #fdf0f0; border: 1px solid #e6c3c3; color: #8a3030; padding: 0.6rem 1rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.875rem; }
@@ -246,6 +258,10 @@ $_activePage = basename($_SERVER['PHP_SELF'], '.php');
          href="<?= e(SITE_URL) ?>/admin/">⊞ Dashboard</a>
       <a class="admin-nav-item <?= in_array($_activePage, ['horses','horse_add','horse_edit','horse_delete']) ? 'active' : '' ?>"
          href="<?= e(SITE_URL) ?>/admin/horses.php">🐎 Hevoset</a>
+      <a class="admin-nav-item <?= $_activePage === 'sukulaiset' ? 'active' : '' ?>"
+         href="<?= e(SITE_URL) ?>/admin/sukulaiset.php">🌳 Sukulaiset</a>
+      <a class="admin-nav-item <?= $_activePage === 'horse_import_vrl' ? 'active' : '' ?>"
+         href="<?= e(SITE_URL) ?>/admin/horse_import_vrl.php">📥 Tuo VRL:stä</a>
       <a class="admin-nav-item <?= in_array($_activePage, ['kasvatus_all','foals']) ? 'active' : '' ?>"
          href="<?= e(SITE_URL) ?>/admin/kasvatus_all.php">🌱 Kasvatus</a>
       <a class="admin-nav-item <?= in_array($_activePage, ['kilpailut_all','competitions']) ? 'active' : '' ?>"
@@ -254,6 +270,8 @@ $_activePage = basename($_SERVER['PHP_SELF'], '.php');
       <a class="admin-nav-item <?= in_array($_activePage, ['kuvat_all','photos','photo_delete']) ? 'active' : '' ?>"
          href="<?= e(SITE_URL) ?>/admin/kuvat_all.php">📷 Kuvat</a>
       <div class="admin-nav-section">Sivusto</div>
+      <a class="admin-nav-item <?= $_activePage === 'settings' ? 'active' : '' ?>"
+         href="<?= e(SITE_URL) ?>/admin/settings.php">⚙️ Asetukset</a>
       <a class="admin-nav-item" href="<?= e(SITE_URL) ?>/" target="_blank">🔗 Julkinen sivu</a>
     </nav>
     <div class="admin-sidebar-footer">

@@ -192,12 +192,111 @@ function animateCount(el, target, duration) {
 <div class="c-main"> ... </div>
 ```
 
+---
+
+## Ajankohtaista / Blogi-nostokortti etusivulla (Sketch 011-C)
+
+Validoitu paikka uusimman blogipostauksen näyttämiselle: `.frontpage-uutinen`-alue etusivun 2-kolumni-rakenteessa.
+
+**Editoriaalinen nostokortti:**
+```css
+.editorial-uutinen {
+  background: var(--color-surface-warm);       /* lämmin parchment-tausta */
+  border: 1px solid var(--color-border-warm);
+  border-left: 4px solid var(--color-gold);    /* kultainen vasen korostusreuna */
+  border-radius: var(--radius-lg);
+  padding: var(--space-6) var(--space-8);
+  box-shadow: var(--shadow-sm);
+}
+```
+
+**Osion tag:**
+```css
+.uutinen-tag {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--color-gold);
+  font-weight: 700;
+  margin-bottom: var(--space-3);
+  display: block;
+}
+```
+
+**Otsikko, ingressi, footer:**
+```css
+.editorial-uutinen h3 {
+  font-family: var(--font-serif);
+  font-size: var(--text-xl);
+  font-weight: normal;
+  color: var(--color-primary);
+  margin-bottom: var(--space-3);
+  line-height: 1.3;
+}
+.editorial-uutinen .body-text {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  line-height: 1.65;
+  margin-bottom: var(--space-4);
+}
+.editorial-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.editorial-footer .date {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  color: var(--color-text-light);
+}
+```
+
+**"Lue lisää" pill-nappi (täyttyy hoverilla):**
+```css
+.editorial-footer a {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  color: var(--color-accent);
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid var(--color-accent);
+  padding: 5px 14px;
+  border-radius: var(--radius-full);
+  transition: all 0.15s;
+}
+.editorial-footer a:hover {
+  background: var(--color-accent);
+  color: #fff;
+}
+```
+
+**HTML-rakenne:**
+```html
+<div class="editorial-uutinen">
+  <span class="uutinen-tag">📰 Ajankohtaista</span>
+  <h3><?= e($post['title']) ?></h3>
+  <p class="body-text"><?= e(mb_substr($post['content'], 0, 220)) ?>…</p>
+  <div class="editorial-footer">
+    <span class="date"><?= e($post['created_at']) ?></span>
+    <a href="#">Lue lisää →</a>
+  </div>
+</div>
+```
+
+**Hylätyt vaihtoehdot (Sketch 011):**
+- **A: Uutinen overlay-korttigrideissä** — kortti liian ahdas pitkälle tekstille; ei tarpeeksi editoriaalinen tunne
+- **B: Erillinen leveä uutispalkki** — näkyvä mutta lisää scrollia; painottaa uutista enemmän kuin tilastoja
+
 ## Mitä välttää
 
 - **Lineaarinen scroll** (Sketch 002 A) profiilisivulle — liikaa scrollausta, informaatio hukkuu
 - **Overlay-kortit ilman `box-shadow: var(--shadow-lg)`** — kelluminen ei erotu ilman vahvempaa varjoa
 - **Tilastonumerot ilman animaatiota** — laskurianimaatio tekee numerot huomioiduiksi
+- **Uutinen overlay-korttigrideissä** — kortti ahdas; törmää tilastojen kanssa hierarkiassa
 
 ## Alkuperäiset sketchit
 - 002-hevonen-profiili — sources/002-hevonen-profiili/
 - 005-etusivu — sources/005-etusivu/
+- 011-ajankohtaista-homepage — .planning/sketches/011-ajankohtaista-homepage/

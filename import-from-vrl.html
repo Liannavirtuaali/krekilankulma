@@ -1,0 +1,1043 @@
+<!doctype html>
+<html lang="fi">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>VH-sukuhaku + VISU tuonti</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      margin: 24px;
+      line-height: 1.35;
+    }
+
+    #proxyShow {
+      display: none;
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: end;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+    }
+
+    input {
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      min-width: 260px;
+    }
+
+    button {
+      padding: 10px 14px;
+      border: 0;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .hint {
+      color: #555;
+      margin-top: 8px;
+    }
+
+    .status {
+      margin: 14px 0;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 16px 0 8px;
+    }
+
+    .tabbtn {
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid #ddd;
+      background: #fff;
+    }
+
+    .tabbtn[aria-selected="true"] {
+      border-color: #000;
+    }
+
+    .tabpanel {
+      display: none;
+    }
+
+    .tabpanel.active {
+      display: block;
+    }
+
+    /* Tables */
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 12px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid #eee;
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #fff;
+      z-index: 1;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #f1f1f1;
+      font-size: 12px;
+    }
+
+    .muted {
+      color: #666;
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    /* Code box */
+    .codebox {
+      position: relative;
+      margin-top: 10px;
+    }
+
+    pre {
+      white-space: pre;
+      overflow: auto;
+      padding: 14px;
+      border: 1px solid #eee;
+      border-radius: 14px;
+      background: #fafafa;
+    }
+
+    .copybtn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      border: 1px solid #ddd;
+      background: #fff;
+      border-radius: 10px;
+      padding: 8px 10px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    /* Sukutaulu styles */
+    .pedigree-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 16px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 16px;
+      background: #fafafa;
+    }
+
+    .pedigree-column {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .pedigree-entry {
+      margin-bottom: 16px;
+      padding: 0;
+      background: #fff;
+      border-radius: 6px;
+      border-left: 3px solid #999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .pedigree-column:nth-child(1) .pedigree-entry {
+      height: calc(50% - 8px);
+      margin-bottom: 16px;
+    }
+
+    .pedigree-column:nth-child(2) .pedigree-entry {
+      height: calc(25% - 12px);
+      margin-bottom: 16px;
+    }
+
+    .pedigree-column:nth-child(3) .pedigree-entry {
+      height: calc(12.5% - 14px);
+      margin-bottom: 16px;
+    }
+
+    .pedigree-entry.sire-line {
+      border-left-color: #4a90e2;
+    }
+
+    .pedigree-entry.dam-line {
+      border-left-color: #e24a90;
+    }
+
+    .pedigree-header {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    .pedigree-mark {
+      flex-shrink: 0;
+    }
+
+    .pedigree-name {
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .pedigree-vh {
+      font-size: 12px;
+      color: #666;
+      font-family: ui-monospace, monospace;
+    }
+
+    .pedigree-detail {
+      font-size: 12px;
+      color: #777;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>VH-sukuhaku</h1>
+
+  <div class="row">
+    <label>
+      VH-tunnus
+      <input id="vh" placeholder="Esim. VH14-014-0143" />
+    </label>
+
+    <button id="go">Hae suku + tiedot</button>
+  </div>
+
+  <div class="hint">
+    Proxy: <span class="mono" id="proxyShow"></span>
+  </div>
+
+  <div class="status" id="status"></div>
+
+  <div id="meta"></div>
+
+  <div class="tabs" role="tablist" aria-label="Näkymät">
+    <button class="tabbtn" id="tab-data" role="tab" aria-selected="true" aria-controls="panel-data">Tiedot</button>
+    <button class="tabbtn" id="tab-pedigree" role="tab" aria-selected="false"
+      aria-controls="panel-pedigree">Sukutaulu</button>
+    <button class="tabbtn" id="tab-visu" role="tab" aria-selected="false" aria-controls="panel-visu">VISU
+      tuonti</button>
+  </div>
+
+  <section id="panel-data" class="tabpanel active" role="tabpanel" aria-labelledby="tab-data">
+    <div class="actions" id="actions" hidden>
+      <button id="dl">Lataa JSON</button>
+      <a id="openSuku" target="_blank" rel="noreferrer">Avaa sukusivu</a>
+    </div>
+
+    <table id="tbl" hidden>
+      <thead>
+        <tr>
+          <th>Kohta</th>
+          <th>Nimi</th>
+          <th>VH</th>
+          <th>Rotu</th>
+          <th>Sukupuoli</th>
+          <th>Säkäkorkeus</th>
+          <th>Syntynyt</th>
+          <th>Väri</th>
+          <th>Sivut</th>
+          <th>Kotitalli</th>
+          <th>Kasvattajanimi</th>
+          <th>Kasvattaja</th>
+          <th>Omistajat</th>
+          <th>Linkki</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <section id="panel-pedigree" class="tabpanel" role="tabpanel" aria-labelledby="tab-pedigree">
+    <p class="muted">
+      Kolmen polven sukutaulu isä- ja emälinjalla.
+    </p>
+
+    <div id="pedigreeContainer"></div>
+
+    <!-- UUSI: HTML-generointi + kopiointi -->
+    <div class="actions" style="margin-top:12px;">
+      <button id="genPedigreeHtml" disabled>Generoi HTML</button>
+      <button id="copyPedigreeHtml" disabled>Kopioi</button>
+    </div>
+
+    <div class="codebox">
+      <pre><code id="pedigreeHtmlOut" class="mono">&lt;!-- Hae ensin suku + tiedot, sitten generoi HTML --&gt;</code></pre>
+    </div>
+  </section>
+
+  <section id="panel-visu" class="tabpanel" role="tabpanel" aria-labelledby="tab-visu">
+    <p class="muted">
+      Tämä näyttää VISU-tuontia varten rakennetun JSONin (hevonen + isälinja + emälinja, syvyys 4). Voit kopioida sen
+      suoraan.
+    </p>
+
+    <div class="codebox">
+      <button class="copybtn" id="copyVisu">Kopioi</button>
+      <pre><code id="visuJson" class="mono">// Hae ensin suku + tiedot, niin tähän ilmestyy JSON</code></pre>
+    </div>
+  </section>
+
+  <script>
+    const $ = (sel) => document.querySelector(sel);
+
+    // Sinun toimiva worker-proxy
+    const PROXY_PREFIX = "https://tight-lake-e0b8.anniina-sipria.workers.dev/?url=";
+
+    // VH-tunnuksen validointi (regex literal -> \d ei tupla-escape)
+    const VH_RE = /^VH\d{2}-\d{3}-\d{4}$/i;
+
+    // Kenttäotsikot, jotta tyhjät arvot eivät "kaappaa" seuraavaa kenttää
+    const FIELD_LABELS = new Set([
+      "Rotu",
+      "Sukupuoli",
+      "Säkäkorkeus",
+      "Syntynyt",
+      "Väri",
+      "Sivut",
+      "Kotitalli",
+      "Kasvattajanimi",
+      "Kasvattaja",
+      "Omistajat",
+      "Painotus"
+    ]);
+
+    $("#proxyShow").textContent = PROXY_PREFIX;
+
+    // --- UI: Tabs ---
+    const tabs = [
+      { btn: $("#tab-data"), panel: $("#panel-data") },
+      { btn: $("#tab-pedigree"), panel: $("#panel-pedigree") },
+      { btn: $("#tab-visu"), panel: $("#panel-visu") }
+    ];
+    function setTab(activeId) {
+      for (const t of tabs) {
+        const isActive = t.btn.id === activeId;
+        t.btn.setAttribute("aria-selected", String(isActive));
+        t.panel.classList.toggle("active", isActive);
+      }
+    }
+    $("#tab-data").addEventListener("click", () => setTab("tab-data"));
+    $("#tab-pedigree").addEventListener("click", () => setTab("tab-pedigree"));
+    $("#tab-visu").addEventListener("click", () => setTab("tab-visu"));
+
+    // --- Helpers ---
+    function setStatus(msg, isError = false) {
+      $("#status").innerHTML = isError ? `<span style="color:#b00020">${msg}</span>` : msg;
+    }
+    function escapeHtml(s) {
+      return (s ?? "").toString().replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+    function buildSukuUrl(vh) {
+      return `https://virtuaalihevoset.net/virtuaalihevoset/hevonen/${encodeURIComponent(vh)}/suku`;
+    }
+    function buildHorseUrl(vh) {
+      return `https://virtuaalihevoset.net/virtuaalihevoset/hevonen/${encodeURIComponent(vh)}`;
+    }
+    async function fetchHtml(targetUrl) {
+      const url = PROXY_PREFIX + encodeURIComponent(targetUrl);
+      const res = await fetch(url, { headers: { "Accept": "text/html" } });
+      if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+      return await res.text();
+    }
+    function extractHorseTitle(doc) {
+      const h2 = doc.querySelector("h2");
+      return h2 ? h2.textContent.trim() : "";
+    }
+
+    // --- Text extraction robust ---
+    function getLinesFromDoc(doc) {
+      const raw = (doc.body && doc.body.innerText && doc.body.innerText.trim().length)
+        ? doc.body.innerText
+        : (doc.body ? doc.body.textContent : doc.documentElement.textContent);
+
+      return raw
+        .split("\n")
+        .map(s => s.replace(/\s+/g, " ").trim())
+        .filter(Boolean);
+    }
+
+    function looksLikeLabelLine(line) {
+      for (const lbl of FIELD_LABELS) {
+        if (line === lbl) return true;
+        if (line.startsWith(lbl + " ")) return true;
+      }
+      return false;
+    }
+
+    function extractField(lines, label) {
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+
+        if (line.startsWith(label + " ")) {
+          return line.slice(label.length).trim();
+        }
+
+        if (line === label) {
+          const next = (lines[i + 1] || "").trim();
+          if (!next || looksLikeLabelLine(next)) return "";
+          return next;
+        }
+      }
+      return "";
+    }
+
+    function normalizeEmpty(v) {
+      const t = (v || "").trim();
+      return (t === "-" ? "" : t);
+    }
+
+    function extractDate(value) {
+      const m = (value || "").match(/\b\d{2}\.\d{2}\.\d{4}\b/);
+      return m ? m[0] : "";
+    }
+
+    function looksLikeHeight(value) {
+      return /\d{2,3}\s*cm/i.test(value || "");
+    }
+
+    // --- 1) Pedigree parsing (from suku page text) ---
+    function parsePedigreeFromText(text) {
+      const cutAt = text.indexOf("Suvun tiedot");
+      const main = cutAt > 0 ? text.slice(0, cutAt) : text;
+
+      const results = [];
+
+      // i./ii./iii./e./ee... + nimi + (VHxx-xxx-xxxx) + extra
+      const withVh = /(\b(?:i|e)(?:i|e){0,2}\.)\s+([^\n(]+?)\s*\(\s*(VH\d{2}-\d{3}-\d{4})\s*\)\s*([^\n]*)/gi;
+      let m;
+      while ((m = withVh.exec(main)) !== null) {
+        const mark = m[1].trim();
+        const name = m[2].trim().replace(/\s+/g, " ");
+        const vh = m[3].toUpperCase();
+        const extra = (m[4] || "").trim().replace(/\s+/g, " ");
+        results.push({ mark, name, vh, pedigreeExtra: extra, known: true });
+      }
+
+      // Tuntemattomat ilman VH:tä
+      const unknown = /(\b(?:i|e)(?:i|e){0,2}\.)\s+(Tuntematon [^\n]+)/gi;
+      while ((m = unknown.exec(main)) !== null) {
+        const mark = m[1].trim();
+        const name = m[2].trim().replace(/\s+/g, " ");
+        if (!results.some(r => r.mark === mark && r.name === name)) {
+          results.push({ mark, name, vh: "", pedigreeExtra: "", known: false });
+        }
+      }
+
+      // Sort: i-line first then e-line; shallower first
+      const score = (mark) => {
+        const side = mark.startsWith("i") ? 0 : 1;
+        const depth = mark.replace(".", "").length;
+        return side * 100 + depth;
+      };
+      results.sort((a, b) => score(a.mark) - score(b.mark) || a.mark.localeCompare(b.mark));
+      return results;
+    }
+
+    // --- 2) Horse profile details ---
+    async function fetchHorseDetails(vh) {
+      const horseUrl = buildHorseUrl(vh);
+      const html = await fetchHtml(horseUrl);
+      const doc = new DOMParser().parseFromString(html, "text/html");
+
+      const lines = getLinesFromDoc(doc);
+
+      const rotu = normalizeEmpty(extractField(lines, "Rotu"));
+      const sukupuoli = normalizeEmpty(extractField(lines, "Sukupuoli"));
+
+      const rawSakakorkeus = normalizeEmpty(extractField(lines, "Säkäkorkeus"));
+      const sakakorkeus = looksLikeHeight(rawSakakorkeus) ? rawSakakorkeus : "";
+
+      const rawSyntynyt = normalizeEmpty(extractField(lines, "Syntynyt"));
+      const syntynyt = extractDate(rawSyntynyt);
+
+      const vari = normalizeEmpty(extractField(lines, "Väri"));
+      const sivut = normalizeEmpty(extractField(lines, "Sivut"));
+      const kotitalli = normalizeEmpty(extractField(lines, "Kotitalli"));
+      const kasvattajanimi = normalizeEmpty(extractField(lines, "Kasvattajanimi"));
+      const kasvattaja = normalizeEmpty(extractField(lines, "Kasvattaja"));
+      const omistajat = normalizeEmpty(extractField(lines, "Omistajat"));
+
+      return {
+        vh,
+        horseUrl,
+        title: extractHorseTitle(doc),
+        rotu,
+        sukupuoli,
+        sakakorkeus,
+        syntynyt,
+        vari,
+        sivut,
+        kotitalli,
+        kasvattajanimi,
+        kasvattaja,
+        omistajat
+      };
+    }
+
+    async function mapLimit(items, limit, mapper) {
+      const out = new Array(items.length);
+      let i = 0;
+      const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
+        while (i < items.length) {
+          const idx = i++;
+          out[idx] = await mapper(items[idx], idx);
+        }
+      });
+      await Promise.all(workers);
+      return out;
+    }
+
+    function renderTable(rows) {
+      const tbl = $("#tbl");
+      const tbody = tbl.querySelector("tbody");
+      tbody.innerHTML = "";
+
+      for (const r of rows) {
+        const link = r.vh ? buildHorseUrl(r.vh) : "";
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+        <td><span class="pill">${escapeHtml(r.mark)}</span></td>
+        <td>${escapeHtml(r.name)}</td>
+        <td class="mono">${r.vh ? escapeHtml(r.vh) : "<span class='muted'>—</span>"}</td>
+
+        <td>${escapeHtml(r.rotu || "")}</td>
+        <td>${escapeHtml(r.sukupuoli || "")}</td>
+        <td>${escapeHtml(r.sakakorkeus || "")}</td>
+        <td>${escapeHtml(r.syntynyt || "")}</td>
+        <td>${escapeHtml(r.vari || "")}</td>
+        <td>${r.sivut ? `<a href="${escapeHtml(r.sivut)}" target="_blank" rel="noreferrer">Linkki</a>` : "<span class='muted'>—</span>"}</td>
+        <td>${escapeHtml(r.kotitalli || "")}</td>
+        <td>${escapeHtml(r.kasvattajanimi || "")}</td>
+        <td>${escapeHtml(r.kasvattaja || "")}</td>
+        <td>${escapeHtml(r.omistajat || "")}</td>
+
+        <td>${link ? `<a href="${link}" target="_blank" rel="noreferrer">Avaa</a>` : "<span class='muted'>—</span>"}</td>
+      `;
+        tbody.appendChild(tr);
+      }
+
+      tbl.hidden = rows.length === 0;
+    }
+
+    // --- Pedigree chart rendering ---
+    function renderPedigreeChart(merged) {
+      const container = $("#pedigreeContainer");
+
+      // Generation definitions
+      const gen1 = ['i.', 'e.'];
+      const gen2 = ['ii.', 'ie.', 'ei.', 'ee.'];
+      const gen3 = ['iii.', 'iie.', 'iei.', 'iee.', 'eii.', 'eie.', 'eei.', 'eee.'];
+
+      const findHorse = (mark) => merged.find(h => h.mark.toLowerCase() === mark.toLowerCase());
+
+      const createEntry = (mark) => {
+        const horse = findHorse(mark);
+        if (!horse) {
+          return `
+            <div class="pedigree-entry">
+              <div class="pedigree-header">
+                <span class="pedigree-mark">${escapeHtml(mark)}</span>
+                <span class="pedigree-name muted">Ei tietoa</span>
+              </div>
+            </div>
+          `;
+        }
+
+        const lineClass = mark.toLowerCase().startsWith('i') ? 'sire-line' : 'dam-line';
+        const details = [];
+        if (horse.sakakorkeus) details.push(horse.sakakorkeus);
+        if (horse.vari) details.push(horse.vari);
+        if (horse.rotu) details.push(horse.rotu);
+
+        return `
+          <div class="pedigree-entry ${lineClass}">
+            <div class="pedigree-header">
+              <span class="pedigree-mark">${escapeHtml(mark)}</span>
+              <span class="pedigree-name">
+                <a href="${escapeHtml(horse.sivut)}" target="_blank" rel="noreferrer">${escapeHtml(horse.name)}</a>
+              </span>
+            </div>
+            ${horse.vh ? `<div class="pedigree-vh">
+              <a href="https://virtuaalihevoset.net/virtuaalihevoset/hevonen/${escapeHtml(horse.vh)}" target="_blank" rel="noreferrer">${escapeHtml(horse.vh)}</a>
+            </div>` : ''}
+            ${details.length > 0 ? `<div class="pedigree-detail">${escapeHtml(details.join(' • '))}</div>` : ''}
+          </div>
+        `;
+      };
+
+      const html = `
+        <div class="pedigree-grid">
+          <div class="pedigree-column">
+            ${gen1.map(createEntry).join('')}
+          </div>
+          <div class="pedigree-column">
+            ${gen2.map(createEntry).join('')}
+          </div>
+          <div class="pedigree-column">
+            ${gen3.map(createEntry).join('')}
+          </div>
+        </div>
+      `;
+
+      container.innerHTML = html;
+    }
+
+    // --- UUSI: Sukutaulun HTML-export (generoi ja kopioi) ---
+    function pedigreeStylesForExport() {
+      return `
+.pedigree-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+  margin-top:16px;
+  border:1px solid #e0e0e0;
+  border-radius:8px;
+  padding:16px;
+  background:#fafafa;
+}
+.pedigree-column{display:flex;flex-direction:column;}
+.pedigree-entry{
+  margin-bottom:16px;
+  padding:0;
+  background:#fff;
+  border-radius:6px;
+  border-left:3px solid #999;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+.pedigree-column:nth-child(1) .pedigree-entry{height:calc(50% - 8px);margin-bottom:16px;}
+.pedigree-column:nth-child(2) .pedigree-entry{height:calc(25% - 12px);margin-bottom:16px;}
+.pedigree-column:nth-child(3) .pedigree-entry{height:calc(12.5% - 14px);margin-bottom:16px;}
+.pedigree-entry.sire-line{border-left-color:#4a90e2;}
+.pedigree-entry.dam-line{border-left-color:#e24a90;}
+.pedigree-header{
+  font-weight:600;
+  color:#333;
+  margin-bottom:4px;
+  display:flex;
+  align-items:baseline;
+  gap:6px;
+}
+.pedigree-name{font-size:15px;font-weight:500;}
+.pedigree-vh{font-size:12px;color:#666;font-family:ui-monospace,monospace;}
+.pedigree-detail{font-size:12px;color:#777;margin-top:4px;}
+.muted{color:#666;}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;}
+`.trim();
+    }
+
+    function buildPedigreeExportHtml() {
+      const container = document.querySelector("#pedigreeContainer");
+      const inner = (container && container.innerHTML && container.innerHTML.trim())
+        ? container.innerHTML.trim()
+        : "";
+
+      if (!inner) return "";
+
+      const css = pedigreeStylesForExport();
+
+      return `<!doctype html>
+<html lang="fi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sukutaulu</title>
+  <style>
+${css}
+  </style>
+</head>
+<body>
+  ${inner}
+</body>
+</html>`;
+    }
+
+    function updatePedigreeHtmlOut(htmlStr) {
+      document.querySelector("#pedigreeHtmlOut").textContent =
+        htmlStr || "<!-- Hae ensin suku + tiedot, sitten generoi HTML -->";
+    }
+
+    document.querySelector("#genPedigreeHtml").addEventListener("click", () => {
+      const html = buildPedigreeExportHtml();
+      updatePedigreeHtmlOut(html);
+    });
+
+    document.querySelector("#copyPedigreeHtml").addEventListener("click", async () => {
+      const txt = document.querySelector("#pedigreeHtmlOut").textContent || "";
+      try {
+        await navigator.clipboard.writeText(txt);
+        const btn = document.querySelector("#copyPedigreeHtml");
+        btn.textContent = "Kopioitu!";
+        setTimeout(() => (btn.textContent = "Kopioi"), 900);
+      } catch {
+        const range = document.createRange();
+        range.selectNodeContents(document.querySelector("#pedigreeHtmlOut"));
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        document.execCommand("copy");
+        sel.removeAllRanges();
+      }
+    });
+
+    // --- Breeds ---
+    let breedsList = [];
+
+    async function loadBreeds() {
+      try {
+        const resp = await fetch("breeds.json");
+        if (resp.ok) {
+          breedsList = await resp.json();
+          console.log("Rodut ladattu:", breedsList.length);
+        } else {
+          console.warn("breeds.json ei löytynyt tai lataus epäonnistui", resp.status);
+        }
+      } catch (e) {
+        console.warn("Virhe breeds.json latauksessa:", e);
+      }
+    }
+    loadBreeds();
+
+    function findBreedId(rotuText) {
+      if (!rotuText || !breedsList.length) return null;
+      const s = rotuText.trim().toLowerCase();
+      const match = breedsList.find(b =>
+        b.name.toLowerCase() === s ||
+        (b.abbreviation && b.abbreviation.toLowerCase() === s)
+      );
+      return match ? match.id : null;
+    }
+
+    // --- VISU JSON builder ---
+    function genderToVisuGender(vhGenderText) {
+      // Virtuaalihevoset: tyypillisesti "tamma", "ori", "ruuna" jne.
+      // VISU-esimerkissä: mare / stallion. Jos ei tunnisteta, jätetään pois.
+      const g = (vhGenderText || "").toLowerCase();
+      if (g.includes("tamma") || g.includes("mare")) return "mare";
+      if (g.includes("ori") || g.includes("stallion")) return "stallion";
+      if (g.includes("ruuna") || g.includes("gelding")) return "gelding";
+      return "";
+    }
+
+    function parseHeightCm(value) {
+      const m = (value || "").match(/(\d{2,3})\s*cm/i);
+      return m ? Number(m[1]) : null;
+    }
+
+    function toVisuHorse(details, fallbackName) {
+      // Mapataan tiedot VISU-muotoon mahdollisimman järkevästi.
+      const heightCm = parseHeightCm(details?.sakakorkeus || "");
+      const gender = genderToVisuGender(details?.sukupuoli || "");
+
+      const rotuText = details?.rotu || "";
+      const foundId = findBreedId(rotuText);
+      const breedId = foundId || (rotuText || undefined);
+
+      return {
+        name: details?.title ? details.title.replace(/\s*\(VH\d{2}-\d{3}-\d{4}\)\s*$/, "") : (fallbackName || ""),
+        registration_number: details?.vh || "",
+        height_cm: heightCm ?? undefined,
+        breed_id: breedId,
+        color: details?.vari || undefined,
+        gender: gender || undefined,
+        birthday: details?.syntynyt || undefined,
+        evm: false,
+        created_by_id: "01KE1QWV1RM5CDZPBD8XNKW5AF",
+        page_url: details?.horseUrl || undefined
+      };
+    }
+
+    function setNested(obj, path, value) {
+      let cur = obj;
+      for (let i = 0; i < path.length - 1; i++) {
+        const k = path[i];
+        if (!cur[k]) cur[k] = {};
+        cur = cur[k];
+      }
+      cur[path[path.length - 1]] = value;
+    }
+
+    function buildVisuTree(inputVh, inputDetails, relativesByMark, detailsByVh) {
+      // VISU: { horse, sire{...}, dam{...} } syvyys 4
+      // Jos sukulaista ei ole (ei VH-tunnusta tai "-"), asetetaan kyseinen haara nulliksi.
+
+      const root = {
+        horse: {
+          ...toVisuHorse(inputDetails, ""),
+          extra_info: undefined,
+          description: undefined,
+          genotype: undefined
+        },
+        sire: null,
+        dam: null
+      };
+
+      // Helper: "iie." -> ["sire", "sire", "dam"]
+      const getPath = (mark) => {
+        return mark.replace(".", "").split("").map(c => (c.toLowerCase() === "i" ? "sire" : "dam"));
+      };
+
+      const isMissingRel = (rel) => {
+        if (!rel) return true;
+        const v = (rel.vh || "").trim();
+        return !v || v === "-";
+      };
+
+      const makeNode = (rel) => {
+        if (!rel || isMissingRel(rel)) return null;
+        const det = detailsByVh.get(rel.vh);
+        return det ? toVisuHorse(det, rel.name) : null;
+      };
+
+      const getAtPath = (obj, path) => {
+        let cur = obj;
+        for (const k of path) {
+          if (cur == null) return null;
+          cur = cur[k];
+        }
+        return cur ?? null;
+      };
+
+      // Iterate all relatives sorted by depth (shortest mark first)
+      // This ensures parents exist before we try to attach children
+      const allMarks = Array.from(relativesByMark.keys()).sort((a, b) => a.length - b.length);
+
+      for (const mark of allMarks) {
+        const path = getPath(mark);
+        const rel = relativesByMark.get(mark);
+        const node = makeNode(rel);
+
+        if (path.length === 1) {
+          root[path[0]] = node;
+        } else {
+          const parentPath = path.slice(0, -1);
+          const prop = path[path.length - 1];
+          const parent = getAtPath(root, parentPath);
+          if (parent) {
+            parent[prop] = node;
+          }
+        }
+
+        // Ensure sire/dam fields exist for structure consistency
+        if (node && typeof node === "object") {
+          if (!Object.prototype.hasOwnProperty.call(node, "sire")) node.sire = undefined;
+          if (!Object.prototype.hasOwnProperty.call(node, "dam")) node.dam = undefined;
+        }
+      }
+
+      return root;
+    }
+
+    function prettyJson(obj) {
+      // Remove undefined recursively so JSON is cleaner
+      const clean = (v) => {
+        if (Array.isArray(v)) return v.map(clean);
+        if (v && typeof v === "object") {
+          const o = {};
+          for (const [k, val] of Object.entries(v)) {
+            if (val === undefined) continue;
+            o[k] = clean(val);
+          }
+          return o;
+        }
+        return v;
+      };
+      return JSON.stringify(clean(obj), null, 2);
+    }
+
+    function updateVisuPanel(jsonStr) {
+      $("#visuJson").textContent = jsonStr;
+    }
+
+    // --- Copy button (VISU) ---
+    $("#copyVisu").addEventListener("click", async () => {
+      const txt = $("#visuJson").textContent || "";
+      try {
+        await navigator.clipboard.writeText(txt);
+        $("#copyVisu").textContent = "Kopioitu!";
+        setTimeout(() => $("#copyVisu").textContent = "Kopioi", 900);
+      } catch {
+        // Fallback: select text
+        const range = document.createRange();
+        range.selectNodeContents($("#visuJson"));
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        document.execCommand("copy");
+        sel.removeAllRanges();
+      }
+    });
+
+    // --- Main flow ---
+    let lastJson = null; // full data json
+
+    $("#go").addEventListener("click", async () => {
+      const vh = $("#vh").value.trim().toUpperCase();
+      if (!VH_RE.test(vh)) {
+        setStatus("Anna VH-tunnus muodossa VH14-014-0143.", true);
+        return;
+      }
+
+      const sukuUrl = buildSukuUrl(vh);
+
+      $("#go").disabled = true;
+      $("#meta").innerHTML = "";
+      $("#actions").hidden = true;
+      $("#tbl").hidden = true;
+      $("#pedigreeContainer").innerHTML = "";
+
+      // reset VISU + pedigree export
+      updateVisuPanel("// Hae ensin suku + tiedot, niin tähän ilmestyy JSON");
+      updatePedigreeHtmlOut("");
+      document.querySelector("#genPedigreeHtml").disabled = true;
+      document.querySelector("#copyPedigreeHtml").disabled = true;
+
+      setStatus(`Haetaan sukua: <span class="mono">${escapeHtml(sukuUrl)}</span> ...`);
+
+      try {
+        // 0) fetch input horse profile (for "horse" block)
+        const inputDetails = await fetchHorseDetails(vh);
+
+        // 1) fetch suku page
+        const sukuHtml = await fetchHtml(sukuUrl);
+        const sukuDoc = new DOMParser().parseFromString(sukuHtml, "text/html");
+        const sukuText = (sukuDoc.body && sukuDoc.body.innerText && sukuDoc.body.innerText.trim().length)
+          ? sukuDoc.body.innerText
+          : (sukuDoc.body ? sukuDoc.body.textContent : sukuDoc.documentElement.textContent);
+
+        const relatives = parsePedigreeFromText(sukuText);
+
+        // 2) fetch profiles for relatives with VH
+        const uniqueVh = [...new Set(relatives.map(r => r.vh).filter(Boolean))];
+
+        setStatus(`Löytyi ${relatives.length} sukumerkintää. Haetaan ${uniqueVh.length} hevosen tiedot...`);
+
+        const detailsList = await mapLimit(uniqueVh, 4, async (rvh) => {
+          try {
+            return await fetchHorseDetails(rvh);
+          } catch (e) {
+            return { vh: rvh, error: e.message };
+          }
+        });
+
+        const detailsByVh = new Map(detailsList.filter(d => d && d.vh).map(d => [d.vh, d]));
+
+        // 3) merge to table rows
+        const merged = relatives.map(r => {
+          const d = r.vh ? detailsByVh.get(r.vh) : null;
+          return {
+            ...r,
+            rotu: d?.rotu || "",
+            sukupuoli: d?.sukupuoli || "",
+            sakakorkeus: d?.sakakorkeus || "",
+            syntynyt: d?.syntynyt || "",
+            vari: d?.vari || "",
+            sivut: d?.sivut || "",
+            kotitalli: d?.kotitalli || "",
+            kasvattajanimi: d?.kasvattajanimi || "",
+            kasvattaja: d?.kasvattaja || "",
+            omistajat: d?.omistajat || "",
+            fetchError: d?.error || ""
+          };
+        });
+
+        // 4) render
+        $("#meta").innerHTML = `
+        <div><strong>Sukusivu:</strong> <a href="${sukuUrl}" target="_blank" rel="noreferrer">${escapeHtml(sukuUrl)}</a></div>
+        <div class="muted">Haettu ${uniqueVh.length} hevosen tiedot (rinnakkaisuus 4 kerrallaan).</div>
+      `;
+        $("#openSuku").href = sukuUrl;
+        $("#actions").hidden = false;
+
+        renderTable(merged);
+        renderPedigreeChart(merged);
+
+        // enable pedigree export buttons after render
+        document.querySelector("#genPedigreeHtml").disabled = false;
+        document.querySelector("#copyPedigreeHtml").disabled = false;
+
+        lastJson = {
+          input: { vh, sukuUrl },
+          fetchedAt: new Date().toISOString(),
+          horse: inputDetails,
+          relatives: merged,
+          errors: detailsList.filter(d => d.error).map(d => ({ vh: d.vh, error: d.error }))
+        };
+
+        // 5) build VISU tree JSON for tab
+        const relativesByMark = new Map(relatives.map(r => [r.mark, r]));
+        const visu = buildVisuTree(vh, inputDetails, relativesByMark, detailsByVh);
+        updateVisuPanel(prettyJson(visu));
+
+        setStatus("Valmis ✅");
+
+      } catch (err) {
+        console.error(err);
+        setStatus(`Haku epäonnistui: ${escapeHtml(err.message)}`, true);
+      } finally {
+        $("#go").disabled = false;
+      }
+    });
+
+    // --- Download full JSON (debug/export) ---
+    $("#dl").addEventListener("click", () => {
+      if (!lastJson) return;
+      const blob = new Blob([JSON.stringify(lastJson, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `${lastJson.input.vh}-suku-ja-tiedot.json`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+  </script>
+</body>
+
+</html>
