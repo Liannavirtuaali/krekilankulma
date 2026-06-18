@@ -100,78 +100,144 @@ if (isset($_GET['deleted'])) $flash = '<p class="flash-ok">Kilpailu poistettu.</
 
 $pageTitle = 'Kilpailut';
 require __DIR__ . '/includes/admin_header.php';
-?>
-<h1>Kilpailut — <?= e($horse['name']) ?></h1>
-<p><a href="<?= e(SITE_URL) ?>/admin/horses.php">← Takaisin hevoslistaan</a></p>
 
+// Tilastot
+$totalPoints = array_sum(array_column($competitions, 'points'));
+$wins = count(array_filter($competitions, fn($c) => $c['placement'] === '1'));
+?>
+<div class="admin-page-header">
+  <a href="<?= e(SITE_URL) ?>/admin/horses.php" class="back-link">← Hevoset</a>
+  <h1>Kilpailut</h1>
+  <div class="page-actions">
+    <button class="btn" onclick="adminOpenModal('comp')">+ Lisää kilpailu</button>
+  </div>
+</div>
+
+<div class="horse-ctx-banner">
+  <span class="hcb-name">🏆 <?= e($horse['name']) ?></span>
+  <span class="hcb-meta"><?= count($competitions) ?> kilpailua</span>
+  <a href="<?= e(SITE_URL) ?>/admin/horses.php" class="hcb-back">← Hevoslistaan</a>
+</div>
+
+<div class="admin-body">
 <?php if ($errors): ?>
-  <ul class="flash-err"><?php foreach ($errors as $emsg): ?><li><?= e($emsg) ?></li><?php endforeach; ?></ul>
+  <div class="flash-err"><ul><?php foreach ($errors as $emsg): ?><li><?= e($emsg) ?></li><?php endforeach; ?></ul></div>
 <?php endif; ?>
 <?= $flash ?>
 
+<div class="comp-stat-row">
+  <div class="comp-stat-card">
+    <div class="cs-num"><?= count($competitions) ?></div>
+    <div class="cs-label">Kilpailua</div>
+  </div>
+  <div class="comp-stat-card">
+    <div class="cs-num"><?= (int)$totalPoints ?></div>
+    <div class="cs-label">Pistettä</div>
+  </div>
+  <div class="comp-stat-card">
+    <div class="cs-num"><?= $wins ?></div>
+    <div class="cs-label">Voittoa</div>
+  </div>
+</div>
+
 <?php if ($competitions): ?>
-<table class="admin-table">
-  <thead>
-    <tr><th>Kilpailu</th><th>Päivämäärä</th><th>Sijoitus</th><th>Pisteet</th><th>Muistiinpanot</th><th>Toiminnot</th></tr>
-  </thead>
-  <tbody>
-  <?php foreach ($competitions as $c): ?>
-    <tr>
-      <td><?= e($c['competition_name']) ?></td>
-      <td><?= $c['competition_date'] ? formatDate($c['competition_date']) : '' ?></td>
-      <td><?= e($c['placement'] ?? '') ?></td>
-      <td><?= $c['points'] !== null ? (int)$c['points'] : '' ?></td>
-      <td><?= e($c['notes'] ?? '') ?></td>
-      <td style="white-space:nowrap">
-        <a href="?horse_id=<?= $horse_id ?>&edit=<?= (int)$c['id'] ?>" class="btn-sm btn-edit">Muokkaa</a>
-        <form method="post" action="" style="display:inline">
-          <input type="hidden" name="csrf_token" value="<?= e($_SESSION['csrf_token']) ?>">
-          <input type="hidden" name="action"   value="delete">
-          <input type="hidden" name="comp_id"  value="<?= (int)$c['id'] ?>">
-          <button type="submit" class="btn-sm btn-danger" onclick="return confirm('Poistetaanko kilpailu?')">Poista</button>
-        </form>
-      </td>
-    </tr>
+<div class="compact-list">
+  <div class="compact-list-header" style="grid-template-columns:2fr 100px 60px 70px 28px">
+    <div>Kilpailu</div><div>Päivämäärä</div><div>Sij.</div><div>Pisteet</div><div></div>
+  </div>
+  <?php foreach ($competitions as $c):
+    $pl = $c['placement'] ?? '';
+    $pbClass = match($pl) { '1' => 'pbadge-1', '2' => 'pbadge-2', '3' => 'pbadge-3', default => 'pbadge-x' };
+  ?>
+  <div class="compact-list-row" style="grid-template-columns:2fr 100px 60px 70px 28px"
+       onclick="adminToggleExpand('c<?= (int)$c['id'] ?>')">
+    <div class="cl-name"><?= e($c['competition_name']) ?></div>
+    <div class="cl-meta"><?= $c['competition_date'] ? formatDate($c['competition_date']) : '—' ?></div>
+    <div><span class="pbadge <?= $pbClass ?>"><?= $pl !== '' ? e($pl) : '—' ?></span></div>
+    <div class="cl-mono"><?= $c['points'] !== null ? (int)$c['points'] : '—' ?></div>
+    <div>
+      <button class="cl-expand-btn" id="cl-btn-c<?= (int)$c['id'] ?>"
+              onclick="event.stopPropagation();adminToggleExpand('c<?= (int)$c['id'] ?>')">▸</button>
+    </div>
+  </div>
+  <div class="cl-expanded" id="cl-exp-c<?= (int)$c['id'] ?>">
+    <?php if ($c['notes']): ?>
+      <p style="font-size:0.8rem;color:var(--color-text-muted);margin:0 0 0.5rem"><?= e($c['notes']) ?></p>
+    <?php endif; ?>
+    <div class="cl-expanded-actions">
+      <button class="btn-sm btn-edit" onclick="openEditComp(<?= (int)$c['id'] ?>, <?= htmlspecialchars(json_encode($c), ENT_QUOTES) ?>)">✏️ Muokkaa</button>
+      <form method="post" action="?horse_id=<?= $horse_id ?>" style="display:inline">
+        <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
+        <input type="hidden" name="action"  value="delete">
+        <input type="hidden" name="comp_id" value="<?= (int)$c['id'] ?>">
+        <button type="submit" class="btn-sm btn-danger" onclick="return confirm('Poistetaanko kilpailu?')">🗑 Poista</button>
+      </form>
+    </div>
+  </div>
   <?php endforeach; ?>
-  </tbody>
-</table>
+</div>
 <?php else: ?>
-  <p>Ei kilpailumerkintöjä.</p>
+  <p style="color:var(--color-text-muted);margin:1rem 0">Ei kilpailumerkintöjä.</p>
 <?php endif; ?>
+</div><!-- /.admin-body -->
 
-<h3><?= $editComp ? 'Muokkaa kilpailua' : 'Lisää kilpailu' ?></h3>
-<form method="post" action="?horse_id=<?= $horse_id ?>">
-  <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
-  <input type="hidden" name="action"  value="<?= $editComp ? 'edit' : 'add' ?>">
-  <?php if ($editComp): ?><input type="hidden" name="comp_id" value="<?= (int)$editComp['id'] ?>"><?php endif; ?>
+<!-- ── MODAL: Lisää/muokkaa kilpailu ── -->
+<div class="admin-modal-overlay" id="modal-overlay-comp">
+  <div class="admin-modal">
+    <div class="admin-modal-header">
+      <h2 id="modal-comp-title">Lisää kilpailu</h2>
+      <button class="admin-modal-close" onclick="adminCloseModal('comp')">×</button>
+    </div>
+    <form method="post" action="?horse_id=<?= $horse_id ?>">
+      <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
+      <input type="hidden" name="action"  id="modal-comp-action" value="add">
+      <input type="hidden" name="comp_id" id="modal-comp-id"     value="">
+      <div class="admin-modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="competition_name">Kilpailun nimi *</label>
+            <input type="text" id="competition_name" name="competition_name" required>
+          </div>
+          <div class="form-group">
+            <label for="competition_date">Päivämäärä</label>
+            <input type="date" id="competition_date" name="competition_date">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="placement">Sijoitus</label>
+            <input type="text" id="placement" name="placement" placeholder="esim. 1, 2, 3, DNS...">
+          </div>
+          <div class="form-group">
+            <label for="points">Pisteet</label>
+            <input type="number" id="points" name="points">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="notes">Muistiinpanot</label>
+          <textarea id="notes" name="notes"></textarea>
+        </div>
+      </div>
+      <div class="admin-modal-footer">
+        <button type="submit" class="btn" id="modal-comp-btn">Lisää kilpailu</button>
+        <button type="button" class="btn-ghost" onclick="adminCloseModal('comp')">Peruuta</button>
+      </div>
+    </form>
+  </div>
+</div>
 
-  <div class="form-row">
-    <div class="form-group">
-      <label for="competition_name">Kilpailun nimi *</label>
-      <input type="text" id="competition_name" name="competition_name" value="<?= e($editComp['competition_name'] ?? '') ?>" required>
-    </div>
-    <div class="form-group">
-      <label for="competition_date">Päivämäärä</label>
-      <input type="date" id="competition_date" name="competition_date" value="<?= e($editComp['competition_date'] ?? '') ?>">
-    </div>
-  </div>
-  <div class="form-row">
-    <div class="form-group">
-      <label for="placement">Sijoitus</label>
-      <input type="text" id="placement" name="placement" value="<?= e($editComp['placement'] ?? '') ?>">
-    </div>
-    <div class="form-group">
-      <label for="points">Pisteet</label>
-      <input type="number" id="points" name="points" value="<?= $editComp['points'] !== null ? (int)$editComp['points'] : '' ?>">
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="notes">Muistiinpanot</label>
-    <textarea id="notes" name="notes"><?= e($editComp['notes'] ?? '') ?></textarea>
-  </div>
-  <p>
-    <button type="submit" class="btn"><?= $editComp ? 'Tallenna muutokset' : 'Lisää kilpailu' ?></button>
-    <?php if ($editComp): ?><a href="?horse_id=<?= $horse_id ?>" style="margin-left:1rem">Peruuta</a><?php endif; ?>
-  </p>
-</form>
+<script>
+function openEditComp(id, data) {
+  document.getElementById('modal-comp-title').textContent  = 'Muokkaa kilpailua';
+  document.getElementById('modal-comp-action').value       = 'edit';
+  document.getElementById('modal-comp-id').value           = id;
+  document.getElementById('competition_name').value        = data.competition_name  || '';
+  document.getElementById('competition_date').value        = data.competition_date  || '';
+  document.getElementById('placement').value               = data.placement         || '';
+  document.getElementById('points').value                  = data.points !== null ? data.points : '';
+  document.getElementById('notes').value                   = data.notes             || '';
+  document.getElementById('modal-comp-btn').textContent    = 'Tallenna muutokset';
+  adminOpenModal('comp');
+}
+</script>
 <?php require __DIR__ . '/includes/admin_footer.php'; ?>

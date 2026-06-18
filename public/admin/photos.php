@@ -75,43 +75,64 @@ if (isset($_GET['deleted']))  $success = 'Kuva poistettu.';
 $pageTitle = 'Kuvat — ' . $horse['name'];
 require __DIR__ . '/includes/admin_header.php';
 ?>
-<h1>Kuvat — <?= e($horse['name']) ?></h1>
-<p><a href="<?= e(SITE_URL) ?>/admin/horses.php">← Takaisin hevoslistaan</a></p>
+<div class="admin-page-header">
+  <a href="<?= e(SITE_URL) ?>/admin/horses.php" class="back-link">← Hevoset</a>
+  <h1>Kuvat</h1>
+</div>
 
+<div class="horse-ctx-banner">
+  <span class="hcb-name">📷 <?= e($horse['name']) ?></span>
+  <span class="hcb-meta"><?= count($photos) ?> / <?= MAX_PHOTOS_PER_HORSE ?> kuvaa</span>
+  <a href="<?= e(SITE_URL) ?>/admin/horses.php" class="hcb-back">← Hevoslistaan</a>
+</div>
+
+<div class="admin-body">
 <?php if ($error):   ?><p class="flash-err"><?= e($error) ?></p><?php endif; ?>
 <?php if ($success): ?><p class="flash-ok"><?= e($success) ?></p><?php endif; ?>
 
+<?php $pct = count($photos) / max(1, MAX_PHOTOS_PER_HORSE) * 100; ?>
+<div class="photo-upload-limit">
+  <span><?= count($photos) ?>/<?= MAX_PHOTOS_PER_HORSE ?> kuvaa</span>
+  <div class="photo-limit-track">
+    <div class="photo-limit-fill <?= $pct >= 100 ? 'full' : '' ?>" style="width:<?= min(100, $pct) ?>%"></div>
+  </div>
+</div>
+
 <?php if ($photos): ?>
-<div style="display:flex;flex-wrap:wrap;gap:1rem;margin:1rem 0">
-  <?php foreach ($photos as $photo): ?>
-    <div style="border:1px solid #e0d5c5;border-radius:4px;padding:0.5rem;text-align:center;max-width:160px">
-      <img src="<?= e(UPLOADS_URL . $photo['filename']) ?>" alt="<?= e($photo['original_name']) ?>"
-           style="max-width:140px;max-height:100px;object-fit:cover;display:block;margin:0 auto 0.4rem">
-      <small style="display:block;color:#888;word-break:break-all"><?= e($photo['original_name']) ?></small>
-      <form method="post" action="<?= e(SITE_URL) ?>/admin/photo_delete.php" style="margin-top:0.4rem">
+<div class="admin-photo-grid">
+  <?php foreach ($photos as $idx => $photo): ?>
+    <div class="admin-photo-thumb">
+      <img src="<?= e(UPLOADS_URL . $photo['filename']) ?>" alt="<?= e($photo['original_name']) ?>">
+      <span class="photo-order-badge"><?= (int)$photo['sort_order'] ?></span>
+      <?php if ($idx === 0): ?><span class="photo-profile-badge">Profiili</span><?php endif; ?>
+      <form class="photo-delete-form" method="post" action="<?= e(SITE_URL) ?>/admin/photo_delete.php">
         <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
         <input type="hidden" name="photo_id"  value="<?= (int)$photo['id'] ?>">
         <input type="hidden" name="horse_id"  value="<?= (int)$horse_id ?>">
-        <button type="submit" class="btn-sm btn-danger" onclick="return confirm('Poistetaanko kuva?')">Poista</button>
+        <button type="submit" class="photo-delete-btn"
+                onclick="return confirm('Poistetaanko kuva?')">×</button>
       </form>
     </div>
   <?php endforeach; ?>
 </div>
 <?php else: ?>
-  <p>Ei kuvia vielä.</p>
+  <p style="color:var(--color-text-muted);margin:1rem 0">Ei kuvia vielä.</p>
 <?php endif; ?>
 
 <?php if (count($photos) < MAX_PHOTOS_PER_HORSE): ?>
-<h3>Lataa uusi kuva</h3>
-<form method="post" enctype="multipart/form-data" action="">
-  <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
-  <div class="form-group" style="max-width:400px">
-    <label for="photo">Kuvatiedosto (JPEG, PNG, GIF, WebP — max 5 Mt)</label>
-    <input type="file" id="photo" name="photo" accept="image/*" required>
-  </div>
-  <button type="submit" class="btn">Lataa kuva</button>
-</form>
+<div class="admin-card" style="margin-top:1.5rem;max-width:480px">
+  <h2>Lataa uusi kuva</h2>
+  <form method="post" enctype="multipart/form-data" action="">
+    <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
+    <div class="form-group">
+      <label for="photo">Kuvatiedosto (JPEG, PNG, GIF, WebP — max 5 Mt)</label>
+      <input type="file" id="photo" name="photo" accept="image/*" required>
+    </div>
+    <button type="submit" class="btn">Lataa kuva</button>
+  </form>
+</div>
 <?php else: ?>
-  <p class="flash-err">Hevosella on jo <?= MAX_PHOTOS_PER_HORSE ?> kuvaa. Poista vanha kuva ennen uuden lataamista.</p>
+  <p class="flash-err" style="max-width:480px">Hevosella on jo <?= MAX_PHOTOS_PER_HORSE ?> kuvaa. Poista vanha kuva ennen uuden lataamista.</p>
 <?php endif; ?>
+</div><!-- /.admin-body -->
 <?php require __DIR__ . '/includes/admin_footer.php'; ?>

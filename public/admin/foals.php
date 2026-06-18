@@ -112,103 +112,146 @@ $statusLabels = ['expected' => 'Odotettu', 'born' => 'Syntynyt'];
 $pageTitle = 'Kasvatus';
 require __DIR__ . '/includes/admin_header.php';
 ?>
-<h1>Kasvatus — <?= e($horse['name']) ?></h1>
-<p><a href="<?= e(SITE_URL) ?>/admin/horses.php">← Takaisin hevoslistaan</a></p>
+<div class="admin-page-header">
+  <a href="<?= e(SITE_URL) ?>/admin/horses.php" class="back-link">← Hevoset</a>
+  <h1>Kasvatus</h1>
+  <div class="page-actions">
+    <button class="btn" onclick="adminOpenSlide('foal')">+ Lisää varsa</button>
+  </div>
+</div>
 
+<div class="horse-ctx-banner">
+  <span class="hcb-name">🌱 <?= e($horse['name']) ?></span>
+  <span class="hcb-meta"><?= count($foals) ?> varsamerkintää</span>
+  <a href="<?= e(SITE_URL) ?>/admin/horses.php" class="hcb-back">← Hevoslistaan</a>
+</div>
+
+<div class="admin-body">
 <?php if ($errors): ?>
-  <ul class="flash-err"><?php foreach ($errors as $emsg): ?><li><?= e($emsg) ?></li><?php endforeach; ?></ul>
+  <div class="flash-err"><ul><?php foreach ($errors as $emsg): ?><li><?= e($emsg) ?></li><?php endforeach; ?></ul></div>
 <?php endif; ?>
 <?= $flash ?>
 
 <?php if ($foals): ?>
-<table class="admin-table">
-  <thead>
-    <tr><th>Nimi</th><th>Isä</th><th>Emä</th><th>Synt.v.</th><th>Sukupuoli</th><th>Status</th><th>Toiminnot</th></tr>
-  </thead>
-  <tbody>
-  <?php foreach ($foals as $fo): ?>
-    <tr>
-      <td><?= e($fo['foal_name']) ?></td>
-      <td><?= e($fo['sire_name'] ?? '—') ?></td>
-      <td><?= e($fo['dam_name']  ?? '—') ?></td>
-      <td><?= $fo['birth_year'] ? (int)$fo['birth_year'] : '' ?></td>
-      <td><?= e($fo['gender'] ?? '') ?></td>
-      <td><?= e($statusLabels[$fo['status']] ?? $fo['status']) ?></td>
-      <td style="white-space:nowrap">
-        <a href="?horse_id=<?= $horse_id ?>&edit=<?= (int)$fo['id'] ?>" class="btn-sm btn-edit">Muokkaa</a>
-        <form method="post" action="" style="display:inline">
-          <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
-          <input type="hidden" name="action"  value="delete">
-          <input type="hidden" name="foal_id" value="<?= (int)$fo['id'] ?>">
-          <button type="submit" class="btn-sm btn-danger" onclick="return confirm('Poistetaanko varsamerkintä?')">Poista</button>
-        </form>
-      </td>
-    </tr>
+<div class="compact-list">
+  <div class="compact-list-header" style="grid-template-columns:2fr 1fr 1fr 70px 80px 28px">
+    <div>Nimi</div><div>Isä</div><div>Emä</div><div>Synt.v.</div><div>Status</div><div></div>
+  </div>
+  <?php foreach ($foals as $fo):
+    $sClass = $fo['status'] === 'expected' ? 'sbadge-expected' : 'sbadge-born';
+  ?>
+  <div class="compact-list-row" style="grid-template-columns:2fr 1fr 1fr 70px 80px 28px"
+       onclick="adminToggleExpand('f<?= (int)$fo['id'] ?>')">
+    <div class="cl-name"><?= e($fo['foal_name']) ?></div>
+    <div class="cl-meta"><?= e($fo['sire_name'] ?? '—') ?></div>
+    <div class="cl-meta"><?= e($fo['dam_name']  ?? '—') ?></div>
+    <div class="cl-mono"><?= $fo['birth_year'] ? (int)$fo['birth_year'] : '—' ?></div>
+    <div><span class="sbadge <?= $sClass ?>"><?= e($statusLabels[$fo['status']] ?? $fo['status']) ?></span></div>
+    <div>
+      <button class="cl-expand-btn" id="cl-btn-f<?= (int)$fo['id'] ?>"
+              onclick="event.stopPropagation();adminToggleExpand('f<?= (int)$fo['id'] ?>')">▸</button>
+    </div>
+  </div>
+  <div class="cl-expanded" id="cl-exp-f<?= (int)$fo['id'] ?>">
+    <div class="cl-expanded-actions">
+      <button class="btn-sm btn-edit" onclick="openEditFoal(<?= (int)$fo['id'] ?>, <?= htmlspecialchars(json_encode($fo), ENT_QUOTES) ?>)">✏️ Muokkaa</button>
+      <form method="post" action="?horse_id=<?= $horse_id ?>" style="display:inline">
+        <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
+        <input type="hidden" name="action"  value="delete">
+        <input type="hidden" name="foal_id" value="<?= (int)$fo['id'] ?>">
+        <button type="submit" class="btn-sm btn-danger" onclick="return confirm('Poistetaanko varsamerkintä?')">🗑 Poista</button>
+      </form>
+    </div>
+  </div>
   <?php endforeach; ?>
-  </tbody>
-</table>
+</div>
 <?php else: ?>
-  <p>Ei varsamerkintöjä.</p>
+  <p style="color:var(--color-text-muted);margin:1rem 0">Ei varsamerkintöjä. Lisää ensimmäinen varsa painamalla "+ Lisää varsa".</p>
 <?php endif; ?>
+</div><!-- /.admin-body -->
 
-<h3><?= $editFoal ? 'Muokkaa varsamerkintää' : 'Lisää varsamerkintä' ?></h3>
-<form method="post" action="?horse_id=<?= $horse_id ?>">
-  <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
-  <input type="hidden" name="action"  value="<?= $editFoal ? 'edit' : 'add' ?>">
-  <?php if ($editFoal): ?><input type="hidden" name="foal_id" value="<?= (int)$editFoal['id'] ?>"><?php endif; ?>
+<!-- ── SLIDE PANEL: Lisää/muokkaa varsa ── -->
+<div class="admin-slide-overlay" id="slide-overlay-foal" onclick="adminCloseSlide('foal')"></div>
+<div class="admin-slide-panel" id="slide-panel-foal">
+  <div class="admin-slide-header">
+    <h2 id="slide-foal-title">Lisää varsamerkintä</h2>
+    <button class="admin-slide-close" onclick="adminCloseSlide('foal')">×</button>
+  </div>
+  <form method="post" action="?horse_id=<?= $horse_id ?>">
+    <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
+    <input type="hidden" name="action"  id="slide-action"  value="add">
+    <input type="hidden" name="foal_id" id="slide-foal-id" value="">
+    <div class="admin-slide-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="foal_name">Varsan nimi *</label>
+          <input type="text" id="foal_name" name="foal_name" required>
+        </div>
+        <div class="form-group">
+          <label for="birth_year">Syntymävuosi</label>
+          <input type="number" id="birth_year" name="birth_year" min="1900" max="2100">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="sire_id">Isä (ori)</label>
+          <select id="sire_id" name="sire_id">
+            <option value="">— ei valittu —</option>
+            <?php foreach ($allHorses as $ah): ?>
+              <option value="<?= (int)$ah['id'] ?>"><?= e($ah['name']) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="dam_id">Emä (tamma)</label>
+          <select id="dam_id" name="dam_id">
+            <option value="">— ei valittu —</option>
+            <?php foreach ($allHorses as $ah): ?>
+              <option value="<?= (int)$ah['id'] ?>"><?= e($ah['name']) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="gender">Sukupuoli</label>
+          <select id="gender" name="gender">
+            <option value="">— valitse —</option>
+            <?php foreach (['ori', 'tamma', 'ruuna', 'tuntematon'] as $g): ?>
+              <option value="<?= e($g) ?>"><?= ucfirst(e($g)) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="status">Status</label>
+          <select id="status" name="status">
+            <?php foreach ($statusLabels as $val => $label): ?>
+              <option value="<?= e($val) ?>"><?= e($label) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+      </div>
+    </div><!-- /.admin-slide-body -->
+    <div class="admin-slide-footer">
+      <button type="submit" class="btn" id="slide-submit-btn">Lisää varsamerkintä</button>
+      <button type="button" class="btn-ghost" onclick="adminCloseSlide('foal')">Peruuta</button>
+    </div>
+  </form>
+</div>
 
-  <div class="form-row">
-    <div class="form-group">
-      <label for="foal_name">Varsan nimi *</label>
-      <input type="text" id="foal_name" name="foal_name" value="<?= e($editFoal['foal_name'] ?? '') ?>" required>
-    </div>
-    <div class="form-group">
-      <label for="birth_year">Syntymävuosi</label>
-      <input type="number" id="birth_year" name="birth_year" min="1900" max="2100" value="<?= $editFoal['birth_year'] ?? '' ?>">
-    </div>
-  </div>
-  <div class="form-row">
-    <div class="form-group">
-      <label for="sire_id">Isä (ori)</label>
-      <select id="sire_id" name="sire_id">
-        <option value="">— ei valittu —</option>
-        <?php foreach ($allHorses as $ah): ?>
-          <option value="<?= (int)$ah['id'] ?>" <?= (int)($editFoal['sire_id'] ?? 0) === (int)$ah['id'] ? 'selected' : '' ?>><?= e($ah['name']) ?></option>
-        <?php endforeach; ?>
-      </select>
-    </div>
-    <div class="form-group">
-      <label for="dam_id">Emä (tamma)</label>
-      <select id="dam_id" name="dam_id">
-        <option value="">— ei valittu —</option>
-        <?php foreach ($allHorses as $ah): ?>
-          <option value="<?= (int)$ah['id'] ?>" <?= (int)($editFoal['dam_id'] ?? 0) === (int)$ah['id'] ? 'selected' : '' ?>><?= e($ah['name']) ?></option>
-        <?php endforeach; ?>
-      </select>
-    </div>
-  </div>
-  <div class="form-row">
-    <div class="form-group">
-      <label for="gender">Sukupuoli</label>
-      <select id="gender" name="gender">
-        <option value="">— valitse —</option>
-        <?php foreach (['ori', 'tamma', 'ruuna', 'tuntematon'] as $g): ?>
-          <option value="<?= e($g) ?>" <?= ($editFoal['gender'] ?? '') === $g ? 'selected' : '' ?>><?= ucfirst(e($g)) ?></option>
-        <?php endforeach; ?>
-      </select>
-    </div>
-    <div class="form-group">
-      <label for="status">Status</label>
-      <select id="status" name="status">
-        <?php foreach ($statusLabels as $val => $label): ?>
-          <option value="<?= e($val) ?>" <?= ($editFoal['status'] ?? 'born') === $val ? 'selected' : '' ?>><?= e($label) ?></option>
-        <?php endforeach; ?>
-      </select>
-    </div>
-  </div>
-  <p>
-    <button type="submit" class="btn"><?= $editFoal ? 'Tallenna muutokset' : 'Lisää varsamerkintä' ?></button>
-    <?php if ($editFoal): ?><a href="?horse_id=<?= $horse_id ?>" style="margin-left:1rem">Peruuta</a><?php endif; ?>
-  </p>
-</form>
+<script>
+function openEditFoal(id, data) {
+  document.getElementById('slide-foal-title').textContent = 'Muokkaa varsamerkintää';
+  document.getElementById('slide-action').value = 'edit';
+  document.getElementById('slide-foal-id').value = id;
+  document.getElementById('foal_name').value   = data.foal_name  || '';
+  document.getElementById('birth_year').value  = data.birth_year || '';
+  document.getElementById('sire_id').value     = data.sire_id    || '';
+  document.getElementById('dam_id').value      = data.dam_id     || '';
+  document.getElementById('gender').value      = data.gender     || '';
+  document.getElementById('status').value      = data.status     || 'born';
+  document.getElementById('slide-submit-btn').textContent = 'Tallenna muutokset';
+  adminOpenSlide('foal');
+}
+</script>
 <?php require __DIR__ . '/includes/admin_footer.php'; ?>

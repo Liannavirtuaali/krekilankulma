@@ -18,44 +18,59 @@ if (isset($_GET['deleted'])) $flash = '<p class="flash-ok">Hevonen poistettu.</p
 $pageTitle = 'Hevoset';
 require __DIR__ . '/includes/admin_header.php';
 ?>
-<h1>Hevoset</h1>
-<p><a href="<?= e(SITE_URL) ?>/admin/horse_add.php" class="btn">+ Lisää hevonen</a></p>
+<div class="admin-page-header">
+  <h1>Hevoset</h1>
+  <div class="page-actions">
+    <a href="<?= e(SITE_URL) ?>/admin/horse_add.php" class="btn">+ Lisää hevonen</a>
+  </div>
+</div>
+<div class="admin-body">
 <?= $flash ?>
 <?php if (empty($horses)): ?>
   <p>Ei hevosia. <a href="<?= e(SITE_URL) ?>/admin/horse_add.php">Lisää ensimmäinen hevonen.</a></p>
 <?php else: ?>
-<table class="admin-table">
-  <thead>
-    <tr>
-      <th>Nimi</th>
-      <th>Rotu</th>
-      <th>Sukupuoli</th>
-      <th>Syntymäaika</th>
-      <th>VH-tunnus</th>
-      <th>Toiminnot</th>
-    </tr>
-  </thead>
-  <tbody>
-  <?php foreach ($horses as $horse): ?>
-    <tr>
-      <td><?= e($horse['name']) ?></td>
-      <td><?= e($horse['breed']) ?></td>
-      <td><?= e($horse['gender']) ?></td>
-      <td><?= $horse['birth_date'] ? formatDate($horse['birth_date']) : '' ?></td>
-      <td><?= e($horse['vh_id']) ?></td>
-      <td style="white-space:nowrap">
-        <a href="<?= e(SITE_URL) ?>/admin/horse_edit.php?id=<?= (int)$horse['id'] ?>" class="btn-sm btn-edit">Muokkaa</a>
-        <a href="<?= e(horseUrl($horse)) ?>" class="btn-sm btn-view" target="_blank">Näytä</a>
-        <a href="<?= e(SITE_URL) ?>/admin/photos.php?horse_id=<?= (int)$horse['id'] ?>" class="btn-sm btn-photos">Kuvat</a>
-        <form method="post" action="<?= e(SITE_URL) ?>/admin/horse_delete.php" style="display:inline">
-          <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
-          <input type="hidden" name="id" value="<?= (int)$horse['id'] ?>">
-          <button type="submit" class="btn-sm btn-danger" onclick="return confirm('Poistetaanko hevonen <?= e(addslashes($horse['name'])) ?>?')">Poista</button>
-        </form>
-      </td>
-    </tr>
+<div class="compact-list">
+  <div class="compact-list-header" style="grid-template-columns:2fr 1.2fr 80px 140px 28px">
+    <div>Nimi / Rotu</div>
+    <div>Sukupuoli</div>
+    <div>Syntymä</div>
+    <div>VH-tunnus</div>
+    <div></div>
+  </div>
+  <?php foreach ($horses as $horse):
+    $gClass = match(mb_strtolower($horse['gender'])) { 'ori' => 'gbadge-ori', 'tamma' => 'gbadge-tamma', default => 'gbadge-ruuna' };
+  ?>
+  <div class="compact-list-row" style="grid-template-columns:2fr 1.2fr 80px 140px 28px"
+       onclick="adminToggleExpand(<?= (int)$horse['id'] ?>)">
+    <div>
+      <div class="cl-name"><?= e($horse['name']) ?></div>
+      <div class="cl-meta"><?= e($horse['breed']) ?></div>
+    </div>
+    <div><span class="gbadge <?= $gClass ?>"><?= e($horse['gender']) ?></span></div>
+    <div class="cl-meta"><?= $horse['birth_date'] ? formatDate($horse['birth_date']) : '—' ?></div>
+    <div class="cl-mono"><?= e($horse['vh_id']) ?></div>
+    <div>
+      <button class="cl-expand-btn" id="cl-btn-<?= (int)$horse['id'] ?>"
+              onclick="event.stopPropagation();adminToggleExpand(<?= (int)$horse['id'] ?>)">▸</button>
+    </div>
+  </div>
+  <div class="cl-expanded" id="cl-exp-<?= (int)$horse['id'] ?>">
+    <div class="cl-expanded-actions">
+      <a href="<?= e(SITE_URL) ?>/admin/horse_edit.php?id=<?= (int)$horse['id'] ?>" class="btn-sm btn-edit">✏️ Muokkaa</a>
+      <a href="<?= e(horseUrl($horse)) ?>" class="btn-sm btn-view" target="_blank">🔗 Näytä</a>
+      <a href="<?= e(SITE_URL) ?>/admin/photos.php?horse_id=<?= (int)$horse['id'] ?>" class="btn-sm btn-photos">📷 Kuvat</a>
+      <a href="<?= e(SITE_URL) ?>/admin/foals.php?horse_id=<?= (int)$horse['id'] ?>" class="btn-sm">🌱 Kasvatus</a>
+      <a href="<?= e(SITE_URL) ?>/admin/competitions.php?horse_id=<?= (int)$horse['id'] ?>" class="btn-sm">🏆 Kilpailut</a>
+      <form method="post" action="<?= e(SITE_URL) ?>/admin/horse_delete.php" style="display:inline">
+        <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
+        <input type="hidden" name="id" value="<?= (int)$horse['id'] ?>">
+        <button type="submit" class="btn-sm btn-danger"
+                onclick="return confirm('Poistetaanko hevonen <?= e(addslashes($horse['name'])) ?>?')">🗑 Poista</button>
+      </form>
+    </div>
+  </div>
   <?php endforeach; ?>
-  </tbody>
-</table>
+</div>
 <?php endif; ?>
+</div><!-- /.admin-body -->
 <?php require __DIR__ . '/includes/admin_footer.php'; ?>

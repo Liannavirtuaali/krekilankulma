@@ -103,10 +103,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $pageTitle = 'Lisää hevonen';
 require __DIR__ . '/includes/admin_header.php';
 ?>
-<h1>Lisää hevonen</h1>
+<div class="admin-page-header">
+  <a href="<?= e(SITE_URL) ?>/admin/horses.php" class="back-link">← Hevoset</a>
+  <h1>Lisää hevonen</h1>
+</div>
+<div class="admin-body">
 <?php if ($errors): ?>
-  <ul class="flash-err"><?php foreach ($errors as $e_msg): ?><li><?= e($e_msg) ?></li><?php endforeach; ?></ul>
+  <div class="flash-err"><ul><?php foreach ($errors as $e_msg): ?><li><?= e($e_msg) ?></li><?php endforeach; ?></ul></div>
 <?php endif; ?>
+<div class="admin-card">
 <form method="post" action="">
   <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
 
@@ -257,9 +262,11 @@ require __DIR__ . '/includes/admin_header.php';
     <textarea id="pedigree_notes" name="pedigree_notes"><?= e($f['pedigree_notes']) ?></textarea>
   </div>
 
-  <p>
+  <div style="display:flex;gap:0.75rem;align-items:center;margin-top:1rem">
     <button type="submit" class="btn">Tallenna hevonen</button>
-    <a href="<?= e(SITE_URL) ?>/admin/horses.php" style="margin-left:1rem">Peruuta</a>
-  </p>
+    <a href="<?= e(SITE_URL) ?>/admin/horses.php" class="btn-ghost">Peruuta</a>
+  </div>
 </form>
+</div><!-- /.admin-card -->
+</div><!-- /.admin-body -->
 <?php require __DIR__ . '/includes/admin_footer.php'; ?>
