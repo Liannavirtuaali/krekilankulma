@@ -269,6 +269,8 @@ $_activePage = basename($_SERVER['PHP_SELF'], '.php');
       <div class="admin-nav-section">Media</div>
       <a class="admin-nav-item <?= in_array($_activePage, ['kuvat_all','photos','photo_delete']) ? 'active' : '' ?>"
          href="<?= e(SITE_URL) ?>/admin/kuvat_all.php">📷 Kuvat</a>
+      <a class="admin-nav-item <?= strpos($_SERVER['PHP_SELF'], '/admin/posts') !== false ? 'active' : '' ?>"
+         href="<?= e(SITE_URL) ?>/admin/posts.php">📝 Postaukset</a>
       <div class="admin-nav-section">Sivusto</div>
       <a class="admin-nav-item <?= $_activePage === 'settings' ? 'active' : '' ?>"
          href="<?= e(SITE_URL) ?>/admin/settings.php">⚙️ Asetukset</a>

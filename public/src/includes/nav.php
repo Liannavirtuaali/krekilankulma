@@ -12,5 +12,8 @@ $uri = rtrim($uri, '/');
     <li><a href="<?= SITE_URL ?>/hevoset"<?= ($uri === '/hevoset' || $uri === '/pages/hevoset') ? ' class="active"' : '' ?>>Hevoset</a></li>
     <li><a href="<?= SITE_URL ?>/kasvatus"<?= ($uri === '/kasvatus' || $uri === '/pages/kasvatus') ? ' class="active"' : '' ?>>Kasvatus</a></li>
     <li><a href="<?= SITE_URL ?>/yhteystiedot"<?= ($uri === '/yhteystiedot' || $uri === '/pages/yhteystiedot') ? ' class="active"' : '' ?>>Yhteystiedot</a></li>
+    <li><a href="<?= SITE_URL ?>/pages/blogi.php"
+           <?= (strpos($uri, '/pages/blogi') === 0 || strpos($uri, '/pages/postaus') === 0)
+               ? ' class="active"' : '' ?>>Ajankohtaista</a></li>
   </ul>
 </nav>
