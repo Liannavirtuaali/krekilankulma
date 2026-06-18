@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>010 — Admin Kuvat</title>
+  <link rel="stylesheet" href="../themes/default.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--color-bg); font-family: var(--font-sans); font-size: var(--text-sm); color: var(--color-text); padding-top: 46px; }
+
+    /* ── VARIANT NAV ─────────────────────── */
+    #variant-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 9998; background: var(--color-surface); border-bottom: 2px solid var(--color-gold); padding: 8px 16px; display: flex; gap: 8px; align-items: center; box-shadow: var(--shadow-sm); }
+    #variant-nav span { font-size: var(--text-xs); color: var(--color-text-muted); margin-right: 8px; font-weight: 600; }
+    .variant-tab { background: none; border: 1px solid var(--color-border); border-radius: var(--radius-full); padding: 5px 14px; font-size: var(--text-xs); cursor: pointer; color: var(--color-text-muted); transition: all 0.15s ease; font-family: var(--font-sans); }
+    .variant-tab:hover { border-color: var(--color-accent); color: var(--color-accent); }
+    .variant-tab.active { background: var(--color-primary); border-color: var(--color-primary); color: var(--color-cream); }
+    .variant { display: none; }
+    .variant.active { display: block; }
+
+    /* ── SIDEBAR SHELL ───────────────────── */
+    .page-shell { display: flex; height: calc(100vh - 46px); }
+    .sidebar { width: 220px; flex-shrink: 0; background: var(--color-primary); display: flex; flex-direction: column; padding: var(--space-4) 0; }
+    .sidebar-logo { padding: var(--space-4) var(--space-6) var(--space-5); border-bottom: 1px solid rgba(201,168,76,0.25); margin-bottom: var(--space-4); }
+    .logo-text { font-family: var(--font-serif); font-size: var(--text-lg); color: var(--color-cream); }
+    .logo-sub { font-size: var(--text-xs); color: var(--color-gold); opacity: 0.8; margin-top: 2px; }
+    .nav-section { font-size: var(--text-xs); color: rgba(201,168,76,0.5); padding: var(--space-3) var(--space-6) var(--space-2); text-transform: uppercase; letter-spacing: 0.08em; }
+    .nav-item { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-6); color: rgba(232,213,183,0.75); font-size: var(--text-sm); cursor: pointer; transition: all 0.15s; text-decoration: none; }
+    .nav-item:hover { color: var(--color-cream); background: rgba(255,255,255,0.06); }
+    .nav-item.active { color: var(--color-gold); background: rgba(201,168,76,0.12); border-right: 3px solid var(--color-gold); }
+    .sidebar-footer { margin-top: auto; padding: var(--space-4) var(--space-6); border-top: 1px solid rgba(201,168,76,0.2); }
+    .sidebar-footer .user-name { color: var(--color-cream); font-size: var(--text-xs); }
+    .sidebar-footer .logout-link { color: var(--color-gold); font-size: var(--text-xs); opacity: 0.7; cursor: pointer; }
+    .main-area { flex: 1; overflow-y: auto; background: var(--color-bg); display: flex; flex-direction: column; }
+
+    /* ── PAGE CHROME ─────────────────────── */
+    .page-header { background: var(--color-surface); border-bottom: 1px solid var(--color-border); padding: var(--space-4) var(--space-8); display: flex; align-items: center; gap: var(--space-4); }
+    .page-header-back { color: var(--color-text-muted); font-size: var(--text-xs); text-decoration: none; }
+    .page-header-back:hover { color: var(--color-accent); }
+    .page-header h1 { font-family: var(--font-serif); font-size: var(--text-2xl); color: var(--color-primary); font-weight: normal; }
+    .page-header-actions { margin-left: auto; display: flex; align-items: center; gap: var(--space-3); }
+    .horse-ctx { background: var(--color-parchment); border-bottom: 1px solid var(--color-border-warm); padding: var(--space-3) var(--space-8); display: flex; align-items: center; gap: var(--space-4); }
+    .horse-ctx-name { font-family: var(--font-serif); font-size: var(--text-lg); color: var(--color-primary); }
+    .horse-ctx-meta { font-size: var(--text-xs); color: var(--color-text-muted); }
+    .horse-ctx-change { margin-left: auto; font-size: var(--text-xs); color: var(--color-accent); cursor: pointer; }
+    .page-body { padding: var(--space-6) var(--space-8); flex: 1; }
+
+    /* ── BUTTONS ─────────────────────────── */
+    .btn-primary { background: var(--color-primary); color: var(--color-cream); border: none; border-radius: var(--radius-md); padding: var(--space-3) var(--space-5); font-size: var(--text-sm); cursor: pointer; font-family: var(--font-sans); transition: background 0.15s; }
+    .btn-primary:hover { background: var(--color-primary-hover); }
+    .btn-ghost { background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-3) var(--space-5); font-size: var(--text-sm); cursor: pointer; font-family: var(--font-sans); transition: all 0.15s; }
+    .btn-ghost:hover { border-color: var(--color-accent); color: var(--color-accent); }
+
+    /* ── FLASH ───────────────────────────── */
+    .flash { border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); margin-bottom: var(--space-4); font-size: var(--text-sm); display: none; }
+    .flash.visible { display: block; }
+    .flash-ok { background: #e8f5e8; border: 1px solid #c3e6c3; color: var(--color-success); }
+    .flash-err { background: #fdf0f0; border: 1px solid #e6c3c3; color: var(--color-danger); }
+
+    /* ── LIMIT BAR ───────────────────────── */
+    .limit-bar { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-5); padding: var(--space-3) var(--space-4); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); }
+    .limit-bar-track { flex: 1; height: 6px; background: var(--color-border); border-radius: 3px; overflow: hidden; }
+    .limit-bar-fill { height: 100%; border-radius: 3px; background: var(--color-gold); transition: width 0.3s; }
+    .limit-bar-fill.full { background: var(--color-danger); }
+    .limit-bar-text { font-size: var(--text-xs); color: var(--color-text-muted); white-space: nowrap; }
+
+    /* ── UPLOAD DROPZONE ─────────────────── */
+    .dropzone {
+      border: 2px dashed var(--color-border-warm); border-radius: var(--radius-lg);
+      padding: var(--space-8); text-align: center; cursor: pointer;
+      background: var(--color-surface); transition: all 0.2s; margin-bottom: var(--space-6);
+    }
+    .dropzone:hover, .dropzone.dragover { border-color: var(--color-gold); background: var(--color-parchment); }
+    .dropzone .drop-icon { font-size: 40px; margin-bottom: var(--space-3); opacity: 0.5; }
+    .dropzone p { color: var(--color-text-muted); font-size: var(--text-sm); }
+    .dropzone strong { color: var(--color-accent); }
+    .dropzone .drop-sub { font-size: var(--text-xs); color: var(--color-text-muted); margin-top: var(--space-2); }
+
+    /* ── PHOTO GRID ──────────────────────── */
+    .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: var(--space-4); }
+    .photo-card {
+      background: var(--color-surface); border: 1px solid var(--color-border);
+      border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.15s; position: relative; cursor: pointer;
+    }
+    .photo-card:hover { box-shadow: var(--shadow-md); }
+    .photo-thumb {
+      width: 100%; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center;
+      font-size: 48px; background: var(--color-parchment);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .photo-info { padding: var(--space-2) var(--space-3); }
+    .photo-name { font-size: var(--text-xs); color: var(--color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .photo-order { font-size: var(--text-xs); color: var(--color-text-light); }
+    .photo-actions {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(61,43,31,0.7); display: flex; align-items: center; justify-content: center;
+      gap: var(--space-3); opacity: 0; transition: opacity 0.2s; border-radius: var(--radius-md);
+    }
+    .photo-card:hover .photo-actions { opacity: 1; }
+    .photo-action-btn {
+      background: rgba(255,255,255,0.9); border: none; border-radius: var(--radius-sm);
+      padding: 6px 10px; font-size: var(--text-xs); cursor: pointer; color: var(--color-primary);
+      font-family: var(--font-sans); transition: all 0.15s;
+    }
+    .photo-action-btn:hover { background: white; }
+    .photo-action-btn.danger { color: var(--color-danger); }
+    .drag-handle {
+      position: absolute; top: 8px; left: 8px;
+      background: rgba(0,0,0,0.4); color: white; border-radius: 4px;
+      padding: 2px 6px; font-size: 12px; cursor: grab; opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .photo-card:hover .drag-handle { opacity: 1; }
+
+    /* ── PHOTO GRID COMPACT (variant B) ─── */
+    .photo-grid-compact { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: var(--space-3); }
+    .photo-thumb-sm { width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 32px; background: var(--color-parchment); border: 1px solid var(--color-border); border-radius: var(--radius-md); position: relative; cursor: pointer; transition: all 0.15s; }
+    .photo-thumb-sm:hover { border-color: var(--color-accent); transform: scale(1.04); box-shadow: var(--shadow-md); }
+    .photo-thumb-sm .del-btn { position: absolute; top: 4px; right: 4px; background: rgba(138,48,48,0.85); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 10px; cursor: pointer; display: none; align-items: center; justify-content: center; }
+    .photo-thumb-sm:hover .del-btn { display: flex; }
+    .photo-num { position: absolute; bottom: 4px; left: 4px; background: rgba(0,0,0,0.5); color: white; font-size: 10px; padding: 1px 5px; border-radius: 3px; font-family: var(--font-mono); }
+
+    /* ── UPLOAD PROGRESS (fake) ──────────── */
+    .upload-progress { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-4); margin-bottom: var(--space-4); display: none; }
+    .upload-progress.visible { display: block; }
+    .progress-bar { height: 6px; background: var(--color-border); border-radius: 3px; overflow: hidden; margin-top: var(--space-2); }
+    .progress-fill { height: 100%; background: var(--color-gold); border-radius: 3px; width: 0%; transition: width 0.1s; }
+
+    /* ── LIGHTBOX ────────────────────────── */
+    .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 600; display: none; align-items: center; justify-content: center; flex-direction: column; gap: var(--space-4); }
+    .lightbox.open { display: flex; }
+    .lightbox-img { font-size: 120px; }
+    .lightbox-name { color: rgba(255,255,255,0.7); font-size: var(--text-sm); }
+    .lightbox-close { position: absolute; top: var(--space-6); right: var(--space-6); background: none; border: none; color: white; font-size: 28px; cursor: pointer; opacity: 0.6; }
+    .lightbox-close:hover { opacity: 1; }
+
+    /* ── SKETCH TOOLBAR ──────────────────── */
+    #sketch-tools { position: fixed; bottom: 12px; right: 12px; z-index: 9999; font-family: system-ui; font-size: 12px; background: rgba(0,0,0,0.75); color: white; padding: 8px 12px; border-radius: 8px; opacity: 0.4; transition: opacity 0.2s; display: flex; gap: 8px; align-items: center; }
+    #sketch-tools:hover { opacity: 1; }
+    #sketch-tools select { background: rgba(255,255,255,0.15); border: none; color: white; font-size: 11px; border-radius: 4px; padding: 2px 4px; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+<div id="variant-nav">
+  <span>010 Kuvat</span>
+  <button class="variant-tab active" onclick="showVariant('a',this)">A: Ruudukko + latauslaatikko</button>
+  <button class="variant-tab" onclick="showVariant('b',this)">B: Kompakti ruudukko + järjestys</button>
+</div>
+
+<!-- ═══════════════════════════════════
+     VARIANT A — Photo grid + dropzone
+═══════════════════════════════════ -->
+<div id="variant-a" class="variant active">
+  <div class="page-shell">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><div class="logo-text">🐴 Virtuaalitalli</div><div class="logo-sub">Hallintapaneeli</div></div>
+      <div class="nav-section">Päävalikko</div>
+      <a class="nav-item" href="#" onclick="return false">⊞ Dashboard</a>
+      <a class="nav-item" href="#" onclick="return false">🐎 Hevoset</a>
+      <a class="nav-item" href="#" onclick="return false">🌱 Kasvatus</a>
+      <a class="nav-item" href="#" onclick="return false">🏆 Kilpailut</a>
+      <div class="nav-section">Media</div>
+      <a class="nav-item active" href="#" onclick="return false">📷 Kuvat</a>
+      <div class="sidebar-footer"><div class="user-name">admin</div><div class="logout-link">Kirjaudu ulos</div></div>
+    </aside>
+
+    <div class="main-area">
+      <div class="page-header">
+        <a class="page-header-back" href="#" onclick="return false">← Hevoset</a>
+        <h1>Kuvat</h1>
+      </div>
+      <div class="horse-ctx">
+        <span style="font-size:20px">🐴</span>
+        <div>
+          <div class="horse-ctx-name">Kultainen Kaiku</div>
+          <div class="horse-ctx-meta">Ruuna · Welsh-poni · s. 2020 · VH00-034-2345</div>
+        </div>
+        <a class="horse-ctx-change" href="#" onclick="return false">Vaihda hevosta ▾</a>
+      </div>
+
+      <div class="page-body">
+        <div id="flash-a" class="flash flash-ok">✓ Kuva ladattu onnistuneesti!</div>
+
+        <!-- Limit bar -->
+        <div class="limit-bar">
+          <span class="limit-bar-text">3 / 10 kuvaa</span>
+          <div class="limit-bar-track">
+            <div class="limit-bar-fill" style="width:30%"></div>
+          </div>
+          <span class="limit-bar-text" style="color:var(--color-text-light)">Voit lisätä vielä 7 kuvaa</span>
+        </div>
+
+        <!-- Dropzone -->
+        <div class="dropzone"
+          id="drop-a"
+          ondragover="event.preventDefault();this.classList.add('dragover')"
+          ondragleave="this.classList.remove('dragover')"
+          ondrop="event.preventDefault();this.classList.remove('dragover');fakeUpload('a')"
+          onclick="fakeUpload('a')">
+          <div class="drop-icon">📁</div>
+          <p>Vedä kuvatiedosto tähän tai <strong>klikkaa valitaksesi</strong></p>
+          <p class="drop-sub">JPG, PNG, WebP — max 5 MB</p>
+        </div>
+
+        <!-- Upload progress -->
+        <div class="upload-progress" id="upload-progress-a">
+          <div style="display:flex;justify-content:space-between;font-size:var(--text-xs);color:var(--color-text-muted)">
+            <span>Ladataan tiedostoa…</span><span id="pct-a">0%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" id="pfill-a"></div></div>
+        </div>
+
+        <!-- Photo grid -->
+        <div class="photo-grid" id="grid-a"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox-a" onclick="closeLightbox('a')">
+    <button class="lightbox-close" onclick="closeLightbox('a')">✕</button>
+    <div class="lightbox-img" id="lbimg-a">🖼</div>
+    <div class="lightbox-name" id="lbname-a"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     VARIANT B — Compact grid + order
+═══════════════════════════════════ -->
+<div id="variant-b" class="variant">
+  <div class="page-shell">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><div class="logo-text">🐴 Virtuaalitalli</div><div class="logo-sub">Hallintapaneeli</div></div>
+      <div class="nav-section">Päävalikko</div>
+      <a class="nav-item" href="#" onclick="return false">⊞ Dashboard</a>
+      <a class="nav-item" href="#" onclick="return false">🐎 Hevoset</a>
+      <a class="nav-item" href="#" onclick="return false">🌱 Kasvatus</a>
+      <a class="nav-item" href="#" onclick="return false">🏆 Kilpailut</a>
+      <div class="nav-section">Media</div>
+      <a class="nav-item active" href="#" onclick="return false">📷 Kuvat</a>
+      <div class="sidebar-footer"><div class="user-name">admin</div><div class="logout-link">Kirjaudu ulos</div></div>
+    </aside>
+
+    <div class="main-area">
+      <div class="page-header">
+        <a class="page-header-back" href="#" onclick="return false">← Hevoset</a>
+        <h1>Kuvat</h1>
+        <div class="page-header-actions">
+          <span style="font-size:var(--text-xs);color:var(--color-text-muted)">Järjestys tallennettu automaattisesti</span>
+          <button class="btn-primary" onclick="fakeUpload('b')">+ Lisää kuva</button>
+        </div>
+      </div>
+      <div class="horse-ctx">
+        <span style="font-size:20px">🐴</span>
+        <div>
+          <div class="horse-ctx-name">Kultainen Kaiku</div>
+          <div class="horse-ctx-meta">Ruuna · Welsh-poni · s. 2020</div>
+        </div>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:var(--space-3)">
+          <span style="font-size:var(--text-xs);color:var(--color-text-muted);background:var(--color-surface);border:1px solid var(--color-border);padding:3px 10px;border-radius:var(--radius-full)">3 / 10 kuvaa</span>
+          <a class="horse-ctx-change" href="#" onclick="return false">Vaihda hevosta ▾</a>
+        </div>
+      </div>
+
+      <div class="page-body">
+        <div id="flash-b" class="flash flash-ok">✓ Kuva lisätty!</div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-4)">
+          <p style="font-size:var(--text-xs);color:var(--color-text-muted)">Ensimmäinen kuva näkyy hevosen profiilikuvana. Vedä ja pudota järjestää uudelleen.</p>
+        </div>
+
+        <div class="photo-grid-compact" id="grid-b"></div>
+
+        <!-- Upload progress -->
+        <div class="upload-progress" id="upload-progress-b" style="margin-top:var(--space-4)">
+          <div style="display:flex;justify-content:space-between;font-size:var(--text-xs);color:var(--color-text-muted)">
+            <span>Ladataan…</span><span id="pct-b">0%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" id="pfill-b"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lightbox B -->
+  <div class="lightbox" id="lightbox-b" onclick="closeLightbox('b')">
+    <button class="lightbox-close" onclick="closeLightbox('b')">✕</button>
+    <div class="lightbox-img" id="lbimg-b">🖼</div>
+    <div class="lightbox-name" id="lbname-b"></div>
+  </div>
+</div>
+
+<!-- ─── SKETCH TOOLBAR ─────────────── -->
+<div id="sketch-tools" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.4'">
+  <span>🖼 010</span>
+  <select onchange="document.querySelector('link[href*=themes]').href='../themes/'+this.value+'.css'">
+    <option value="default.css">Default</option>
+  </select>
+</div>
+
+<script>
+const photoEmojis = ['🐴','🐎','🌿','🌸','🍂','🌾','🌅','🏡'];
+let photos = [
+  { id:1, name:'kultainen-01.jpg', emoji:'🐴', order:1 },
+  { id:2, name:'kultainen-02.jpg', emoji:'🐎', order:2 },
+  { id:3, name:'kultainen-03.jpg', emoji:'🌿', order:3 },
+];
+
+function showVariant(id, btn) {
+  document.querySelectorAll('.variant').forEach(v => { v.classList.remove('active'); v.style.display = 'none'; });
+  document.querySelectorAll('.variant-tab').forEach(t => t.classList.remove('active'));
+  const el = document.getElementById('variant-' + id);
+  el.classList.add('active'); el.style.display = 'block'; btn.classList.add('active');
+}
+document.querySelectorAll('.variant').forEach((v, i) => { v.style.display = i === 0 ? 'block' : 'none'; });
+
+/* Render grid A — large cards with hover overlay */
+function renderGridA() {
+  document.getElementById('grid-a').innerHTML = photos.map((p, i) => `
+    <div class="photo-card" onclick="openLightbox('a','${p.emoji}','${p.name}')">
+      <div class="drag-handle">⠿</div>
+      <div class="photo-thumb">${p.emoji}</div>
+      <div class="photo-info">
+        <div class="photo-name">${p.name}</div>
+        <div class="photo-order">Järjestys: ${p.order}</div>
+      </div>
+      <div class="photo-actions">
+        <button class="photo-action-btn" onclick="event.stopPropagation();openLightbox('a','${p.emoji}','${p.name}')">👁 Näytä</button>
+        <button class="photo-action-btn danger" onclick="event.stopPropagation();deletePhoto(${p.id},'a')">🗑 Poista</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* Render grid B — compact squares */
+function renderGridB() {
+  document.getElementById('grid-b').innerHTML = photos.map((p, i) => `
+    <div class="photo-thumb-sm" onclick="openLightbox('b','${p.emoji}','${p.name}')">
+      <span>${p.emoji}</span>
+      <button class="del-btn" onclick="event.stopPropagation();deletePhoto(${p.id},'b')">✕</button>
+      <span class="photo-num">${p.order}</span>
+      ${i === 0 ? '<span style="position:absolute;bottom:4px;right:4px;background:var(--color-gold);color:#3d2b1f;font-size:9px;padding:1px 5px;border-radius:3px;font-weight:700">PROFIILI</span>' : ''}
+    </div>
+  `).join('');
+}
+
+function deletePhoto(id, v) {
+  if (!confirm('Poistetaanko kuva?')) return;
+  photos = photos.filter(p => p.id !== id);
+  photos.forEach((p, i) => p.order = i + 1);
+  if (v === 'a') renderGridA();
+  else renderGridB();
+}
+
+function fakeUpload(v) {
+  const prog = document.getElementById('upload-progress-' + v);
+  const fill = document.getElementById('pfill-' + v);
+  const pct  = document.getElementById('pct-' + v);
+  prog.classList.add('visible');
+  let w = 0;
+  const interval = setInterval(() => {
+    w += Math.random() * 20 + 8;
+    if (w >= 100) w = 100;
+    fill.style.width = w + '%';
+    pct.textContent = Math.round(w) + '%';
+    if (w >= 100) {
+      clearInterval(interval);
+      setTimeout(() => {
+        prog.classList.remove('visible');
+        fill.style.width = '0%';
+        const newId = Date.now();
+        photos.push({ id: newId, name: `kultainen-0${photos.length+1}.jpg`, emoji: photoEmojis[photos.length % photoEmojis.length], order: photos.length + 1 });
+        if (v === 'a') renderGridA();
+        else renderGridB();
+        const f = document.getElementById('flash-' + v);
+        f.classList.add('visible');
+        setTimeout(() => f.classList.remove('visible'), 3000);
+      }, 300);
+    }
+  }, 100);
+}
+
+function openLightbox(v, emoji, name) {
+  document.getElementById('lbimg-' + v).textContent = emoji;
+  document.getElementById('lbname-' + v).textContent = name;
+  document.getElementById('lightbox-' + v).classList.add('open');
+}
+function closeLightbox(v) {
+  document.getElementById('lightbox-' + v).classList.remove('open');
+}
+
+renderGridA();
+renderGridB();
+</script>
+</body>
+</html>

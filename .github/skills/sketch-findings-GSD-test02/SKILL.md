@@ -14,7 +14,7 @@ Tunnelma: arvokas, maanläheinen, yhteisöllinen.
 
 **Referenssit:** Olemassa oleva style.css, rustiikkinen horse community -sivusto.
 
-Sketch-sessiot: 2024-06-18
+Sketch-sessiot: 2024-06-18, 2026-06-18
 </context>
 
 <design_direction>
@@ -50,6 +50,8 @@ Nostokorteissa `translateY(-3px)` hover. Suodatinpainikkeet: pill-muoto (`border
 | Listaus & Suodatus | references/listaus-suodatus.md | Vaakasuuntainen listakortti (160×90px kuva), pill-suodattimet, translateX hover |
 | Hero & Etusivu | references/hero-etusivu.md | Koko leveyden hero kuvapohjalla + gradient-overlay; etusivulla overlay-kortit heroon |
 | Yksinkertaiset tietosivut | references/yksinkertaiset-sivut.md | Yksi kortti sivun keskellä, ikonirivirakenne yhteystiedoille |
+| Admin Shell & Navigaatio | references/admin-shell.md | 220px tummanruskea sivupalkki; kompakti+laajennettava -lista hevosille |
+| Admin Hallintasivut | references/admin-hallintasivut.md | Slide-in paneeli lomakkeille; kilpailut kompaktilista+modal; kuvat 1:1-ruudukko |
 
 ## Teematiedosto
 
@@ -139,6 +141,83 @@ Alkuperäiset sketch-HTML-tiedostot: `.planning/sketches/`
 - Listakorttikuva: `https://picsum.photos/seed/horse/320/160`
 - Profiilisivu hero: `https://picsum.photos/seed/horse/1200/400`
 - Käytä aina `seed`-parametria — sama seed antaa aina saman kuvan
+
+### Admin sivupalkki — nav-item aktiivinen tila
+```css
+.admin-nav-item.active {
+  color: var(--color-gold);
+  background: rgba(201,168,76,0.12);
+  border-right: 3px solid var(--color-gold);
+}
+```
+
+### Admin kompakti lista — grid-rivit
+```css
+/* Hevoset: */
+.admin-compact-row { grid-template-columns: 2fr 1fr 1fr 80px 28px; }
+/* Kasvatus: */
+.admin-compact-row { grid-template-columns: 2fr 1fr 1fr 80px 28px; }
+/* Kilpailut: */
+.admin-compact-row { grid-template-columns: 2fr 100px 60px 70px 28px; }
+
+.admin-compact-row:hover { background: var(--color-surface-warm); }
+.admin-expanded-panel.open { display: block; }
+```
+
+### Slide-in paneeli (lomakkeet)
+```css
+.admin-slide-panel {
+  position: fixed;
+  top: 0; right: -440px;
+  width: 420px; height: 100vh;
+  transition: right 0.25s ease;
+  border-left: 1px solid var(--color-border);
+}
+.admin-slide-panel.open { right: 0; }
+/* Header: sama primary+gold kuin sidebar-logo */
+.admin-slide-header {
+  background: var(--color-primary);
+  border-bottom: 3px solid var(--color-gold);
+}
+```
+
+### Kompakti kuvaruudukko (kuvat)
+```css
+.admin-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: var(--space-3);
+}
+.admin-photo-thumb {
+  aspect-ratio: 1;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+/* Profiilikuva-merkintä (eka kuva, sort_order=1) */
+.photo-profile-badge {
+  position: absolute; bottom: 4px; right: 4px;
+  background: var(--color-gold); color: #3d2b1f;
+  font-size: 9px; font-weight: 700; text-transform: uppercase;
+  padding: 1px 5px; border-radius: 3px;
+}
+```
+
+### Sijoitusbadget (kilpailut)
+```css
+.place-1 { background: #fff3cd; color: #7a5f00; border: 1px solid #f0c040; }
+.place-2 { background: #f0f0f0; color: #555;    border: 1px solid #ccc; }
+.place-3 { background: #fde8d8; color: #8a3d00; border: 1px solid #e0a070; }
+```
+
+### Horse context -banneri (admin-sisäsivut)
+```css
+.horse-ctx {
+  background: var(--color-parchment);
+  border-bottom: 1px solid var(--color-border-warm);
+  padding: var(--space-3) var(--space-8);
+  display: flex; align-items: center; gap: var(--space-4);
+}
+```
 </key_patterns>
 
 <metadata>
@@ -149,4 +228,9 @@ Alkuperäiset sketch-HTML-tiedostot: `.planning/sketches/`
 - 003-kasvatus (voittaja C: Kompakti lista)
 - 004-yhteystiedot (voittaja A: Korttikortti)
 - 005-etusivu (voittaja C: Overlay-kortit)
+- 006-admin-layout (voittaja A: Sivupalkki)
+- 007-horse-list (voittaja C: Kompakti + laajennettava)
+- 008-admin-kasvatus (voittaja B: Slide-in paneeli)
+- 009-admin-kilpailut (voittaja A: Kompakti lista + modal)
+- 010-admin-kuvat (voittaja B: Kompakti ruudukko)
 </metadata>

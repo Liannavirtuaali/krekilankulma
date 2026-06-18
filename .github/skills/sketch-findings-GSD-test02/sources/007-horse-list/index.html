@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>007 — Horse List Design</title>
+  <link rel="stylesheet" href="../themes/default.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--color-bg); font-family: var(--font-sans); font-size: var(--text-sm); color: var(--color-text); }
+
+    /* ── VARIANT NAV ────────────────────────────── */
+    #variant-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 9998;
+      background: var(--color-surface); border-bottom: 2px solid var(--color-gold);
+      padding: 8px 16px; display: flex; gap: 8px; align-items: center;
+      box-shadow: var(--shadow-sm);
+    }
+    #variant-nav span { font-size: var(--text-xs); color: var(--color-text-muted); margin-right: 8px; font-weight: 600; }
+    .variant-tab {
+      background: none; border: 1px solid var(--color-border); border-radius: var(--radius-full);
+      padding: 5px 14px; font-size: var(--text-xs); cursor: pointer; color: var(--color-text-muted);
+      transition: all 0.15s ease; font-family: var(--font-sans);
+    }
+    .variant-tab:hover { border-color: var(--color-accent); color: var(--color-accent); }
+    .variant-tab.active { background: var(--color-primary); border-color: var(--color-primary); color: var(--color-cream); }
+    .variant { display: none; }
+    .variant.active { display: block; }
+    body { padding-top: 46px; }
+
+    /* ── SHARED PAGE CHROME ────────────────────── */
+    .page-shell { display: flex; height: calc(100vh - 46px); }
+    .sidebar {
+      width: 220px; flex-shrink: 0; background: var(--color-primary);
+      display: flex; flex-direction: column; padding: var(--space-4) 0;
+    }
+    .sidebar-logo { padding: var(--space-4) var(--space-6) var(--space-6); border-bottom: 1px solid rgba(201,168,76,0.25); margin-bottom: var(--space-4); }
+    .sidebar-logo .logo-text { font-family: var(--font-serif); font-size: var(--text-lg); color: var(--color-cream); }
+    .sidebar-logo .logo-sub { font-size: var(--text-xs); color: var(--color-gold); opacity: 0.8; margin-top: 2px; }
+    .nav-item { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-6); color: rgba(232,213,183,0.75); font-size: var(--text-sm); cursor: pointer; transition: all 0.15s; text-decoration: none; }
+    .nav-item:hover { color: var(--color-cream); background: rgba(255,255,255,0.06); }
+    .nav-item.active { color: var(--color-gold); background: rgba(201,168,76,0.12); border-right: 3px solid var(--color-gold); }
+    .nav-section { font-size: var(--text-xs); color: rgba(201,168,76,0.5); padding: var(--space-4) var(--space-6) var(--space-2); text-transform: uppercase; letter-spacing: 0.08em; margin-top: var(--space-2); }
+    .sidebar-footer { margin-top: auto; padding: var(--space-4) var(--space-6); border-top: 1px solid rgba(201,168,76,0.2); }
+    .sidebar-footer .user-name { color: var(--color-cream); font-size: var(--text-xs); }
+    .sidebar-footer .logout-link { color: var(--color-gold); font-size: var(--text-xs); opacity: 0.7; cursor: pointer; }
+
+    .main-content { flex: 1; overflow-y: auto; background: var(--color-bg); }
+    .page-header {
+      background: var(--color-surface); border-bottom: 1px solid var(--color-border);
+      padding: var(--space-4) var(--space-8);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .page-header h1 { font-family: var(--font-serif); font-size: var(--text-2xl); color: var(--color-primary); font-weight: normal; }
+    .page-body { padding: var(--space-6) var(--space-8); }
+
+    /* ── SHARED BUTTONS ────────────────────────── */
+    .btn-primary { background: var(--color-primary); color: var(--color-cream); border: none; border-radius: var(--radius-md); padding: var(--space-3) var(--space-6); font-size: var(--text-sm); cursor: pointer; font-family: var(--font-sans); transition: background 0.15s; }
+    .btn-primary:hover { background: var(--color-primary-hover); }
+    .btn-ghost { background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-3) var(--space-6); font-size: var(--text-sm); cursor: pointer; font-family: var(--font-sans); transition: all 0.15s; }
+    .btn-ghost:hover { border-color: var(--color-accent); color: var(--color-accent); }
+    .btn-sm { padding: 4px 10px; font-size: var(--text-xs); border-radius: var(--radius-sm); border: 1px solid var(--color-border); background: var(--color-surface); cursor: pointer; font-family: var(--font-sans); transition: all 0.15s; color: var(--color-text); }
+    .btn-sm:hover { background: var(--color-surface-warm); }
+    .btn-sm-danger { border-color: #c9a0a0; color: var(--color-danger); }
+    .btn-sm-danger:hover { background: #fdf0f0; border-color: var(--color-danger); }
+    .btn-sm-accent { border-color: var(--color-accent); color: var(--color-accent); }
+    .btn-sm-accent:hover { background: var(--color-surface-accent); }
+
+    /* ── FILTERS BAR ───────────────────────────── */
+    .filters-bar { display: flex; gap: var(--space-3); align-items: center; margin-bottom: var(--space-6); flex-wrap: wrap; }
+    .filter-pill { padding: var(--space-2) var(--space-4); border-radius: var(--radius-full); border: 1px solid var(--color-border); background: var(--color-surface); font-size: var(--text-xs); cursor: pointer; transition: all 0.15s; color: var(--color-text-muted); }
+    .filter-pill:hover { border-color: var(--color-accent); color: var(--color-accent); }
+    .filter-pill.active { background: var(--color-primary); border-color: var(--color-primary); color: var(--color-cream); }
+    .filter-search { display: flex; align-items: center; gap: var(--space-2); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-2) var(--space-3); background: var(--color-surface); flex: 1; max-width: 280px; }
+    .filter-search input { border: none; outline: none; font-size: var(--text-sm); font-family: var(--font-sans); background: none; color: var(--color-text); width: 100%; }
+    .filter-search input::placeholder { color: var(--color-text-muted); }
+    .result-count { margin-left: auto; font-size: var(--text-xs); color: var(--color-text-muted); }
+
+    /* ── GENDER BADGE ──────────────────────────── */
+    .gender-badge { display: inline-block; padding: 2px 8px; border-radius: var(--radius-full); font-size: var(--text-xs); font-weight: 600; }
+    .gender-ori { background: #e8f0ff; color: #3b5bdb; }
+    .gender-tamma { background: #fce8f3; color: #9c36b5; }
+    .gender-ruuna { background: #e8f5e8; color: #2b8a3e; }
+
+    /* ── VARIANT A: Modern Table ───────────────── */
+    .modern-table { width: 100%; border-collapse: collapse; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
+    .modern-table thead { background: var(--color-surface-warm); }
+    .modern-table th { font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-muted); font-weight: 600; padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--color-border); text-align: left; cursor: pointer; user-select: none; }
+    .modern-table th:hover { color: var(--color-primary); }
+    .modern-table th .sort-icon { opacity: 0.4; margin-left: 4px; }
+    .modern-table th.sorted { color: var(--color-primary); }
+    .modern-table th.sorted .sort-icon { opacity: 1; }
+    .modern-table td { padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--color-border); vertical-align: middle; }
+    .modern-table tr:last-child td { border-bottom: none; }
+    .modern-table tr:hover td { background: var(--color-surface-warm); }
+    .modern-table .row-actions { display: flex; gap: var(--space-2); opacity: 0; transition: opacity 0.15s; }
+    .modern-table tr:hover .row-actions { opacity: 1; }
+    .horse-name-cell strong { display: block; color: var(--color-primary); }
+    .horse-name-cell .slug { font-size: var(--text-xs); color: var(--color-text-muted); font-family: var(--font-mono); }
+
+    /* ── VARIANT B: Card List ──────────────────── */
+    .card-list { display: flex; flex-direction: column; gap: var(--space-3); }
+    .horse-card {
+      background: var(--color-surface); border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg); padding: var(--space-4) var(--space-6);
+      display: flex; align-items: center; gap: var(--space-6);
+      box-shadow: var(--shadow-sm); transition: box-shadow 0.15s, transform 0.15s;
+      cursor: pointer;
+    }
+    .horse-card:hover { box-shadow: var(--shadow-md); transform: translateX(3px); }
+    .horse-card-photo {
+      width: 64px; height: 64px; border-radius: var(--radius-md);
+      background: var(--color-parchment); border: 1px solid var(--color-border-warm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; flex-shrink: 0;
+    }
+    .horse-card-info { flex: 1; min-width: 0; }
+    .horse-card-name { font-family: var(--font-serif); font-size: var(--text-lg); color: var(--color-primary); }
+    .horse-card-meta { display: flex; gap: var(--space-3); margin-top: 4px; align-items: center; flex-wrap: wrap; }
+    .horse-card-meta span { font-size: var(--text-xs); color: var(--color-text-muted); }
+    .horse-card-meta .separator { color: var(--color-border-warm); }
+    .horse-card-vh { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--color-text-muted); }
+    .horse-card-actions { display: flex; gap: var(--space-2); flex-shrink: 0; opacity: 0; transition: opacity 0.15s; }
+    .horse-card:hover .horse-card-actions { opacity: 1; }
+    .horse-card-photo-count { font-size: var(--text-xs); color: var(--color-text-muted); white-space: nowrap; }
+
+    /* ── VARIANT C: Compact Data Rows ─────────── */
+    .compact-list { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
+    .compact-row {
+      display: grid;
+      grid-template-columns: 2fr 1.2fr 80px 140px 32px;
+      align-items: center; gap: var(--space-4);
+      padding: var(--space-3) var(--space-5);
+      border-bottom: 1px solid var(--color-border);
+      transition: background 0.1s;
+      cursor: pointer;
+    }
+    .compact-row:last-child { border-bottom: none; }
+    .compact-row:hover { background: var(--color-surface-warm); }
+    .compact-row.header-row {
+      background: var(--color-surface-accent); cursor: default;
+      font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-muted); font-weight: 600;
+    }
+    .compact-row.header-row:hover { background: var(--color-surface-accent); }
+    .compact-name { font-weight: 600; color: var(--color-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .compact-breed { color: var(--color-text-muted); font-size: var(--text-xs); }
+    .compact-vh { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--color-text-muted); }
+    .compact-expand-btn { background: none; border: none; color: var(--color-text-muted); cursor: pointer; font-size: 14px; padding: 4px; border-radius: var(--radius-sm); transition: all 0.15s; }
+    .compact-expand-btn:hover { background: var(--color-surface-accent); color: var(--color-primary); }
+    .compact-expanded-row {
+      display: none;
+      padding: var(--space-4) var(--space-5) var(--space-4) calc(var(--space-5) + 16px);
+      border-bottom: 1px solid var(--color-border);
+      background: var(--color-surface-warm);
+    }
+    .compact-expanded-row.open { display: block; }
+    .expanded-actions { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+
+    /* ── SKETCH TOOLBAR ─────────────────────── */
+    #sketch-tools {
+      position: fixed; bottom: 12px; right: 12px; z-index: 9999;
+      font-family: system-ui; font-size: 12px;
+      background: rgba(0,0,0,0.75); color: white;
+      padding: 8px 12px; border-radius: 8px;
+      opacity: 0.4; transition: opacity 0.2s;
+      display: flex; gap: 8px; align-items: center;
+    }
+    #sketch-tools:hover { opacity: 1; }
+    #sketch-tools button { background: rgba(255,255,255,0.15); border: none; color: white; padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; }
+    #sketch-tools button:hover { background: rgba(255,255,255,0.3); }
+    #sketch-tools select { background: rgba(255,255,255,0.15); border: none; color: white; font-size: 11px; border-radius: 4px; padding: 2px 4px; cursor: pointer; }
+
+    /* ── FLASH MESSAGE ──────────────────────── */
+    .flash { background: #e8f5e8; border: 1px solid #c3e6c3; color: var(--color-success); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); margin-bottom: var(--space-4); font-size: var(--text-sm); display: none; }
+    .flash.visible { display: block; }
+  </style>
+</head>
+<body>
+
+<!-- ─── VARIANT NAV ─────────────────────── -->
+<div id="variant-nav">
+  <span>007 Horse List</span>
+  <button class="variant-tab active" onclick="showVariant('a', this)">A: Moderni taulukko</button>
+  <button class="variant-tab" onclick="showVariant('b', this)">B: Korttirivit</button>
+  <button class="variant-tab" onclick="showVariant('c', this)">C: Kompakti + laajennettava</button>
+</div>
+
+<!-- Sample data -->
+<script>
+const horses = [
+  { name: "Auringon Aatos", slug: "auringon-aatos", breed: "Suomenhevonen", gender: "Ori", birth: "2019", vh: "VH00-012-3456", photos: 5 },
+  { name: "Hopeatähti",      slug: "hopeatahti",      breed: "Puoliverinen",  gender: "Tamma", birth: "2017", vh: "VH00-023-7890", photos: 12 },
+  { name: "Kultainen Kaiku", slug: "kultainen-kaiku", breed: "Welsh-poni",    gender: "Ruuna", birth: "2020", vh: "VH00-034-2345", photos: 3 },
+  { name: "Metsän Mystikko", slug: "metsan-mystikko", breed: "Suomenhevonen", gender: "Ori",   birth: "2018", vh: "VH00-045-6789", photos: 8 },
+  { name: "Pilven Lento",    slug: "pilven-lento",    breed: "Lämminverinen", gender: "Tamma", birth: "2021", vh: "VH00-056-0123", photos: 2 },
+  { name: "Revontuli",       slug: "revontuli",       breed: "Islanninhevonen", gender: "Ruuna", birth: "2016", vh: "VH00-067-4567", photos: 7 },
+];
+const genderClass = { "Ori": "gender-ori", "Tamma": "gender-tamma", "Ruuna": "gender-ruuna" };
+</script>
+
+<!-- ═══════════════════════════════════════════
+     VARIANT A — Modern Table
+═══════════════════════════════════════════ -->
+<div id="variant-a" class="variant active">
+  <div class="page-shell">
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-text">🐴 Virtuaalitalli</div>
+        <div class="logo-sub">Hallintapaneeli</div>
+      </div>
+      <div class="nav-section">Päävalikko</div>
+      <a class="nav-item" href="#" onclick="return false">⊞ Dashboard</a>
+      <a class="nav-item active" href="#" onclick="return false">🐎 Hevoset</a>
+      <a class="nav-item" href="#" onclick="return false">🌱 Kasvatus</a>
+      <a class="nav-item" href="#" onclick="return false">🏆 Kilpailut</a>
+      <div class="nav-section">Media</div>
+      <a class="nav-item" href="#" onclick="return false">📷 Kuvat</a>
+      <div class="sidebar-footer">
+        <div class="user-name">admin</div>
+        <div class="logout-link">Kirjaudu ulos</div>
+      </div>
+    </aside>
+
+    <div class="main-content">
+      <div class="page-header">
+        <div>
+          <h1>Hevoset</h1>
+        </div>
+        <button class="btn-primary" onclick="showFlash('a')">+ Lisää hevonen</button>
+      </div>
+
+      <div class="page-body">
+        <div id="flash-a" class="flash">✓ Hevonen lisätty onnistuneesti!</div>
+
+        <div class="filters-bar">
+          <div class="filter-search">
+            <span style="color:var(--color-text-muted)">🔍</span>
+            <input type="search" placeholder="Hae nimellä…" oninput="filterTable(this.value)">
+          </div>
+          <button class="filter-pill active" onclick="setFilter(this, 'kaikki')">Kaikki (6)</button>
+          <button class="filter-pill" onclick="setFilter(this, 'ori')">Orit</button>
+          <button class="filter-pill" onclick="setFilter(this, 'tamma')">Tammat</button>
+          <button class="filter-pill" onclick="setFilter(this, 'ruuna')">Ruunat</button>
+          <span class="result-count" id="result-count-a">6 hevosta</span>
+        </div>
+
+        <table class="modern-table" id="table-a">
+          <thead>
+            <tr>
+              <th onclick="sortTable('name')" class="sorted">Nimi <span class="sort-icon">↑</span></th>
+              <th onclick="sortTable('breed')">Rotu <span class="sort-icon">↕</span></th>
+              <th onclick="sortTable('gender')">Sukupuoli <span class="sort-icon">↕</span></th>
+              <th onclick="sortTable('birth')">Syntymä <span class="sort-icon">↕</span></th>
+              <th>VH-tunnus</th>
+              <th style="width:150px">Toiminnot</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-a"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     VARIANT B — Card List
+═══════════════════════════════════════════ -->
+<div id="variant-b" class="variant">
+  <div class="page-shell">
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-text">🐴 Virtuaalitalli</div>
+        <div class="logo-sub">Hallintapaneeli</div>
+      </div>
+      <div class="nav-section">Päävalikko</div>
+      <a class="nav-item" href="#" onclick="return false">⊞ Dashboard</a>
+      <a class="nav-item active" href="#" onclick="return false">🐎 Hevoset</a>
+      <a class="nav-item" href="#" onclick="return false">🌱 Kasvatus</a>
+      <a class="nav-item" href="#" onclick="return false">🏆 Kilpailut</a>
+      <div class="nav-section">Media</div>
+      <a class="nav-item" href="#" onclick="return false">📷 Kuvat</a>
+      <div class="sidebar-footer">
+        <div class="user-name">admin</div>
+        <div class="logout-link">Kirjaudu ulos</div>
+      </div>
+    </aside>
+
+    <div class="main-content">
+      <div class="page-header">
+        <h1>Hevoset</h1>
+        <button class="btn-primary" onclick="showFlash('b')">+ Lisää hevonen</button>
+      </div>
+      <div class="page-body">
+        <div id="flash-b" class="flash">✓ Hevonen lisätty onnistuneesti!</div>
+
+        <div class="filters-bar" style="margin-bottom:var(--space-4)">
+          <div class="filter-search">
+            <span style="color:var(--color-text-muted)">🔍</span>
+            <input type="search" placeholder="Hae nimellä…">
+          </div>
+          <button class="filter-pill active">Kaikki (6)</button>
+          <button class="filter-pill">Orit</button>
+          <button class="filter-pill">Tammat</button>
+          <button class="filter-pill">Ruunat</button>
+        </div>
+
+        <div class="card-list" id="card-list-b"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     VARIANT C — Compact + Expandable
+═══════════════════════════════════════════ -->
+<div id="variant-c" class="variant">
+  <div class="page-shell">
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-text">🐴 Virtuaalitalli</div>
+        <div class="logo-sub">Hallintapaneeli</div>
+      </div>
+      <div class="nav-section">Päävalikko</div>
+      <a class="nav-item" href="#" onclick="return false">⊞ Dashboard</a>
+      <a class="nav-item active" href="#" onclick="return false">🐎 Hevoset</a>
+      <a class="nav-item" href="#" onclick="return false">🌱 Kasvatus</a>
+      <a class="nav-item" href="#" onclick="return false">🏆 Kilpailut</a>
+      <div class="nav-section">Media</div>
+      <a class="nav-item" href="#" onclick="return false">📷 Kuvat</a>
+      <div class="sidebar-footer">
+        <div class="user-name">admin</div>
+        <div class="logout-link">Kirjaudu ulos</div>
+      </div>
+    </aside>
+
+    <div class="main-content">
+      <div class="page-header">
+        <h1>Hevoset</h1>
+        <button class="btn-primary" onclick="showFlash('c')">+ Lisää hevonen</button>
+      </div>
+      <div class="page-body">
+        <div id="flash-c" class="flash">✓ Hevonen lisätty onnistuneesti!</div>
+
+        <div class="filters-bar">
+          <div class="filter-search">
+            <span style="color:var(--color-text-muted)">🔍</span>
+            <input type="search" placeholder="Hae nimellä…">
+          </div>
+          <button class="filter-pill active">Kaikki (6)</button>
+          <button class="filter-pill">Orit</button>
+          <button class="filter-pill">Tammat</button>
+          <button class="filter-pill">Ruunat</button>
+        </div>
+
+        <div class="compact-list" id="compact-list-c">
+          <div class="compact-row header-row">
+            <div>Nimi / Rotu</div>
+            <div>Sukupuoli</div>
+            <div>Syntymä</div>
+            <div>VH-tunnus</div>
+            <div></div>
+          </div>
+          <!-- rows injected by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── SKETCH TOOLBAR ─────────────────── -->
+<div id="sketch-tools"
+  onmouseenter="this.style.opacity='1'"
+  onmouseleave="this.style.opacity='0.4'">
+  <span>🖼 007</span>
+  <select onchange="document.querySelector('link[href*=themes]').href='../themes/'+this.value+'.css'">
+    <option value="default.css">Default</option>
+  </select>
+</div>
+
+<script>
+/* ── Variant switching ────────── */
+function showVariant(id, btn) {
+  document.querySelectorAll('.variant').forEach(v => { v.classList.remove('active'); v.style.display = 'none'; });
+  document.querySelectorAll('.variant-tab').forEach(t => t.classList.remove('active'));
+  const el = document.getElementById('variant-' + id);
+  el.classList.add('active');
+  el.style.display = 'block';
+  btn.classList.add('active');
+}
+document.querySelectorAll('.variant').forEach((v, i) => { v.style.display = i === 0 ? 'block' : 'none'; });
+
+/* ── Flash messages ───────────── */
+function showFlash(variant) {
+  const f = document.getElementById('flash-' + variant);
+  f.classList.add('visible');
+  setTimeout(() => f.classList.remove('visible'), 3000);
+}
+
+/* ── Filter pills ─────────────── */
+function setFilter(btn, type) {
+  btn.closest('.filters-bar').querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+/* ── Sort table (A) ───────────── */
+let sortKey = 'name', sortDir = 1;
+function sortTable(key) {
+  if (sortKey === key) sortDir = -sortDir;
+  else { sortKey = key; sortDir = 1; }
+  document.querySelectorAll('.modern-table th .sort-icon').forEach(s => s.textContent = '↕');
+  document.querySelectorAll('.modern-table th').forEach(th => th.classList.remove('sorted'));
+  renderTableA();
+}
+function filterTable(q) {
+  const rows = document.querySelectorAll('#tbody-a tr');
+  rows.forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(q.toLowerCase()) ? '' : 'none';
+  });
+  const visible = [...rows].filter(r => r.style.display !== 'none').length;
+  document.getElementById('result-count-a').textContent = visible + ' hevosta';
+}
+
+/* ── Render table A ───────────── */
+function renderTableA() {
+  const sorted = [...horses].sort((a, b) => {
+    if (a[sortKey] < b[sortKey]) return -sortDir;
+    if (a[sortKey] > b[sortKey]) return sortDir;
+    return 0;
+  });
+  document.getElementById('tbody-a').innerHTML = sorted.map((h, i) => `
+    <tr>
+      <td class="horse-name-cell">
+        <strong>${h.name}</strong>
+        <span class="slug">${h.slug}</span>
+      </td>
+      <td>${h.breed}</td>
+      <td><span class="gender-badge ${genderClass[h.gender]}">${h.gender}</span></td>
+      <td style="color:var(--color-text-muted)">${h.birth}</td>
+      <td class="compact-vh">${h.vh}</td>
+      <td>
+        <div class="row-actions">
+          <button class="btn-sm btn-sm-accent" onclick="alert('Muokkaa: ${h.name}')">Muokkaa</button>
+          <button class="btn-sm" onclick="alert('Kuvat: ${h.name}')">📷 ${h.photos}</button>
+          <button class="btn-sm btn-sm-danger" onclick="confirmDelete('${h.name}')">Poista</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+/* ── Render card list B ───────── */
+function renderCardListB() {
+  document.getElementById('card-list-b').innerHTML = horses.map(h => `
+    <div class="horse-card">
+      <div class="horse-card-photo">🐴</div>
+      <div class="horse-card-info">
+        <div class="horse-card-name">${h.name}</div>
+        <div class="horse-card-meta">
+          <span>${h.breed}</span>
+          <span class="separator">·</span>
+          <span class="gender-badge ${genderClass[h.gender]}" style="font-size:11px">${h.gender}</span>
+          <span class="separator">·</span>
+          <span>s. ${h.birth}</span>
+          <span class="separator">·</span>
+          <span class="horse-card-vh">${h.vh}</span>
+        </div>
+      </div>
+      <div class="horse-card-photo-count">📷 ${h.photos} kuvaa</div>
+      <div class="horse-card-actions">
+        <button class="btn-sm btn-sm-accent" onclick="alert('Muokkaa: ${h.name}');event.stopPropagation()">Muokkaa</button>
+        <button class="btn-sm" onclick="alert('Kuvat');event.stopPropagation()">Kuvat</button>
+        <button class="btn-sm btn-sm-danger" onclick="confirmDelete('${h.name}');event.stopPropagation()">Poista</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ── Render compact list C ────── */
+function renderCompactC() {
+  const list = document.getElementById('compact-list-c');
+  const header = list.querySelector('.header-row');
+  list.innerHTML = '';
+  list.appendChild(header);
+  horses.forEach((h, i) => {
+    const row = document.createElement('div');
+    row.className = 'compact-row';
+    row.innerHTML = `
+      <div>
+        <div class="compact-name">${h.name}</div>
+        <div class="compact-breed">${h.breed}</div>
+      </div>
+      <div><span class="gender-badge ${genderClass[h.gender]}">${h.gender}</span></div>
+      <div style="color:var(--color-text-muted);font-size:var(--text-xs)">${h.birth}</div>
+      <div class="compact-vh">${h.vh}</div>
+      <div>
+        <button class="compact-expand-btn" onclick="toggleExpand(${i})">▸</button>
+      </div>
+    `;
+    row.onclick = (e) => { if (!e.target.classList.contains('compact-expand-btn')) toggleExpand(i); };
+    list.appendChild(row);
+
+    const exp = document.createElement('div');
+    exp.className = 'compact-expanded-row';
+    exp.id = 'exp-' + i;
+    exp.innerHTML = `
+      <div class="expanded-actions">
+        <button class="btn-sm btn-sm-accent" onclick="alert('Muokkaa: ${h.name}')">✏️ Muokkaa tietoja</button>
+        <button class="btn-sm" onclick="alert('Kuvat: ${h.photos}')">📷 Kuvat (${h.photos})</button>
+        <button class="btn-sm" onclick="alert('Näytä julkinen sivu')" target="_blank">🔗 Näytä sivu</button>
+        <button class="btn-sm btn-sm-danger" onclick="confirmDelete('${h.name}')">🗑 Poista</button>
+      </div>
+    `;
+    list.appendChild(exp);
+  });
+}
+
+function toggleExpand(i) {
+  const exp = document.getElementById('exp-' + i);
+  const isOpen = exp.classList.contains('open');
+  document.querySelectorAll('.compact-expanded-row').forEach(e => e.classList.remove('open'));
+  document.querySelectorAll('.compact-expand-btn').forEach(b => b.textContent = '▸');
+  if (!isOpen) {
+    exp.classList.add('open');
+    exp.previousElementSibling.querySelector('.compact-expand-btn').textContent = '▾';
+  }
+}
+
+function confirmDelete(name) {
+  if (confirm('Poistetaanko hevonen "' + name + '"?')) {
+    alert('Hevonen "' + name + '" poistettu.');
+  }
+}
+
+/* ── Init ─────────────────────── */
+renderTableA();
+renderCardListB();
+renderCompactC();
+</script>
+</body>
+</html>
