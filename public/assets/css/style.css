@@ -890,3 +890,212 @@ a[target="_blank"]::after,
   font-style: normal;
   font-weight: bold;
 }
+
+/* ============================================================
+   BLOGI — postauslista (blogi.php)
+   ============================================================ */
+
+.post-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Listakortit: horisontaalinen asettelu kuten list-card-pattern */
+.post-list-card {
+  display: flex;
+  gap: 1.25rem;
+  background: var(--color-surface-warm);
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow .15s;
+}
+.post-list-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,.12);
+}
+.post-list-card__body {
+  flex: 1;
+}
+.post-list-card__title {
+  font-family: var(--font-serif);
+  font-size: var(--text-lg);
+  color: var(--color-dark);
+  margin: 0 0 .4rem;
+}
+.post-list-card__date {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+  margin-bottom: .6rem;
+}
+.post-list-card__excerpt {
+  font-size: var(--text-base);
+  color: var(--color-text);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ============================================================
+   BLOGI — yksittäinen postaus (postaus.php)
+   ============================================================ */
+
+/* Kaksipalstainen layout: artikkeli + sticky sidebar */
+.post-layout {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: 2.5rem;
+  align-items: start;
+}
+@media (max-width: 860px) {
+  .post-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Artikkeli */
+.post-article__title {
+  font-family: var(--font-serif);
+  font-size: var(--text-2xl);
+  margin: 0 0 .3rem;
+}
+.post-article__date {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+  margin-bottom: 1.5rem;
+  display: block;
+}
+
+/* Dropcap ensimmäisessä kappaleessa */
+.post-body p:first-child::first-letter {
+  float: left;
+  font-family: var(--font-serif);
+  font-size: 3.2rem;
+  line-height: .85;
+  margin: .1rem .45rem 0 0;
+  color: var(--color-gold);
+}
+
+.post-body p {
+  line-height: 1.75;
+  margin: 0 0 1.1rem;
+}
+
+/* Lainauslaatikko */
+.post-body blockquote {
+  border-left: 4px solid var(--color-gold);
+  background: var(--color-surface-warm);
+  margin: 1.25rem 0;
+  padding: .85rem 1.25rem;
+  font-style: italic;
+  color: var(--color-dark);
+}
+.post-body blockquote p {
+  margin: 0;
+}
+
+/* ============================================================
+   BLOGI — sticky sidebar
+   ============================================================ */
+
+.post-sidebar {
+  position: sticky;
+  top: 68px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Edellinen / seuraava navigaatio */
+.post-prevnext {
+  background: var(--color-surface-warm);
+  border-radius: 8px;
+  padding: .85rem 1rem;
+  font-size: var(--text-sm);
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+.post-prevnext a {
+  color: var(--color-gold);
+  text-decoration: none;
+}
+.post-prevnext a:hover { text-decoration: underline; }
+
+/* Arkisto */
+.archive-sidebar {
+  background: var(--color-dark);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.archive-sidebar__header {
+  background: var(--color-dark);
+  color: var(--color-gold);
+  font-family: var(--font-serif);
+  font-size: var(--text-base);
+  padding: .75rem 1rem;
+  border-bottom: 2px solid var(--color-gold);
+  margin: 0;
+}
+
+/* Accordion: <details>/<summary> ilman JS */
+.archive-sidebar details {
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.archive-sidebar details:last-child { border-bottom: none; }
+.archive-sidebar summary {
+  padding: .6rem 1rem;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: var(--text-sm);
+  color: var(--color-cream);
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+}
+.archive-sidebar summary::-webkit-details-marker { display: none; }
+.archive-sidebar summary::after {
+  content: '▸';
+  font-size: .75rem;
+  color: var(--color-gold);
+  transition: transform .2s;
+}
+.archive-sidebar details[open] summary::after { transform: rotate(90deg); }
+.archive-sidebar__months {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 .4rem;
+}
+.archive-sidebar__months li a {
+  display: block;
+  padding: .3rem 1.5rem;
+  font-size: var(--text-sm);
+  color: var(--color-cream);
+  text-decoration: none;
+  opacity: .8;
+}
+.archive-sidebar__months li a:hover {
+  opacity: 1;
+  color: var(--color-gold);
+}
+
+/* ============================================================
+   BLOGI — admin-lomake (posts.php)
+   ============================================================ */
+
+.post-admin-form textarea {
+  width: 100%;
+  min-height: 260px;
+  resize: vertical;
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  padding: .5rem .75rem;
+  border: 1px solid var(--color-border, #ccc);
+  border-radius: 4px;
+  background: #fff;
+}
