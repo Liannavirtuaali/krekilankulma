@@ -14,7 +14,7 @@ Projekti rakentaa PHP/MySQL-pohjaisen virtuaalitallin kokonaan uudelleen: ensin 
 - [x] **Phase 2: Julkiset sivut** - Kaikki 5 julkista sivua live-datalla tietokannasta
 - [ ] **Phase 3: Admin-paneeli** - Hevosten hallinta, kirjautuminen, kuvat, kilpailut
 - [ ] **Phase 4: Tietoturva & Viimeistely** - OWASP, CSRF, XSS ja Altervista-deployment
-- [x] **Phase 5: Blogi** - Postausten hallinta adminissa, julkinen postauslista ja yksittäinen postaussivu arkistosidebarilla (completed 2026-06-18)
+- [x] **Phase 5: Blogi** - Postausten hallinta adminissa, julkinen postauslista ja yksittäinen postaussivu arkistosidebarilla (completed 2026-06-18)
 
 ## Phase Details
 
@@ -80,7 +80,7 @@ Plans:
 
 ### Phase 4: Tietoturva & Viimeistely
 
-**Goal**: Kaikki OWASP-tietoturvakohteet toteutettu ja koko sivusto on valmis julkaistavaksi Altervistaan.
+**Goal**: Kaikki OWASP-tietoturvakohteet toteutettu ja koko sivusto on valmis julkaistavaksi Altervistaan automatisoidulla CI/CD-deploymentilla.
 **Depends on**: Phase 3
 **Requirements**: [SEC-01, SEC-02, SEC-03, SEC-04, SEC-05, SEC-06, SEC-07, SEC-08]
 **Success Criteria** (what must be TRUE):
@@ -89,18 +89,18 @@ Plans:
   2. Kaikki lomakkeet sisältävät CSRF-tokenin ja palvelin validoi sen
   3. Kuvalataus hylkää PHP-tiedostot ja väärät MIME-tyypit
   4. Sivusto toimii oikein Altervistan tuotantoympäristössä
+  5. Push main-haaraan deployaa automaattisesti vain `public/`-hakemiston Altervistaan GitHub Actionsin (FTP) kautta
 
-**Plans**: 3 plans
+**Plans**: 2 plans
 
 Plans:
 
-- [ ] 04-01: Tietoturva-audit ja korjaukset (SQL-injektio, XSS, CSRF-tokenit)
-- [ ] 04-02: Kuvatiedostojen upload-tietoturva (MIME-validointi, koon tarkistus)
-- [ ] 04-03: Session-tietoturva, virheiden käsittely ja Altervista-deployment-checklist
+- [x] PLAN.md: Tietoturva-audit ja korjaukset (SEC-01–SEC-08: SQL-injektio, XSS, CSRF, upload, session, virheet) — completed 2026-06-17
+- [ ] 04-02-PLAN.md: GitHub Actions CI/CD -deployment Altervistaan (deploy.yml + DEPLOYMENT_CHECKLIST päivitys)
 
 ---
 *Roadmap created: 2026-06-17*
-*Last updated: 2026-06-18 — Phase 5 Blogi lisätty*
+*Last updated: 2026-06-18 — Phase 5 Blogi lisätty; Phase 4 CI/CD-deployment-suunnitelma lisätty*
 
 ### Phase 5: Blogi
 
