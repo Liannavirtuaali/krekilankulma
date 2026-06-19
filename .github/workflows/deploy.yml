@@ -25,11 +25,8 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftps          # enforce encrypted transport (FTPS); if Altervista uses implicit TLS add: port: 990
           local-dir: ./public/
-          # IMPORTANT: verify the correct web root path by logging in via FTP manually.
-          # On Altervista free hosting it is typically /htdocs/ or /www/, NOT /.
-          # Deploying to / means files may not be served by Apache, or may overwrite
-          # files in unexpected locations. Confirm before first production deployment.
-          server-dir: /           # TODO: confirm correct value (likely /htdocs/)
+          # FTP root = /membri/tilli/ (user home). Web root subfolder = demotalli/.
+          server-dir: /demotalli/
           exclude: |
             **/.git*
             **/.git*/**
