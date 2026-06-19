@@ -29,7 +29,7 @@ SET @sd = IF(@d1 > 0,
 PREPARE stmt FROM @sd; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
 -- 3. Tyhjennä vanha data ja poista AUTO_INCREMENT
-TRUNCATE TABLE `disciplines`;
+DELETE FROM `disciplines`;
 ALTER TABLE `disciplines` MODIFY `id` INT UNSIGNED NOT NULL;
 
 -- 4. Lisää uusi data kiinteillä ID:llä
