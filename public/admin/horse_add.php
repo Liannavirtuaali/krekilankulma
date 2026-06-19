@@ -48,6 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errors[] = 'Profiililinkki ei ole kelvollinen URL.';
         }
 
+        $validGenders = ['ori','tamma','ruuna'];
         if (empty($errors)) {
             // Generoi slug
             $slug = slugify($f['name']);
@@ -78,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':vh_id'          => $f['vh_id'] ?: null,
                 ':breed_id'       => $f['breed_id'] !== '' ? (int)$f['breed_id'] : null,
                 ':birth_date'     => $f['birth_date'] ?: null,
-                ':gender'         => $f['gender'] ?: null,
+                ':gender'         => in_array($f['gender'], $validGenders, true) ? $f['gender'] : 'tamma',
                 ':color_id'       => $f['color_id'] !== '' ? (int)$f['color_id'] : null,
                 ':height_cm'      => $f['height_cm'] !== '' ? (int)$f['height_cm'] : null,
                 ':discipline_id'  => $f['discipline_id'] !== '' ? (int)$f['discipline_id'] : null,
@@ -158,7 +159,7 @@ require __DIR__ . '/includes/admin_header.php';
       <label for="gender">Sukupuoli</label>
       <select id="gender" name="gender">
         <option value="">— valitse —</option>
-        <?php foreach (['ori', 'tamma', 'ruuna', 'tuntematon'] as $g): ?>
+        <?php foreach (['ori', 'tamma', 'ruuna'] as $g): ?>
           <option value="<?= e($g) ?>" <?= $f['gender'] === $g ? 'selected' : '' ?>><?= ucfirst(e($g)) ?></option>
         <?php endforeach; ?>
       </select>

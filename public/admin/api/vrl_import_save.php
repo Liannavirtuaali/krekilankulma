@@ -210,10 +210,10 @@ function insertHorse(
         $stmt = $db->prepare(
             'INSERT INTO horses
                (name, vh_id, breed_id, height_cm, color_id, profile_url,
-                ancestor, sire_id, dam_id, slug)
+                gender, ancestor, sire_id, dam_id, slug)
              VALUES
                (:name, :vh_id, :breed_id, :height_cm, :color_id, :profile_url,
-                1, :sire_id, :dam_id, :slug)'
+                :gender, 1, :sire_id, :dam_id, :slug)'
         );
         $stmt->execute([
             ':name'        => mb_substr($name, 0, 150),
@@ -222,6 +222,7 @@ function insertHorse(
             ':height_cm'   => !empty($d['sakakorkeus']) ? parseHeightCm($d['sakakorkeus'])         : null,
             ':color_id'    => !empty($d['vari'])        ? matchColorId($d['vari'], $colorsByName)  : null,
             ':profile_url' => $profileUrl,
+            ':gender'      => !empty($d['sukupuoli'])   ? mapGender($d['sukupuoli'])               : 'tamma',
             ':sire_id'     => $sireId,
             ':dam_id'      => $damId,
             ':slug'        => $slug,

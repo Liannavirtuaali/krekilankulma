@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS `horses` (
   `call_name` VARCHAR(100) DEFAULT NULL COMMENT 'Kutsumanimi',
   `breed_id` INT UNSIGNED DEFAULT NULL COMMENT 'Rotu (breeds.id)',
   `birth_date` DATE DEFAULT NULL COMMENT 'Syntymäpäivä',
-  `gender` ENUM('ori','tamma','ruuna','käkky') NOT NULL DEFAULT 'tamma',
+  `gender` ENUM('ori','tamma','ruuna') NOT NULL DEFAULT 'tamma',
   `color_id` INT UNSIGNED DEFAULT NULL COMMENT 'Väri (colors.id)',
   `height_cm` SMALLINT UNSIGNED DEFAULT NULL COMMENT 'Säkäkorkeus cm',
   `vh_id` VARCHAR(50) DEFAULT NULL COMMENT 'VH-tunnus',
