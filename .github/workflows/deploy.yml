@@ -36,3 +36,4 @@ jobs:
             **/database/**
             **/node_modules/**
             **/.github/**
+            **/uploads/**
