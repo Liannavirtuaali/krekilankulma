@@ -653,8 +653,9 @@ tr:hover td { background: var(--color-parchment); }
   min-height: 300px;
   overflow: hidden;
   position: relative;
-  background: linear-gradient(160deg, rgba(42,26,16,0.88) 0%, rgba(61,43,31,0.72) 50%, rgba(90,64,48,0.60) 100%),
-              url('https://picsum.photos/seed/stable/1200/400') center/cover no-repeat;
+  background-image: var(--hero-overlay), url('https://picsum.photos/seed/stable/1200/400');
+  background-size: cover;
+  background-position: center;
   display: flex;
   align-items: flex-end;
 }
@@ -1014,12 +1015,11 @@ tr:hover td { background: var(--color-parchment); }
 
 /* ── Etusivun sisältöosiot ───────────────────── */
 .frontpage-content {
-  max-width: 1000px;
-  margin: 3rem auto 0;
-  padding: 0 2rem 3rem;
-  display: grid;
-  grid-template-columns: 3fr 2fr;
-  gap: 1.75rem;
+    max-width: 1000px;
+    margin: 3rem auto 0;
+    padding: 0 2rem 3rem;
+    grid-template-columns: 3fr 2fr;
+
 }
 .frontpage-esittely {
   background: var(--color-surface);
@@ -1081,7 +1081,6 @@ tr:hover td { background: var(--color-parchment); }
 /* ── Responsive ──────────────────────────────── */
 @media (max-width: 700px) {
   .overlay-cards { grid-template-columns: 1fr; margin-top: 0; }
-  .frontpage-content { grid-template-columns: 1fr; }
   .profile-layout { grid-template-columns: 1fr; }
   .horse-list-card .card-img { width: 100px; }
   .horse-list-card .card-img img { width: 100px; }

@@ -100,7 +100,7 @@ function pedigreeHorseLink(array $h): string {
 // Ensimmäinen kuva hero-banneria varten
 $heroPhoto = !empty($photos) ? $photos[0]['filename'] : null;
 $heroStyle = $heroPhoto
-    ? 'background-image: linear-gradient(160deg,rgba(42,26,16,.85) 0%,rgba(61,43,31,.65) 50%,rgba(90,64,48,.50) 100%), url(' . e(UPLOADS_URL . $heroPhoto) . ');background-size:cover;background-position:center;'
+    ? 'background-image: var(--hero-overlay), url(' . e(UPLOADS_URL . $heroPhoto) . ');background-size:cover;background-position:center;'
     : '';
 ?>
 

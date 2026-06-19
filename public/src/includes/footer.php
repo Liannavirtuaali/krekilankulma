@@ -1,6 +1,6 @@
 <footer>
   <div class="site-footer">
-    <p>&copy; <?= date('Y') ?> <?= SITE_NAME ?>. Kaikki oikeudet pidätetään.</p>
+    <p>&copy; <?= date('Y') ?> <?= SITE_NAME ?>.</p>
   </div>
 </footer>
 </body>
