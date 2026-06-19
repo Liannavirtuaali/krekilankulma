@@ -19,6 +19,7 @@ jobs:
           server: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps          # enforce encrypted transport (FTPS); if Altervista uses implicit TLS add: port: 990
           local-dir: ./public/
           server-dir: /
           exclude: |
