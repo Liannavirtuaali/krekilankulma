@@ -56,7 +56,7 @@ $page_title = $horse['name'];
 
 // Hae kilpailut
 $stmtComp = $db->prepare(
-    'SELECT competition_name, competition_date, placement, points, notes
+    'SELECT competition_date, organizer, class, placement, notes
      FROM competitions WHERE horse_id = :id ORDER BY competition_date DESC'
 );
 $stmtComp->execute([':id' => $id]);
@@ -64,7 +64,7 @@ $competitions = $stmtComp->fetchAll();
 
 // Hae kuvat
 $stmtPhotos = $db->prepare(
-    'SELECT filename, original_name FROM horse_photos
+    'SELECT filename, original_name, title, caption FROM horse_photos
      WHERE horse_id = :id ORDER BY sort_order ASC LIMIT 5'
 );
 $stmtPhotos->execute([':id' => $id]);
@@ -255,17 +255,17 @@ $heroStyle = $heroPhoto
       <div class="comp-list">
         <div class="comp-header">
           <div>Päivämäärä</div>
-          <div>Kilpailu</div>
-          <div>Sijoitus</div>
-          <div>Pisteet</div>
+          <div>Järjestäjä</div>
+          <div>Luokka</div>
+          <div>Tulos</div>
           <div>Huomiot</div>
         </div>
         <?php foreach ($competitions as $comp): ?>
           <div class="comp-row">
             <div class="comp-cell" data-label="Päivämäärä"><?= e(formatDate($comp['competition_date'])) ?></div>
-            <div class="comp-cell" data-label="Kilpailu"><?= e($comp['competition_name']) ?></div>
-            <div class="comp-cell" data-label="Sijoitus"><?= e($comp['placement'] ?? '—') ?></div>
-            <div class="comp-cell" data-label="Pisteet"><?= $comp['points'] !== null ? e((string)$comp['points']) : '—' ?></div>
+            <div class="comp-cell" data-label="Järjestäjä"><?= e($comp['organizer'] ?? '—') ?></div>
+            <div class="comp-cell" data-label="Luokka"><?= e($comp['class'] ?? '—') ?></div>
+            <div class="comp-cell" data-label="Tulos"><?= e($comp['placement'] ?? '—') ?></div>
             <div class="comp-cell" data-label="Huomiot"><?= e($comp['notes'] ?? '') ?></div>
           </div>
         <?php endforeach; ?>
@@ -279,9 +279,17 @@ $heroStyle = $heroPhoto
     <div class="gallery">
       <?php if (!empty($photos)): ?>
         <?php foreach ($photos as $photo): ?>
-          <div class="gallery-item" onclick="openLightbox(this)" title="Avaa suuremmaksi">
-            <img src="<?= e(UPLOADS_URL . $photo['filename']) ?>"
-                 alt="<?= e($photo['original_name'] ?? $horse['name']) ?>">
+          <?php
+            $altText  = e($photo['title'] ?? $photo['original_name'] ?? $horse['name']);
+            $captionJ = htmlspecialchars($photo['caption'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            $titleJ   = htmlspecialchars($photo['title']   ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+          ?>
+          <div class="gallery-item" onclick="openLightbox(this)" title="Avaa suuremmaksi"
+               data-caption="<?= $captionJ ?>" data-title="<?= $titleJ ?>">
+            <img src="<?= e(UPLOADS_URL . $photo['filename']) ?>" alt="<?= $altText ?>">
+            <?php if (!empty($photo['title'])): ?>
+              <div class="gallery-item-label"><?= e($photo['title']) ?></div>
+            <?php endif; ?>
           </div>
         <?php endforeach; ?>
       <?php else: ?>
@@ -297,13 +305,25 @@ $heroStyle = $heroPhoto
   <!-- Lightbox -->
   <div id="lightbox" class="lightbox" onclick="closeLightbox()" style="display:none">
     <button class="lightbox-close" onclick="closeLightbox()" aria-label="Sulje">&times;</button>
-    <img id="lightbox-img" src="" alt="">
+    <div class="lightbox-inner" onclick="event.stopPropagation()">
+      <img id="lightbox-img" src="" alt="">
+      <div id="lightbox-caption" class="lightbox-caption" style="display:none">
+        <strong id="lightbox-title"></strong>
+        <span id="lightbox-text"></span>
+      </div>
+    </div>
   </div>
   <script>
   function openLightbox(el) {
-    var img = el.querySelector('img');
+    var img     = el.querySelector('img');
+    var title   = el.dataset.title   || '';
+    var caption = el.dataset.caption || '';
     document.getElementById('lightbox-img').src = img.src;
     document.getElementById('lightbox-img').alt = img.alt;
+    document.getElementById('lightbox-title').textContent   = title;
+    document.getElementById('lightbox-text').textContent    = caption;
+    var capEl = document.getElementById('lightbox-caption');
+    capEl.style.display = (title || caption) ? 'block' : 'none';
     document.getElementById('lightbox').style.display = 'flex';
     document.body.style.overflow = 'hidden';
   }

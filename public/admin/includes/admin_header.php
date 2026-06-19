@@ -171,9 +171,10 @@ $_adminTheme = $GLOBALS['color_theme'];
     .comp-stat-card .cs-label { font-size: 0.7rem; color: var(--color-text-muted, #6b5e52); text-transform: uppercase; letter-spacing: 0.05em; }
 
     /* ── PHOTO GRID (010-B) ────────────────────── */
-    .admin-photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.75rem; }
+    .admin-photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; }
+    .admin-photo-card { display: flex; flex-direction: column; gap: 0.5rem; }
     .admin-photo-thumb { position: relative; aspect-ratio: 1; border: 1px solid var(--color-border, #e0d5c5); border-radius: 8px; overflow: hidden; cursor: pointer; background: var(--color-parchment, #f5ede0); transition: all 0.15s; }
-    .admin-photo-thumb:hover { border-color: var(--color-accent, #a0633a); transform: scale(1.04); box-shadow: 0 4px 8px rgba(61,43,31,0.1); }
+    .admin-photo-thumb:hover { border-color: var(--color-accent, #a0633a); transform: scale(1.02); box-shadow: 0 4px 8px rgba(61,43,31,0.1); }
     .admin-photo-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .photo-order-badge { position: absolute; bottom: 4px; left: 4px; background: rgba(0,0,0,0.5); color: #fff; font-size: 10px; padding: 1px 5px; border-radius: 3px; font-family: var(--font-mono, monospace); }
     .photo-profile-badge { position: absolute; bottom: 4px; right: 4px; background: var(--color-gold, #c9a84c); color: #3d2b1f; font-size: 9px; padding: 1px 5px; border-radius: 3px; font-weight: 700; text-transform: uppercase; }
@@ -181,6 +182,10 @@ $_adminTheme = $GLOBALS['color_theme'];
     .admin-photo-thumb:hover .photo-delete-form { display: block; }
     .photo-delete-btn { background: rgba(138,48,48,0.85); color: #fff; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
     .photo-delete-btn:hover { background: rgba(138,48,48,1); }
+    .photo-meta-form { display: flex; flex-direction: column; gap: 0.3rem; }
+    .photo-meta-form .form-control-sm { font-size: 0.78rem; padding: 0.25rem 0.45rem; border: 1px solid var(--color-border, #e0d5c5); border-radius: 5px; font-family: inherit; background: var(--color-surface, #fff); color: var(--color-text, #2c2c2c); width: 100%; transition: border-color 0.15s; }
+    .photo-meta-form .form-control-sm:focus { outline: none; border-color: var(--color-accent, #a0633a); }
+    .photo-meta-form textarea.form-control-sm { resize: vertical; min-height: 40px; }
     .photo-upload-limit { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0.75rem; background: var(--color-surface, #fff); border: 1px solid var(--color-border, #e0d5c5); border-radius: 6px; margin-bottom: 1rem; font-size: 0.75rem; color: var(--color-text-muted, #6b5e52); }
     .photo-limit-track { flex: 1; height: 5px; background: var(--color-border, #e0d5c5); border-radius: 3px; overflow: hidden; }
     .photo-limit-fill { height: 100%; border-radius: 3px; background: var(--color-gold, #c9a84c); }

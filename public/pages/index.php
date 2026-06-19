@@ -6,7 +6,7 @@ $page_title = 'Etusivu';
 $db = getDB();
 
 // Hevosmäärä
-$stmtCount = $db->query('SELECT COUNT(*) FROM horses WHERE is_deleted = 0 AND evm = 0');
+$stmtCount = $db->query('SELECT COUNT(*) FROM horses WHERE is_deleted = 0 AND evm = 0 AND ancestor = 0');
 $horseCount = (int)$stmtCount->fetchColumn();
 
 // Varsoja tänä vuonna

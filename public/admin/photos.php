@@ -47,14 +47,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $maxOrderStmt->execute([':horse_id' => $horse_id]);
                     $nextOrder = (int)$maxOrderStmt->fetchColumn() + 1;
 
+                    $newTitle   = sanitize($_POST['title']   ?? '');
+                    $newCaption = sanitize($_POST['caption'] ?? '');
+
                     $insStmt = $db->prepare(
-                        'INSERT INTO horse_photos (horse_id, filename, original_name, sort_order)
-                         VALUES (:horse_id, :filename, :original_name, :sort_order)'
+                        'INSERT INTO horse_photos (horse_id, filename, original_name, title, caption, sort_order)
+                         VALUES (:horse_id, :filename, :original_name, :title, :caption, :sort_order)'
                     );
                     $insStmt->execute([
                         ':horse_id'      => $horse_id,
                         ':filename'      => $filename,
                         ':original_name' => sanitize($_FILES['photo']['name']),
+                        ':title'         => $newTitle   !== '' ? $newTitle   : null,
+                        ':caption'       => $newCaption !== '' ? $newCaption : null,
                         ':sort_order'    => $nextOrder,
                     ]);
                     redirect(SITE_URL . '/admin/photos.php?horse_id=' . $horse_id . '&uploaded=1');
@@ -65,12 +70,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Hae nykyiset kuvat
-$photosStmt = $db->prepare('SELECT id, filename, original_name, sort_order FROM horse_photos WHERE horse_id = :horse_id ORDER BY sort_order ASC');
+$photosStmt = $db->prepare('SELECT id, filename, original_name, title, caption, sort_order FROM horse_photos WHERE horse_id = :horse_id ORDER BY sort_order ASC');
 $photosStmt->execute([':horse_id' => $horse_id]);
 $photos = $photosStmt->fetchAll();
 
 if (isset($_GET['uploaded'])) $success = 'Kuva ladattu.';
 if (isset($_GET['deleted']))  $success = 'Kuva poistettu.';
+if (isset($_GET['updated']))  $success = 'Kuvan tiedot tallennettu.';
 
 $pageTitle = 'Kuvat — ' . $horse['name'];
 require __DIR__ . '/includes/admin_header.php';
@@ -101,16 +107,33 @@ require __DIR__ . '/includes/admin_header.php';
 <?php if ($photos): ?>
 <div class="admin-photo-grid">
   <?php foreach ($photos as $idx => $photo): ?>
-    <div class="admin-photo-thumb">
-      <img src="<?= e(UPLOADS_URL . $photo['filename']) ?>" alt="<?= e($photo['original_name']) ?>">
-      <span class="photo-order-badge"><?= (int)$photo['sort_order'] ?></span>
-      <?php if ($idx === 0): ?><span class="photo-profile-badge">Profiili</span><?php endif; ?>
-      <form class="photo-delete-form" method="post" action="<?= e(SITE_URL) ?>/admin/photo_delete.php">
+    <div class="admin-photo-card">
+      <div class="admin-photo-thumb">
+        <img src="<?= e(UPLOADS_URL . $photo['filename']) ?>" alt="<?= e($photo['original_name']) ?>">
+        <span class="photo-order-badge"><?= (int)$photo['sort_order'] ?></span>
+        <?php if ($idx === 0): ?><span class="photo-profile-badge">Profiili</span><?php endif; ?>
+        <form class="photo-delete-form" method="post" action="<?= e(SITE_URL) ?>/admin/photo_delete.php">
+          <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
+          <input type="hidden" name="photo_id"  value="<?= (int)$photo['id'] ?>">
+          <input type="hidden" name="horse_id"  value="<?= (int)$horse_id ?>">
+          <button type="submit" class="photo-delete-btn"
+                  onclick="return confirm('Poistetaanko kuva?')">×</button>
+        </form>
+      </div>
+      <form class="photo-meta-form" method="post" action="<?= e(SITE_URL) ?>/admin/photo_update.php">
         <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
         <input type="hidden" name="photo_id"  value="<?= (int)$photo['id'] ?>">
         <input type="hidden" name="horse_id"  value="<?= (int)$horse_id ?>">
-        <button type="submit" class="photo-delete-btn"
-                onclick="return confirm('Poistetaanko kuva?')">×</button>
+        <div class="form-group" style="margin-bottom:0.4rem">
+          <input type="text" name="title" placeholder="Otsikko"
+                 value="<?= e($photo['title'] ?? '') ?>"
+                 maxlength="255" class="form-control form-control-sm">
+        </div>
+        <div class="form-group" style="margin-bottom:0.4rem">
+          <textarea name="caption" placeholder="Kuvateksti" rows="2"
+                    class="form-control form-control-sm"><?= e($photo['caption'] ?? '') ?></textarea>
+        </div>
+        <button type="submit" class="btn btn-sm">Tallenna</button>
       </form>
     </div>
   <?php endforeach; ?>
@@ -127,6 +150,14 @@ require __DIR__ . '/includes/admin_header.php';
     <div class="form-group">
       <label for="photo">Kuvatiedosto (JPEG, PNG, GIF, WebP — max 5 Mt)</label>
       <input type="file" id="photo" name="photo" accept="image/*" required>
+    </div>
+    <div class="form-group">
+      <label for="title">Otsikko <span style="color:var(--color-text-muted);font-weight:normal">(valinnainen)</span></label>
+      <input type="text" id="title" name="title" maxlength="255" class="form-control">
+    </div>
+    <div class="form-group">
+      <label for="caption">Kuvateksti <span style="color:var(--color-text-muted);font-weight:normal">(valinnainen)</span></label>
+      <textarea id="caption" name="caption" rows="2" class="form-control"></textarea>
     </div>
     <button type="submit" class="btn">Lataa kuva</button>
   </form>

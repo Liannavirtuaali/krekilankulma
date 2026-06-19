@@ -7,6 +7,31 @@ SET NAMES utf8mb4;
 SET CHARACTER SET utf8mb4;
 
 -- ------------------------------------------------------------
+-- Lajit (disciplines)
+-- ------------------------------------------------------------
+INSERT IGNORE INTO `disciplines` (`id`,`name`,`abbreviation`) VALUES
+  (1,  'esteratsastus',      're.'),
+  (2,  'kouluratsastus',     'ko.'),
+  (3,  'kenttäratsastus',    'kent.'),
+  (4,  'matkaratsastus',     'matk.'),
+  (5,  'lännenratsastus',    'länn.'),
+  (6,  'valjakkoajo',        'valj.'),
+  (7,  'askellajiratsastus', 'askel'),
+  (8,  'ravit',              'ravit'),
+  (9,  'työhevosajo',        'työh.'),
+  (10, 'laukat',             'lauk.'),
+  (11, 'poniravit',          'pora'),
+  (12, 'maastoeste',         'me'),
+  (13, 'näyttelyt',          'n.');
+
+-- ------------------------------------------------------------
+-- Tasot (levels)
+-- ------------------------------------------------------------
+INSERT IGNORE INTO `levels` (`name`) VALUES
+  ('Harrastaja'),('Alkeis'),('Helppo'),('Keskiluokka'),
+  ('Vaikea'),('Kilpa'),('Eliitti');
+
+-- ------------------------------------------------------------
 -- Rodut
 -- ------------------------------------------------------------
 INSERT IGNORE INTO `breeds` (`id`,`name`,`abbreviation`,`is_rare`) VALUES
@@ -524,8 +549,9 @@ INSERT IGNORE INTO `colors` (`id`,`name`,`abbreviation`) VALUES
 -- Generoi oikea tiiviste PHP:llä: echo password_hash('oma_salasana', PASSWORD_BCRYPT, ['cost' => 12]);
 -- Alla oleva hash on esimerkki — generoi oma ennen tuotantoon siirtoa.
 INSERT IGNORE INTO `admin_users` (`username`, `password`) VALUES
-  ('admin', '$2y$12$YMaQagVb65uBPLePlpiX2OMLMzcdjcMF5ytFLzahRjZKiHUGOwfoq');
+  ('admin', '$2y$12$l/XHt42ns9SFcY.NthYsfurFblh97K7DA5bk2QIYusKxA4kYwCfeK');
 -- HUOM: Tämä on TESTISALASANA. Generoi uusi tiiviste ennen tuotantoon siirtoa!
+-- 173EKfaqdc4F85n66HYs87r9F5g3oC6I
 
 -- Hevonen 1: Isoisä (ulkopuolinen, evm=1, asuu muualla)
 INSERT INTO `horses` (`id`, `name`, `slug`, `call_name`, `breed_id`, `birth_date`, `gender`, `color_id`, `evm`, `profile_url`) VALUES
@@ -540,8 +566,8 @@ INSERT INTO `horses` (`id`, `name`, `slug`, `call_name`, `breed_id`, `birth_date
   (3, 'Testiponi Tähti', 'testiponi-tahti', 'Tähti', 18, '2018-07-10', 'tamma', 120, 145, 'VH-2018-12345', 1, 1, 'Maija Meikäläinen', 'maija@esimerkki.fi', 'Virtanen Oy', 2, 'Rauhallinen ja luotettava tamma. Sopii hyvin aloittelijoille.', 0);
 
 -- Kilpailu testihevoselle
-INSERT INTO `competitions` (`horse_id`, `competition_name`, `competition_date`, `placement`, `points`, `notes`) VALUES
-  (3, 'Kevätkilpailu 2024', '2024-05-12', '2.', 85.50, 'Hyvä suoritus, hieman hermostunut alussa.');
+INSERT INTO `competitions` (`horse_id`, `competition_name`, `competition_date`, `organizer`, `class`, `placement`, `points`, `notes`) VALUES
+  (3, 'Kevätkilpailu 2024', '2024-05-12', 'Ruusupuiston talli', 'EA', '2.', 85.50, 'Hyvä suoritus, hieman hermostunut alussa.');
 
 -- Tuleva varsa testihevoselle
 INSERT INTO `foals` (`horse_id`, `foal_name`, `sire_id`, `dam_id`, `birth_year`, `gender`, `status`) VALUES

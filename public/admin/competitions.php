@@ -28,47 +28,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'Virheellinen pyyntö.';
     } else {
         if ($action === 'add') {
-            $comp_name = sanitize($_POST['competition_name'] ?? '');
-            if ($comp_name === '') {
-                $errors[] = 'Kilpailun nimi on pakollinen.';
-            } else {
                 $stmt = $db->prepare(
-                    'INSERT INTO competitions (horse_id, competition_name, competition_date, placement, points, notes)
-                     VALUES (:horse_id, :competition_name, :competition_date, :placement, :points, :notes)'
+                    'INSERT INTO competitions (horse_id, competition_date, organizer, class, placement, notes)
+                     VALUES (:horse_id, :competition_date, :organizer, :class, :placement, :notes)'
                 );
                 $stmt->execute([
                     ':horse_id'        => $horse_id,
-                    ':competition_name'=> $comp_name,
                     ':competition_date'=> sanitize($_POST['competition_date'] ?? '') ?: null,
+                    ':organizer'       => sanitize($_POST['organizer'] ?? '') ?: null,
+                    ':class'           => sanitize($_POST['class'] ?? '') ?: null,
                     ':placement'       => sanitize($_POST['placement'] ?? '') ?: null,
-                    ':points'          => $_POST['points'] !== '' ? (int)$_POST['points'] : null,
                     ':notes'           => sanitize($_POST['notes'] ?? '') ?: null,
                 ]);
                 redirect(SITE_URL . '/admin/competitions.php?horse_id=' . $horse_id . '&added=1');
-            }
         } elseif ($action === 'edit' && $comp_id > 0) {
             // Omistajuustarkistus
             $own = $db->prepare('SELECT id FROM competitions WHERE id = :comp_id AND horse_id = :horse_id');
             $own->execute([':comp_id' => $comp_id, ':horse_id' => $horse_id]);
             if ($own->fetch()) {
-                $comp_name = sanitize($_POST['competition_name'] ?? '');
-                if ($comp_name === '') {
-                    $errors[] = 'Kilpailun nimi on pakollinen.';
-                } else {
                     $stmt = $db->prepare(
-                        'UPDATE competitions SET competition_name=:competition_name, competition_date=:competition_date,
-                         placement=:placement, points=:points, notes=:notes WHERE id=:comp_id'
+                        'UPDATE competitions SET competition_date=:competition_date,
+                         organizer=:organizer, class=:class, placement=:placement, notes=:notes WHERE id=:comp_id'
                     );
                     $stmt->execute([
-                        ':competition_name'=> $comp_name,
                         ':competition_date'=> sanitize($_POST['competition_date'] ?? '') ?: null,
+                        ':organizer'       => sanitize($_POST['organizer'] ?? '') ?: null,
+                        ':class'           => sanitize($_POST['class'] ?? '') ?: null,
                         ':placement'       => sanitize($_POST['placement'] ?? '') ?: null,
-                        ':points'          => $_POST['points'] !== '' ? (int)$_POST['points'] : null,
                         ':notes'           => sanitize($_POST['notes'] ?? '') ?: null,
                         ':comp_id'         => $comp_id,
                     ]);
                     redirect(SITE_URL . '/admin/competitions.php?horse_id=' . $horse_id . '&updated=1');
-                }
             }
         } elseif ($action === 'delete' && $comp_id > 0) {
             $own = $db->prepare('SELECT id FROM competitions WHERE id = :comp_id AND horse_id = :horse_id');
@@ -102,8 +92,7 @@ $pageTitle = 'Kilpailut';
 require __DIR__ . '/includes/admin_header.php';
 
 // Tilastot
-$totalPoints = array_sum(array_column($competitions, 'points'));
-$wins = count(array_filter($competitions, fn($c) => $c['placement'] === '1'));
+$wins = count(array_filter($competitions, fn($c) => $c['placement'] === '1.'));
 ?>
 <div class="admin-page-header">
   <a href="<?= e(SITE_URL) ?>/admin/horses.php" class="back-link">← Hevoset</a>
@@ -131,10 +120,6 @@ $wins = count(array_filter($competitions, fn($c) => $c['placement'] === '1'));
     <div class="cs-label">Kilpailua</div>
   </div>
   <div class="comp-stat-card">
-    <div class="cs-num"><?= (int)$totalPoints ?></div>
-    <div class="cs-label">Pistettä</div>
-  </div>
-  <div class="comp-stat-card">
     <div class="cs-num"><?= $wins ?></div>
     <div class="cs-label">Voittoa</div>
   </div>
@@ -142,19 +127,19 @@ $wins = count(array_filter($competitions, fn($c) => $c['placement'] === '1'));
 
 <?php if ($competitions): ?>
 <div class="compact-list">
-  <div class="compact-list-header" style="grid-template-columns:2fr 100px 60px 70px 28px">
-    <div>Kilpailu</div><div>Päivämäärä</div><div>Sij.</div><div>Pisteet</div><div></div>
+  <div class="compact-list-header" style="grid-template-columns:1.5fr 1.5fr 80px 60px 28px">
+    <div>Järjestäjä</div><div>Luokka</div><div>Päivämäärä</div><div>Tulos</div><div></div>
   </div>
   <?php foreach ($competitions as $c):
     $pl = $c['placement'] ?? '';
     $pbClass = match($pl) { '1' => 'pbadge-1', '2' => 'pbadge-2', '3' => 'pbadge-3', default => 'pbadge-x' };
   ?>
-  <div class="compact-list-row" style="grid-template-columns:2fr 100px 60px 70px 28px"
+  <div class="compact-list-row" style="grid-template-columns:1.5fr 1.5fr 80px 60px 28px"
        onclick="adminToggleExpand('c<?= (int)$c['id'] ?>')">
-    <div class="cl-name"><?= e($c['competition_name']) ?></div>
+    <div class="cl-name"><?= e($c['organizer'] ?? '—') ?></div>
+    <div class="cl-meta"><?= e($c['class'] ?? '—') ?></div>
     <div class="cl-meta"><?= $c['competition_date'] ? formatDate($c['competition_date']) : '—' ?></div>
     <div><span class="pbadge <?= $pbClass ?>"><?= $pl !== '' ? e($pl) : '—' ?></span></div>
-    <div class="cl-mono"><?= $c['points'] !== null ? (int)$c['points'] : '—' ?></div>
     <div>
       <button class="cl-expand-btn" id="cl-btn-c<?= (int)$c['id'] ?>"
               onclick="event.stopPropagation();adminToggleExpand('c<?= (int)$c['id'] ?>')">▸</button>
@@ -195,26 +180,26 @@ $wins = count(array_filter($competitions, fn($c) => $c['placement'] === '1'));
       <div class="admin-modal-body">
         <div class="form-row">
           <div class="form-group">
-            <label for="competition_name">Kilpailun nimi *</label>
-            <input type="text" id="competition_name" name="competition_name" required>
-          </div>
-          <div class="form-group">
             <label for="competition_date">Päivämäärä</label>
             <input type="date" id="competition_date" name="competition_date">
+          </div>
+          <div class="form-group">
+            <label for="placement">Tulos</label>
+            <input type="text" id="placement" name="placement" placeholder="esim. 1., 2., DNS, DQ…">
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label for="placement">Sijoitus</label>
-            <input type="text" id="placement" name="placement" placeholder="esim. 1, 2, 3, DNS...">
+            <label for="organizer">Järjestäjä</label>
+            <input type="text" id="organizer" name="organizer" placeholder="Järjestävä talli">
           </div>
           <div class="form-group">
-            <label for="points">Pisteet</label>
-            <input type="number" id="points" name="points">
+            <label for="class">Luokka</label>
+            <input type="text" id="class" name="class" placeholder="esim. EA, EP, Helppo A…">
           </div>
         </div>
         <div class="form-group">
-          <label for="notes">Muistiinpanot</label>
+          <label for="notes">Huomiot</label>
           <textarea id="notes" name="notes"></textarea>
         </div>
       </div>
@@ -231,10 +216,10 @@ function openEditComp(id, data) {
   document.getElementById('modal-comp-title').textContent  = 'Muokkaa kilpailua';
   document.getElementById('modal-comp-action').value       = 'edit';
   document.getElementById('modal-comp-id').value           = id;
-  document.getElementById('competition_name').value        = data.competition_name  || '';
   document.getElementById('competition_date').value        = data.competition_date  || '';
+  document.getElementById('organizer').value               = data.organizer         || '';
+  document.getElementById('class').value                   = data.class             || '';
   document.getElementById('placement').value               = data.placement         || '';
-  document.getElementById('points').value                  = data.points !== null ? data.points : '';
   document.getElementById('notes').value                   = data.notes             || '';
   document.getElementById('modal-comp-btn').textContent    = 'Tallenna muutokset';
   adminOpenModal('comp');
