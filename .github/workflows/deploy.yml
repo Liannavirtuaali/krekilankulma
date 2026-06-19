@@ -14,7 +14,10 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Deploy public/ to Altervista via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4
+        # Pinned to v4.3.4 tag for supply-chain safety (avoids mutable @v4 pointer).
+        # TODO: replace with the exact commit SHA once verified:
+        #   gh release view v4.3.4 --repo SamKirkland/FTP-Deploy-Action --json targetCommitish
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4  # v4.3.4
         with:
           server: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USERNAME }}
