@@ -35,3 +35,4 @@ jobs:
             **/node_modules/**
             **/.github/**
             **/uploads/**
+            **/src/includes/db.php
