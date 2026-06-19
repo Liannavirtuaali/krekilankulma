@@ -12,23 +12,29 @@ if (!defined('SITE_NAME')) {
     require_once __DIR__ . '/config.php';
 }
 
-// Haetaan tallin nimi tietokannasta (kerran per pyyntö)
-if (!isset($GLOBALS['stable_name'])) {
+// Haetaan tallin nimi ja väriteema tietokannasta (kerran per pyyntö)
+// Käytetään erillistä lippua jotta sivu-tason $stable_name-muuttuja ei sekoita $GLOBALS-tarkistusta
+if (!isset($GLOBALS['_vt_settings_loaded'])) {
     try {
         $db = getDB();
-        $val = $db->query("SELECT setting_value FROM settings WHERE setting_key = 'stable_name' LIMIT 1")->fetchColumn();
-        $GLOBALS['stable_name'] = ($val !== false && $val !== '') ? $val : SITE_NAME;
+        $rows = $db->query("SELECT setting_key, setting_value FROM settings WHERE setting_key IN ('stable_name','color_theme')")->fetchAll(PDO::FETCH_KEY_PAIR);
+        $GLOBALS['stable_name']         = (!empty($rows['stable_name']))  ? $rows['stable_name']  : SITE_NAME;
+        $GLOBALS['color_theme']         = (!empty($rows['color_theme']))  ? $rows['color_theme']  : 'savi';
+        $GLOBALS['_vt_settings_loaded'] = true;
     } catch (Exception $e) {
-        $GLOBALS['stable_name'] = SITE_NAME;
+        $GLOBALS['stable_name']         = SITE_NAME;
+        $GLOBALS['color_theme']         = 'savi';
+        $GLOBALS['_vt_settings_loaded'] = true;
     }
 }
 $site_display_name = $GLOBALS['stable_name'];
+$color_theme       = $GLOBALS['color_theme'];
 
 // XSS-suojaus: sanitoi $page_title
 $page_title = isset($page_title) ? htmlspecialchars($page_title, ENT_QUOTES, 'UTF-8') : $site_display_name;
 ?>
 <!DOCTYPE html>
-<html lang="fi">
+<html lang="fi" data-theme="<?= htmlspecialchars($color_theme, ENT_QUOTES, 'UTF-8') ?>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">

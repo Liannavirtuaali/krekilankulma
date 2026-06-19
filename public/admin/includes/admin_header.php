@@ -5,9 +5,20 @@ if (!defined('SITE_NAME')) {
 }
 // Tunnista aktiivinen sivu URL:n perusteella
 $_activePage = basename($_SERVER['PHP_SELF'], '.php');
+// Haetaan väriteema (getDB() on jo alustettu kutsuvan sivun require:ssa)
+if (!isset($GLOBALS['color_theme'])) {
+    try {
+        $db = getDB();
+        $t = $db->query("SELECT setting_value FROM settings WHERE setting_key = 'color_theme' LIMIT 1")->fetchColumn();
+        $GLOBALS['color_theme'] = ($t !== false && $t !== '') ? $t : 'savi';
+    } catch (Exception $e) {
+        $GLOBALS['color_theme'] = 'savi';
+    }
+}
+$_adminTheme = $GLOBALS['color_theme'];
 ?>
 <!DOCTYPE html>
-<html lang="fi">
+<html lang="fi" data-theme="<?= e($_adminTheme) ?>">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">

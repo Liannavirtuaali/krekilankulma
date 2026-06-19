@@ -33,13 +33,8 @@ require __DIR__ . '/../src/includes/header.php';
 <!-- Hero -->
 <div class="frontpage-hero">
   <div class="frontpage-hero-content">
-    <h1>Tervetuloa <?= e(SITE_NAME) ?>on</h1>
+    <h1>Tervetuloa!</h1>
     <p>Täällä asuvat rakkaimmat hevosemme. Tutustu talliimme ja sen asukkaisiin!</p>
-    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-      <a class="btn-gold" href="<?= e(SITE_URL) ?>/pages/hevoset.php">Hevoset →</a>
-      <a href="<?= e(SITE_URL) ?>/pages/kasvatus.php"
-         style="color:var(--color-cream);text-decoration:none;font-size:var(--text-sm);opacity:.85;align-self:center;font-family:var(--font-sans);">Kasvatus →</a>
-    </div>
   </div>
 </div>
 

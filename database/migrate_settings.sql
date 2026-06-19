@@ -16,4 +16,5 @@ INSERT IGNORE INTO `settings` (`setting_key`, `setting_value`) VALUES
   ('owner_vrl_id',     ''),
   ('owner_email',      ''),
   ('owner_forum_url',  ''),
-  ('stable_name',      '');
+  ('stable_name',      ''),
+  ('color_theme',      'savi');

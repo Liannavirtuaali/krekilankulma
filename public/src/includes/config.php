@@ -5,7 +5,7 @@
  */
 
 // Sivuston asetukset
-define('SITE_NAME', 'Virtuaalitalli');
+define('SITE_NAME', 'Virtuaalitalli Demotesti');
 // Docker-kehitys: aseta SITE_URL ympäristömuuttujana (docker-compose.yml)
 // Altervista: päivitä osoite tähän suoraan
 define('SITE_URL', rtrim(getenv('SITE_URL') ?: 'https://your-domain.altervista.org', '/'));

@@ -5,13 +5,28 @@
 SET FOREIGN_KEY_CHECKS = 0;
 SET NAMES utf8mb4;
 
--- 1. Lisää abbreviation-sarake jos puuttuu
-ALTER TABLE `disciplines`
-  ADD COLUMN IF NOT EXISTS `abbreviation` VARCHAR(20) DEFAULT NULL COMMENT 'Lyhenne';
+-- 1. Lisää abbreviation-sarake jos puuttuu (MySQL 8.0 -yhteensopiva)
+SET @col_exists = (
+    SELECT COUNT(*) FROM information_schema.columns
+    WHERE table_schema = DATABASE()
+      AND table_name   = 'disciplines'
+      AND column_name  = 'abbreviation'
+);
+SET @sql = IF(@col_exists = 0,
+    'ALTER TABLE `disciplines` ADD COLUMN `abbreviation` VARCHAR(20) DEFAULT NULL',
+    'SELECT ''abbreviation already exists'' AS info'
+);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
--- 2. Poista created_at jos on
-ALTER TABLE `disciplines`
-  DROP COLUMN IF EXISTS `created_at`;
+-- 2. Poista created_at jos on (MySQL 8.0 -yhteensopiva)
+SET @d1 = (SELECT COUNT(*) FROM information_schema.columns
+           WHERE table_schema = DATABASE() AND table_name = 'disciplines' AND column_name = 'created_at');
+SET @sd = IF(@d1 > 0,
+    'ALTER TABLE `disciplines` DROP COLUMN `created_at`',
+    'SELECT ''created_at not found, skipping'' AS info');
+PREPARE stmt FROM @sd; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
 -- 3. Tyhjennä vanha data ja poista AUTO_INCREMENT
 TRUNCATE TABLE `disciplines`;
