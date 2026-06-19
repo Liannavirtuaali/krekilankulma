@@ -1,7 +1,6 @@
 # Altervista virtuaalitalli — pääkonfiguraatio
 Options -Indexes
 
-# Estä suora pääsy src/-kansioon
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /
@@ -10,14 +9,33 @@ Options -Indexes
     RewriteRule ^src/ - [F,L]
 
     # Sivut ilman .php-päätettä
+    # Altervistalla sovellus on /demotalli/-alihakemistossa joten absoluuttiset
+    # rewrite-kohteet vaativat /demotalli/-etuliitteen. Paikallisella Dockerilla
+    # DocRoot on public/ suoraan, joten /pages/... riittää.
+    RewriteCond %{HTTP_HOST} altervista\.org$ [NC]
+    RewriteRule ^hevoset/?$ /demotalli/pages/hevoset.php [L,QSA]
     RewriteRule ^hevoset/?$ /pages/hevoset.php [L,QSA]
+
+    RewriteCond %{HTTP_HOST} altervista\.org$ [NC]
+    RewriteRule ^kasvatus/?$ /demotalli/pages/kasvatus.php [L,QSA]
     RewriteRule ^kasvatus/?$ /pages/kasvatus.php [L,QSA]
+
+    RewriteCond %{HTTP_HOST} altervista\.org$ [NC]
+    RewriteRule ^yhteystiedot/?$ /demotalli/pages/yhteystiedot.php [L,QSA]
     RewriteRule ^yhteystiedot/?$ /pages/yhteystiedot.php [L,QSA]
 
-    # Hevosen profiilisivu kauniin URL:n kautta: /pages/horse/slug
+    RewriteCond %{HTTP_HOST} altervista\.org$ [NC]
+    RewriteRule ^ajankohtaista/?$ /demotalli/pages/ajankohtaista.php [L,QSA]
+    RewriteRule ^ajankohtaista/?$ /pages/ajankohtaista.php [L,QSA]
+
+    # Hevosen profiilisivu: /pages/horse/slug
+    RewriteCond %{HTTP_HOST} altervista\.org$ [NC]
+    RewriteRule ^pages/horse/([^/]+)/?$ /demotalli/pages/hevonen.php?slug=$1 [L,QSA]
     RewriteRule ^pages/horse/([^/]+)/?$ /pages/hevonen.php?slug=$1 [L,QSA]
 
-    # Blogijuttu kauniin URL:n kautta: /pages/ajankohtaista/slug
+    # Blogijuttu: /pages/ajankohtaista/slug
+    RewriteCond %{HTTP_HOST} altervista\.org$ [NC]
+    RewriteRule ^pages/ajankohtaista/([^/]+)/?$ /demotalli/pages/postaus.php?slug=$1 [L,QSA]
     RewriteRule ^pages/ajankohtaista/([^/]+)/?$ /pages/postaus.php?slug=$1 [L,QSA]
 </IfModule>
 
