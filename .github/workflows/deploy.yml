@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:  # allow manual re-runs from GitHub Actions UI (e.g. after secret rotation or FTP timeout)
 
 jobs:
   deploy:
