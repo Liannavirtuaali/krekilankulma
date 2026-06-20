@@ -78,17 +78,16 @@ require __DIR__ . '/../src/includes/header.php';
   </a>
 </div>
 
-<!-- Esittely + uutinen -->
+<!-- Esittely -->
 <div class="frontpage-content">
   <div class="frontpage-esittely">
-    <img src="https://picsum.photos/seed/barn2/600/200" alt="Talli">
+    <img src="https://picsum.photos/seed/barn2/800/200" alt="Talli">
     <h2>Tietoa tallista</h2>
-    <p><?= e(SITE_NAME) ?> on perustettu rakkaudesta hevosiin ja virtuaaliseen hevosmaailmaan.
-       Pidämme huolta jokaisesta tallin asukkaasta ja panostamme laadukkaaseen kasvatukseen.</p>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:1.25rem;">
-      <a class="btn" href="<?= e(SITE_URL) ?>/pages/hevoset.php">Tutustu hevosiin →</a>
-      <a class="btn-gold" href="<?= e(SITE_URL) ?>/pages/kasvatus.php">Kasvatus →</a>
-    </div>
+    <p><?= e(SITE_NAME) ?> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec semper scelerisque sem, et consectetur diam. Nam eros ipsum, dapibus sed odio eget, ullamcorper euismod eros. Nulla ut purus eros. Mauris sit amet faucibus ex. Nam tincidunt eros in sapien tincidunt, vel condimentum ipsum sagittis. Etiam at vehicula tellus. Proin bibendum ligula vitae nibh bibendum, non pharetra erat lacinia. Phasellus scelerisque tristique urna vitae bibendum. In bibendum, quam sed interdum euismod, nulla mauris mattis nisl, vitae aliquam ex felis eu odio. Vestibulum sed quam luctus eros facilisis aliquet a quis nisi.</p>
+
+<p>Nulla finibus nisl at ipsum condimentum placerat. Vivamus vel vehicula orci, id tincidunt ante. Integer vestibulum dui augue, ac condimentum arcu pharetra sit amet. Nunc interdum odio sit amet vulputate convallis. Suspendisse rhoncus mauris id odio fermentum varius. Nam feugiat, arcu vel dignissim varius, metus massa lacinia sapien, eget convallis ligula nulla ac ex. Suspendisse vitae leo sed odio lobortis vulputate. Integer sit amet metus in velit sagittis mollis a non ipsum. Phasellus vitae leo non mauris vehicula pretium. Pellentesque dui orci, dapibus sed mauris eu, scelerisque scelerisque nisl.</p>
+
+<p>Proin vehicula ex massa, vel pretium mi posuere ac. Praesent vel lorem feugiat, facilisis urna quis, tincidunt tortor. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Sed et ex hendrerit, efficitur odio et, faucibus sem. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec efficitur metus elit, nec pellentesque velit iaculis id. Sed quam lacus, euismod in massa id, placerat hendrerit nisi. Duis ex lectus, placerat nec aliquet eu, lobortis vel est. Nullam ut auctor velit, eget gravida velit. Pellentesque fermentum leo vitae arcu pellentesque, a scelerisque purus dictum. Duis nec erat id augue placerat ornare. Etiam sagittis eleifend lacus, dapibus luctus lectus dignissim sit amet. Nam eu pretium ante, ac iaculis risus. Maecenas orci velit, tincidunt id lacinia eget, blandit a dolor.</p>
   </div>
 
 </div>
