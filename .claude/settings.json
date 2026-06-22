@@ -8,10 +8,25 @@
       "Skill(gsd-plan-phase)",
       "Skill(gsd-plan-phase:*)",
       "Bash(git commit *)",
-      "Bash(grep -n \"INSERT INTO \\\\`horses\\\\`\" database/seed.sql)"
+      "Bash(grep -n \"INSERT INTO \\\\`horses\\\\`\" database/seed.sql)",
+      "Bash(node 'C:\\\\Users\\\\annii/.claude/gsd-core/bin/gsd-tools.cjs' query state.milestone-switch --milestone v1.1 --name Teemajärjestelmä)",
+      "Bash(node 'C:\\\\Users\\\\annii/.claude/gsd-core/bin/gsd-tools.cjs' query phases.clear --confirm)",
+      "Bash(node 'C:\\\\Users\\\\annii/.claude/gsd-core/bin/gsd-tools.cjs' query commit 'docs: start milestone v1.1 Teemajärjestelmä' --files .planning/PROJECT.md .planning/STATE.md)",
+      "Bash(echo \"RESEARCHER:\")",
+      "Bash(node 'C:\\\\Users\\\\annii/.claude/gsd-core/bin/gsd-tools.cjs' query agent-skills gsd-project-researcher)",
+      "Bash(ls \"$HOME/.claude/gsd-core/templates/research-project/\" 2>/dev/null || echo \"NOT_FOUND\")",
+      "Read(//c/Users/annii/.claude/gsd-core/templates/research-project/**)",
+      "Read(//root/.claude/gsd-core/templates/research-project/**)",
+      "Bash(node 'C:\\\\Users\\\\annii/.claude/gsd-core/bin/gsd-tools.cjs' query commit 'docs: research summary for v1.1 theme system' --files .planning/research/SUMMARY.md)",
+      "Bash(node 'C:\\\\Users\\\\annii/.claude/gsd-core/bin/gsd-tools.cjs' query commit 'docs: define milestone v1.1 requirements' --files .planning/REQUIREMENTS.md)",
+      "Read(//c/Users/annii/.claude/gsd-core/templates/**)",
+      "Bash(node 'C:\\\\Users\\\\annii/.claude/gsd-core/bin/gsd-tools.cjs' query commit 'docs: create milestone v1.1 roadmap \\(4 phases\\)' --files .planning/ROADMAP.md .planning/STATE.md .planning/REQUIREMENTS.md)",
+      "Bash(ls c:/Users/annii/Documents/dev/PHP/simgamestable-template-php/.planning/todos/pending/)",
+      "Bash(echo \"NO_PENDING_TODOS\")"
     ],
     "additionalDirectories": [
-      "C:\\Users\\annii\\AppData\\Local\\Temp\\sv-04-reviewfix-Kuyuxz\\.github\\workflows"
+      "C:\\Users\\annii\\AppData\\Local\\Temp\\sv-04-reviewfix-Kuyuxz\\.github\\workflows",
+      "C:\\Users\\annii\\AppData\\Local\\Temp\\sv-06-reviewfix-tJMeEz\\public\\src\\includes"
     ]
   }
 }
