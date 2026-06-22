@@ -82,15 +82,42 @@
 - [ ] **SEC-07**: Admin-sessio käyttää turvallisia PHP-sessioasetuksia (httponly, secure cookies)
 - [ ] **SEC-08**: Virheilmoitukset eivät paljasta tietokanta- tai hakemistorakennetta julkisesti
 
+## v1.1 Requirements — Teemajärjestelmä
+
+### Teema-infrastruktuuri
+
+- [ ] **THEME-01**: Tallinpitäjä voi käyttää `resolveThemePath()`-helperia joka lataa tiedoston aktiivisesta teemasta path-traversal-suojatusti (`realpath` + prefix-check) ja fallback-oletuksena `default`-teemaan jos tiedosto puuttuu
+- [ ] **THEME-02**: Järjestelmä tallentaa aktiivisen teeman nimen `settings`-tauluun `active_theme`-rivinä
+- [ ] **THEME-03**: Julkiset sivut saavat `THEME_PATH`- ja `THEME_URL`-vakiot `src/includes/theme.php`-shimistä; admin-paneeli ei koskaan lataa shimmiä
+- [ ] **THEME-04**: Jokainen teema sisältää `theme.json`-tiedoston (nimi, versio) admin-löydettävyyttä varten
+
+### Oletustema
+
+- [ ] **THEME-05**: Oletustema sisältää `public/themes/default/includes/` — header.php, footer.php, nav.php nykyisen ilmeen mukaan
+- [ ] **THEME-06**: Oletustema sisältää `public/themes/default/pages/` — kaikki 7 julkista sivupohjaa (index, hevoset, hevonen, kasvatus, yhteystiedot, blogi, postaus)
+- [ ] **THEME-07**: Oletustema sisältää `public/themes/default/assets/css/style.css` nykyisten tyylien mukaan
+
+### Sivukontrollerien migraatio
+
+- [ ] **THEME-08**: Kaikki 5 julkista sivukontrolleria (index.php, hevoset.php, hevonen.php, kasvatus.php, yhteystiedot.php) muuttuvat data-only-kontrollereiksi jotka käyttävät `resolveThemePath()`
+- [ ] **THEME-09**: Blogi-sivukontrollerit (blogi.php, postaus.php) muuttuvat data-only-kontrollereiksi jotka käyttävät `resolveThemePath()`
+
+### Admin-teemavalinta
+
+- [ ] **THEME-10**: Admin voi nähdä kaikki asennetut teemat listana `settings.php`:ssä (`glob()`-löydös, `theme.json`-nimi näytettynä)
+- [ ] **THEME-11**: Admin voi valita aktiivisen teeman ja tallentaa valinnan (allowlist-validoitu POST + CSRF-suojaus)
+- [ ] **THEME-12**: Tallinpitäjä voi varmistaa että teemajärjestelmä toimii Altervistassa (CSS MIME-tyypit, URL-polut, `public/themes/`-kansion suojaus)
+
 ## v2 Requirements
 
 ### Tulevaisuuden laajennukset
 
 - **V2-01**: Useampi admin-käyttäjä rooleineen
-- **V2-02**: Uutiset/blogi-osio
-- **V2-03**: Hakutoiminto hevoslistauksen suodattamiseen
-- **V2-04**: Hevosen profiilisivun tulostettava versio
-- **V2-05**: Talliesittely-sivu (säännöt, info)
+- **V2-02**: Hakutoiminto hevoslistauksen suodattamiseen
+- **V2-03**: Hevosen profiilisivun tulostettava versio
+- **V2-04**: Talliesittely-sivu (säännöt, info)
+- **V2-05**: Teeman esikatselukuva (`preview.png`) admin-listauksessa
+- **V2-06**: Toinen valmis teema tarjolla
 
 ## Out of Scope
 
@@ -106,21 +133,26 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DB-01–DB-05 | Phase 1 | Pending |
-| HORSE-01–HORSE-10 | Phase 1 | Pending |
-| PUB-01–PUB-06 | Phase 2 | Pending |
-| AUTH-01–AUTH-05 | Phase 3 | Pending |
-| ADMIN-01–ADMIN-05 | Phase 3 | Pending |
-| PHOTO-01–PHOTO-05 | Phase 3 | Pending |
-| COMP-01–COMP-03 | Phase 3 | Pending |
-| BREED-01–BREED-03 | Phase 3 | Pending |
-| SEC-01–SEC-08 | Phase 4 | Pending |
+| DB-01–DB-05 | Phase 1 | Complete (v1.0) |
+| HORSE-01–HORSE-10 | Phase 1 | Complete (v1.0) |
+| PUB-01–PUB-06 | Phase 2 | Complete (v1.0) |
+| AUTH-01–AUTH-05 | Phase 3 | Complete (v1.0) |
+| ADMIN-01–ADMIN-05 | Phase 3 | Complete (v1.0) |
+| PHOTO-01–PHOTO-05 | Phase 3 | Complete (v1.0) |
+| COMP-01–COMP-03 | Phase 3 | Complete (v1.0) |
+| BREED-01–BREED-03 | Phase 3 | Complete (v1.0) |
+| SEC-01–SEC-08 | Phase 4 | Complete (v1.0) |
+| THEME-01–THEME-04 | Phase 6 (v1.1) | Pending |
+| THEME-05–THEME-07 | Phase 7 (v1.1) | Pending |
+| THEME-08–THEME-09 | Phase 8 (v1.1) | Pending |
+| THEME-10–THEME-12 | Phase 9 (v1.1) | Pending |
 
 **Coverage:**
-- v1 requirements: 43 total
-- Mapped to phases: 43
+- v1.0 requirements: 43 total — all complete ✓
+- v1.1 requirements: 12 total
+- Mapped to phases: 12
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-06-17*
-*Last updated: 2026-06-17 — project initialization*
+*Last updated: 2026-06-22 — v1.1 Teemajärjestelmä requirements added (THEME-01–THEME-12)*
