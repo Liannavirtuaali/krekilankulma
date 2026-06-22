@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../src/includes/db.php';
+require_once __DIR__ . '/../src/includes/theme.php'; // Phase 6: teemashim
 
 $page_title = 'Etusivu';
 
