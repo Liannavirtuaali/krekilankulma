@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Teemajärjestelmä
-status: executing
-stopped_at: "Completed 06-01-PLAN.md"
-last_updated: "2026-06-22T15:40:00.000Z"
-last_activity: 2026-06-22 -- Phase 06 Plan 01 completed
+status: phase_complete
+stopped_at: "Completed 06-02-PLAN.md"
+last_updated: "2026-06-22T16:05:00.000Z"
+last_activity: 2026-06-22 -- Phase 06 Plan 02 completed
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
-  percent: 0
+  completed_plans: 2
+  percent: 25
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-06-22)
 
 ## Current Position
 
-Phase: 06 (teema-infrastruktuuri) — EXECUTING
-Plan: 2 of 2
-Status: Executing Phase 06 (Plan 02 next)
-Last activity: 2026-06-22 -- Phase 06 Plan 01 completed
+Phase: 06 (teema-infrastruktuuri) — COMPLETE
+Plan: 2 of 2 (kaikki valmiina)
+Status: Phase 06 valmis — seuraava: Phase 07 (oletusteman rakenne)
+Last activity: 2026-06-22 -- Phase 06 Plan 02 completed
 
-Progress: [█████░░░░░] 50% (v1.1 scope)
+Progress: [██████░░░░] 60% (v1.1 scope)
 
 ## Workflow Status
 
@@ -41,7 +41,7 @@ Progress: [█████░░░░░] 50% (v1.1 scope)
 | Phase 3 — Admin-paneeli | Complete | 2026-06-17 | 2026-06-17 |
 | Phase 4 — Tietoturva & Deploy | Complete | 2026-06-17 | 2026-06-18 |
 | Phase 5 — Blogi | Complete | 2026-06-18 | 2026-06-18 |
-| Phase 6 — Teema-infrastruktuuri | Not started | — | — |
+| Phase 6 — Teema-infrastruktuuri | Complete | 2026-06-22 | 2026-06-22 |
 | Phase 7 — Oletusteman rakenne | Not started | — | — |
 | Phase 8 — Sivukontrollerien migraatio | Not started | — | — |
 | Phase 9 — Admin-teemavalinta & Altervista | Not started | — | — |
@@ -66,6 +66,8 @@ Progress: [█████░░░░░] 50% (v1.1 scope)
 - v1.1: public/assets/css/style.css pysyy muuttumattomana — admin_header.php riippuu siitä
 - v1.1 Plan 01: INSERT IGNORE (ei ON DUPLICATE KEY UPDATE) migraatioissa — yhdenmukaisuus migrate_*.sql-tiedostojen kanssa
 - v1.1 Plan 01: theme.json vain name+version — description/author/preview ovat V2-05 laajennuksia
+- v1.1 Plan 02: resolveThemePath() käyttää str_starts_with + string|false union type (PHP 8.0+); Altervista-yhteensopivuus varmistetaan Phase 9:ssä
+- v1.1 Plan 02: realpath()-fallback shimissä — shim ei kuole vaikka themes/-hakemisto puuttuu käynnistyksessä
 
 ### Blockers/Concerns
 
@@ -73,6 +75,6 @@ Progress: [█████░░░░░] 50% (v1.1 scope)
 
 ## Session Continuity
 
-Last session: 2026-06-22T15:40:00.000Z
-Stopped at: Completed 06-01-PLAN.md
-Resume file: .planning/phases/06-teema-infrastruktuuri/06-02-PLAN.md
+Last session: 2026-06-22T16:05:00.000Z
+Stopped at: Completed 06-02-PLAN.md (Phase 06 valmis)
+Resume file: .planning/phases/07-oletusteman-rakenne/07-01-PLAN.md
