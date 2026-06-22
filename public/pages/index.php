@@ -58,16 +58,19 @@ require __DIR__ . '/../src/includes/header.php';
   </a>
 
   <?php
+  // CR-02: Build $newsHref without calling e() here — escape at the single output
+  // point (line below) to avoid double-encoding. rawurlencode() does not encode
+  // `"` or `>`, so the assembled string MUST be passed through e() before output.
   $newsHref = $latestPost
-      ? e(SITE_URL) . '/pages/ajankohtaista/' . rawurlencode($latestPost['slug'])
-      : e(SITE_URL) . '/pages/ajankohtaista.php';
+      ? SITE_URL . '/pages/ajankohtaista/' . rawurlencode($latestPost['slug'])
+      : SITE_URL . '/pages/ajankohtaista.php';
   $newsTitle   = $latestPost ? e($latestPost['title']) : 'Ajankohtaista';
   $newsExcerpt = $latestPost
       ? e(mb_substr($latestPost['content'], 0, 120, 'UTF-8')) . '…'
       : 'Lue uusimmat kuulumiset tallin blogista.';
   $newsDate    = $latestPost ? formatDate($latestPost['created_at']) : '';
   ?>
-  <a class="overlay-card overlay-card--news" href="<?= $newsHref ?>">
+  <a class="overlay-card overlay-card--news" href="<?= e($newsHref) ?>">
     <img src="https://picsum.photos/seed/winter1/320/160" alt="Ajankohtaista">
     <div class="uutinen-tag" style="margin-bottom:.5rem;">📰 Ajankohtaista</div>
     <h3><?= $newsTitle ?></h3>
