@@ -8,6 +8,16 @@ Virtuaalitalli on PHP- ja MySQL-pohjainen tallinhallintajärjestelmä, joka korv
 
 Hevosomistaja voi hallita koko tallinsa hevostietoja (profiilit, sukutaulut, kisahistoria, kuvat ja kasvatus) yhdestä turvallisesta admin-paneelista, ja kaikki tieto näkyy automaattisesti julkisella sivustolla.
 
+## Current Milestone: v1.1 Teemajärjestelmä
+
+**Goal:** Tallinpitäjä voi vaihtaa sivuston julkisen puolen ulkoasun admin-paneelista valitsemalla asennetun teeman; teemat ovat tiedostopohjaisia ja sijaitsevat `public/themes/`-kansiossa.
+
+**Target features:**
+- Teemakansiorakenne `public/themes/` (header, footer, nav, sivupohjat, CSS, blogi-sivut)
+- Nykyinen oletus-ilme siirretään `public/themes/default/`-rakenteeseen
+- Admin-paneeliin teeman valintanäkymä (listaa asennetut teemat, tallentaa valinnan)
+- PHP lataa sivupohjat aktiivisesta teemasta
+
 ## Requirements
 
 ### Validated
@@ -36,7 +46,7 @@ Hevosomistaja voi hallita koko tallinsa hevostietoja (profiilit, sukutaulut, kis
 - Useampi admin-käyttäjä — yksi omistaja riittää MVP:hen
 - Rekisteröityminen/kirjautuminen julkiselle sivustolle — sivusto on vain esittelysivu
 - Maksujärjestelmä — ei kaupallinen toiminto
-- Uutiset/blogi — ei pyydetty
+- Uutiset/blogi — toteutettu Phase 5:ssa (v1.0)
 - Varausjärjestelmä — ei pyydetty
 
 ## Context
@@ -63,5 +73,22 @@ Hevosomistaja voi hallita koko tallinsa hevostietoja (profiilit, sukutaulut, kis
 | PHP includes sivupohjien pilkkomiseen | Jatkaa olemassa olevaa arkkitehtuurikuviota | — Pending |
 | Kuvien tallennus palvelimelle | File upload → palvelinhakemisto; URL tallennetaan tietokantaan | — Pending |
 
+## Evolution
+
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition** (via `/gsd-transition`):
+1. Requirements invalidated? → Move to Out of Scope with reason
+2. Requirements validated? → Move to Validated with phase reference
+3. New requirements emerged? → Add to Active
+4. Decisions to log? → Add to Key Decisions
+5. "What This Is" still accurate? → Update if drifted
+
+**After each milestone** (via `/gsd-complete-milestone`):
+1. Full review of all sections
+2. Core Value check — still the right priority?
+3. Audit Out of Scope — reasons still valid?
+4. Update Context with current state
+
 ---
-*Last updated: 2026-06-17 — project initialization*
+*Last updated: 2026-06-22 — milestone v1.1 Teemajärjestelmä started*

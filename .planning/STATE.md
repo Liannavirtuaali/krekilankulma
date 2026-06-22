@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-current_phase: 04
-status: Phase 04 Complete
-last_updated: "2026-06-18T00:00:00.000Z"
+milestone: v1.1
+milestone_name: Teemajärjestelmä
+status: planning
+last_updated: "2026-06-22T14:19:15.732Z"
+last_activity: 2026-06-22
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 13
-  completed_plans: 13
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -70,3 +70,10 @@ See `.planning/phases/04-tietoturva-deploy/DEPLOYMENT_CHECKLIST.md` for full ins
 
 ---
 *Last updated: 2026-06-18 — Phase 4 Plan 2 complete: GitHub Actions CI/CD deployment workflow added*
+
+## Current Position
+
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-06-22 — Milestone v1.1 started
