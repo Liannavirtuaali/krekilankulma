@@ -108,8 +108,8 @@ function animateCount(el, target, duration) {
   }, 16);
 }
 setTimeout(() => {
-  animateCount(document.getElementById('stat-hevoset'), <?= $horseCount ?>, 800);
-  animateCount(document.getElementById('stat-varsat'),  <?= $foalCount ?>,  600);
+  animateCount(document.getElementById('stat-hevoset'), <?= json_encode($horseCount) ?>, 800);
+  animateCount(document.getElementById('stat-varsat'),  <?= json_encode($foalCount) ?>,  600);
 }, 150);
 </script>
 
