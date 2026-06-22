@@ -1,10 +1,11 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.1
-milestone_name: Teemajärjestelmä
+milestone_name: — Teemajärjestelmä
 status: planning
-last_updated: "2026-06-22"
-last_activity: 2026-06-22
+stopped_at: Phase 6 context gathered
+last_updated: "2026-06-22T14:54:24.209Z"
+last_activity: 2026-06-22 — Milestone v1.1 roadmap created (phases 6–9)
 progress:
   total_phases: 4
   completed_phases: 0
@@ -70,6 +71,6 @@ Progress: [░░░░░░░░░░] 0% (v1.1 scope)
 
 ## Session Continuity
 
-Last session: 2026-06-22
-Stopped at: Roadmap created for v1.1 — phases 6–9 written to ROADMAP.md
-Resume file: None
+Last session: 2026-06-22T14:54:24.196Z
+Stopped at: Phase 6 context gathered
+Resume file: .planning/phases/06-teema-infrastruktuuri/06-CONTEXT.md
