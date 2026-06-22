@@ -10,14 +10,23 @@
 
 if (!defined('THEME_PATH')) {
     // 1. Lue aktiivinen teema tietokannasta (prepared statement, SEC-01-pattern)
-    $db = getDB();
-    $stmt = $db->prepare(
-        'SELECT setting_value FROM settings WHERE setting_key = :k LIMIT 1'
-    );
-    $stmt->execute([':k' => 'active_theme']);
-    // Käytetään ?: (Elvis) koska fetchColumn() palauttaa false puuttuvalle riville,
-    // ei null — ?? ei toimisi tässä (Pitfall 3)
-    $rawTheme = $stmt->fetchColumn() ?: 'default';
+    // Wrapped in try/catch: PDO::ERRMODE_EXCEPTION means prepare/execute can throw
+    // PDOException. Because theme.php loads before any application error handler,
+    // an uncaught exception here would expose a raw stack trace to the user.
+    // Fall back to 'default' theme on any database failure (CR-01).
+    try {
+        $db = getDB();
+        $stmt = $db->prepare(
+            'SELECT setting_value FROM settings WHERE setting_key = :k LIMIT 1'
+        );
+        $stmt->execute([':k' => 'active_theme']);
+        // Käytetään ?: (Elvis) koska fetchColumn() palauttaa false puuttuvalle riville,
+        // ei null — ?? ei toimisi tässä (Pitfall 3)
+        $rawTheme = $stmt->fetchColumn() ?: 'default';
+    } catch (\Throwable $e) {
+        error_log('theme.php: aktiivisen teeman haku epäonnistui: ' . $e->getMessage());
+        $rawTheme = 'default';
+    }
 
     // 2. Validoi teemanimi — salli vain alfanumeerinen + viivat/alaviivat (ei pisteitä)
     // Null-byte injection ('theme\0name') torjutaan samalla allowlistilla
