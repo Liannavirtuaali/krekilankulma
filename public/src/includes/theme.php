@@ -39,8 +39,13 @@ if (!defined('THEME_PATH')) {
     if ($resolvedThemesRoot === false) {
         // Fallback: hakemisto ei ole olemassa tai realpath() epäonnistuu
         // Rakennetaan polku manuaalisesti — resolveThemePath() palauttaa false
-        // kunnes hakemisto syntyy tiedostojärjestelmään
-        $resolvedThemesRoot = __DIR__ . '/../../themes';
+        // kunnes hakemisto syntyy tiedostojärjestelmään.
+        // WR-01: Log the missing directory so developers get a diagnostic instead
+        // of silent failure. The str_starts_with prefix check in resolveThemePath()
+        // will always fail while this unresolved path is in use (an absolute
+        // realpath() result cannot start with an unresolved `../../` path).
+        error_log('theme.php: themes/-hakemistoa ei löydy: ' . __DIR__ . '/../../themes');
+        $resolvedThemesRoot = __DIR__ . '/../../themes'; // resolveThemePath() returns false until dir exists
     }
 
     // 4. Määrittele vakiot
