@@ -431,17 +431,17 @@ if (is_readable($jsonPath)) {
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **PHP-versio Altervistassa**
+1. **PHP-versio Altervistassa** (RESOLVED)
    - What we know: CONTEXT.md viittaa `string|false` return type hintiin (PHP 8.0+ union types) — kehitysympäristö tukee tätä
    - What's unclear: Tukeeko Altervista PHP 8.0+ virallisesti?
-   - Recommendation: Lisää PHP-versiotarkistus Wave 0:n ympäristöauditointiin, tai kirjoita `resolveThemePath()` ilman union type hintiä (PHP 7.4 -yhteensopivuus) kunnes varmistuu
+   - Resolution: Planner käyttää PHP 7.4 -yhteensopivaa fallbackia: `/** @return string|false */` docblock `string|false` union typen sijaan, ja `strncmp()` `str_starts_with()`:n sijaan. Altervistan PHP-version varmistus tehdään Phase 9:ssä (THEME-12). Assumption A1/A2 dokumentoi tämän riskin.
 
-2. **DIRECTORY_SEPARATOR Windows-kehitysympäristössä vs. Altervista (Linux)**
+2. **DIRECTORY_SEPARATOR Windows-kehitysympäristössä vs. Altervista (Linux)** (RESOLVED)
    - What we know: Kehitysympäristö on Docker/Linux (`localhost:8080`) — `DIRECTORY_SEPARATOR` on `/` molemmissa
    - What's unclear: Ei tunnettuja ongelmia
-   - Recommendation: Käytä `DIRECTORY_SEPARATOR` koodissa johdonmukaisesti; testaa sekä Dockerissa että varmista Altervistassa Phase 9:ssä
+   - Resolution: Docker-kehitysympäristö on Linux (`/`) ja Altervista on Linux (`/`) — separaattori on identtinen. `DIRECTORY_SEPARATOR`-käyttö koodissa on riittävä; ei erillisiä toimia tarvita.
 
 ---
 

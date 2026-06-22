@@ -31,7 +31,7 @@ Teemajärjestelmän infrastruktuurikerros: `src/includes/theme.php` -shim joka t
 
 ### Teema-admin-eristys (aiemmin päätetty)
 - **D-09:** `src/includes/theme.php` EI saa olla require-kutsussa `db.php`:ssä — `db.php` on jaettu sekä julkisille sivuille että admin-sivuille. Admin-sivut EIVÄT koskaan lataa theme.php:tä.
-- **D-10:** `public/assets/css/style.css` pysyy muuttumattomana — `admin_header.php` riippuu siitä. Teeman CSS on `public/themes/{teema}/assets/css/style.css`.
+- **D-10** [informational]: `public/assets/css/style.css` pysyy muuttumattomana — `admin_header.php` riippuu siitä. Teeman CSS on `public/themes/{teema}/assets/css/style.css`. (Negatiivinen rajoite — ei luo artefaktia, ei vaadi omaa tehtävää.)
 
 </decisions>
 

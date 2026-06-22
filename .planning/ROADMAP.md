@@ -139,10 +139,13 @@ Plans:
   5. Jokainen teemakansio jolla on `theme.json` löytyy ja luetaan oikein (nimi, versio)
 
 **Plans**: 2 plans
-
 Plans:
+**Wave 1**
 
 - [ ] 06-01-PLAN.md — migrate_theme.sql (active_theme-rivi) ja public/themes/default/theme.json (THEME-02, THEME-04)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 06-02-PLAN.md — theme.php-shim (THEME_PATH/THEME_URL + resolveThemePath path-traversal-suojauksella) ja index.php-integraatiotodistus (THEME-01, THEME-03)
 
 **UI hint**: no
