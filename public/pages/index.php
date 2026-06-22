@@ -76,7 +76,7 @@ require __DIR__ . '/../src/includes/header.php';
     <h3><?= $newsTitle ?></h3>
     <p><?= $newsExcerpt ?></p>
     <div class="uutinen-footer" style="margin-top:auto;padding-top:.75rem;">
-      <span class="card-date"><?= $newsDate ?></span>
+      <span class="card-date"><?= e($newsDate) ?></span>
       <span class="overlay-card-link">Lue lisää →</span>
     </div>
   </a>
