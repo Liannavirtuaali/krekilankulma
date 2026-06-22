@@ -87,9 +87,9 @@
 ### Teema-infrastruktuuri
 
 - [ ] **THEME-01**: Tallinpitäjä voi käyttää `resolveThemePath()`-helperia joka lataa tiedoston aktiivisesta teemasta path-traversal-suojatusti (`realpath` + prefix-check) ja fallback-oletuksena `default`-teemaan jos tiedosto puuttuu
-- [ ] **THEME-02**: Järjestelmä tallentaa aktiivisen teeman nimen `settings`-tauluun `active_theme`-rivinä
+- [x] **THEME-02**: Järjestelmä tallentaa aktiivisen teeman nimen `settings`-tauluun `active_theme`-rivinä
 - [ ] **THEME-03**: Julkiset sivut saavat `THEME_PATH`- ja `THEME_URL`-vakiot `src/includes/theme.php`-shimistä; admin-paneeli ei koskaan lataa shimmiä
-- [ ] **THEME-04**: Jokainen teema sisältää `theme.json`-tiedoston (nimi, versio) admin-löydettävyyttä varten
+- [x] **THEME-04**: Jokainen teema sisältää `theme.json`-tiedoston (nimi, versio) admin-löydettävyyttä varten
 
 ### Oletustema
 
@@ -148,6 +148,7 @@
 | THEME-10–THEME-12 | Phase 9 (v1.1) | Pending |
 
 **Coverage:**
+
 - v1.0 requirements: 43 total — all complete ✓
 - v1.1 requirements: 12 total
 - Mapped to phases: 12

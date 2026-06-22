@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: — Teemajärjestelmä
 status: executing
-stopped_at: Phase 6 context gathered
-last_updated: "2026-06-22T15:26:19.450Z"
-last_activity: 2026-06-22 — Milestone v1.1 roadmap created (phases 6–9)
+stopped_at: "Completed 06-01-PLAN.md"
+last_updated: "2026-06-22T15:40:00.000Z"
+last_activity: 2026-06-22 -- Phase 06 Plan 01 completed
 progress:
   total_phases: 4
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 2
+  completed_plans: 1
   percent: 0
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-22)
 
 **Core value:** Hevosomistaja voi hallita koko tallinsa hevostietoja yhdestä turvallisesta admin-paneelista, ja kaikki tieto näkyy automaattisesti julkisella sivustolla.
-**Current focus:** Phase 6 — Teema-infrastruktuuri
+**Current focus:** Phase 06 — teema-infrastruktuuri
 
 ## Current Position
 
-Phase: 6 of 9 (Teema-infrastruktuuri)
-Plan: — (not started)
-Status: Ready to execute
-Last activity: 2026-06-22 — Milestone v1.1 roadmap created (phases 6–9)
+Phase: 06 (teema-infrastruktuuri) — EXECUTING
+Plan: 2 of 2
+Status: Executing Phase 06 (Plan 02 next)
+Last activity: 2026-06-22 -- Phase 06 Plan 01 completed
 
-Progress: [░░░░░░░░░░] 0% (v1.1 scope)
+Progress: [█████░░░░░] 50% (v1.1 scope)
 
 ## Workflow Status
 
@@ -64,6 +64,8 @@ Progress: [░░░░░░░░░░] 0% (v1.1 scope)
 - v1.1: resolveThemePath() käyttää preg_match + realpath + prefix-check (path-traversal-suojaus)
 - v1.1: admin-paneeli ei koskaan lataa theme.php-shimmiä
 - v1.1: public/assets/css/style.css pysyy muuttumattomana — admin_header.php riippuu siitä
+- v1.1 Plan 01: INSERT IGNORE (ei ON DUPLICATE KEY UPDATE) migraatioissa — yhdenmukaisuus migrate_*.sql-tiedostojen kanssa
+- v1.1 Plan 01: theme.json vain name+version — description/author/preview ovat V2-05 laajennuksia
 
 ### Blockers/Concerns
 
@@ -71,6 +73,6 @@ Progress: [░░░░░░░░░░] 0% (v1.1 scope)
 
 ## Session Continuity
 
-Last session: 2026-06-22T14:54:24.196Z
-Stopped at: Phase 6 context gathered
-Resume file: .planning/phases/06-teema-infrastruktuuri/06-CONTEXT.md
+Last session: 2026-06-22T15:40:00.000Z
+Stopped at: Completed 06-01-PLAN.md
+Resume file: .planning/phases/06-teema-infrastruktuuri/06-02-PLAN.md
