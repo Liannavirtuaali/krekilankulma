@@ -138,7 +138,13 @@ Plans:
   4. `settings`-taulussa on `active_theme`-rivi ja sen arvo on haettavissa tietokannasta
   5. Jokainen teemakansio jolla on `theme.json` löytyy ja luetaan oikein (nimi, versio)
 
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+
+- [ ] 06-01-PLAN.md — migrate_theme.sql (active_theme-rivi) ja public/themes/default/theme.json (THEME-02, THEME-04)
+- [ ] 06-02-PLAN.md — theme.php-shim (THEME_PATH/THEME_URL + resolveThemePath path-traversal-suojauksella) ja index.php-integraatiotodistus (THEME-01, THEME-03)
+
 **UI hint**: no
 
 ### Phase 7: Oletusteman rakenne
@@ -195,7 +201,7 @@ Plans:
 | 3. Admin-paneeli | 4/4 | Complete | 2026-06-17 |
 | 4. Tietoturva & Viimeistely | 2/2 | Complete | 2026-06-18 |
 | 5. Blogi | 0/0 | Complete | 2026-06-18 |
-| 6. Teema-infrastruktuuri | 0/? | Not started | - |
+| 6. Teema-infrastruktuuri | 0/2 | Not started | - |
 | 7. Oletusteman rakenne | 0/? | Not started | - |
 | 8. Sivukontrollerien migraatio | 0/? | Not started | - |
 | 9. Admin-teemavalinta & Altervista-verifiointi | 0/? | Not started | - |
