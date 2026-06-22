@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Teemajärjestelmä
 status: planning
-last_updated: "2026-06-22T14:19:15.732Z"
+last_updated: "2026-06-22"
 last_activity: 2026-06-22
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -15,65 +15,61 @@ progress:
 
 # Project State
 
-**Project:** Virtuaalitalli
-**Initialized:** 2026-06-17
-**Current Phase:** 04
+## Project Reference
+
+See: .planning/PROJECT.md (updated 2026-06-22)
+
+**Core value:** Hevosomistaja voi hallita koko tallinsa hevostietoja yhdestä turvallisesta admin-paneelista, ja kaikki tieto näkyy automaattisesti julkisella sivustolla.
+**Current focus:** Phase 6 — Teema-infrastruktuuri
+
+## Current Position
+
+Phase: 6 of 9 (Teema-infrastruktuuri)
+Plan: — (not started)
+Status: Ready to plan
+Last activity: 2026-06-22 — Milestone v1.1 roadmap created (phases 6–9)
+
+Progress: [░░░░░░░░░░] 0% (v1.1 scope)
 
 ## Workflow Status
 
 | Phase | Status | Started | Completed |
 |-------|--------|---------|-----------|
-| Phase 1 — Perusta & DB | ✅ Complete | 2026-06-17 | 2026-06-17 |
-| Phase 2 — Julkiset sivut | ✅ Complete | 2026-06-17 | 2026-06-17 |
-| Phase 3 — Admin-paneeli | ✅ Complete | 2026-06-17 | 2026-06-17 |
-| Phase 4 — Tietoturva & Deploy | ✅ Code complete | 2026-06-17 | 2026-06-17 |
+| Phase 1 — Perusta & DB | Complete | 2026-06-17 | 2026-06-17 |
+| Phase 2 — Julkiset sivut | Complete | 2026-06-17 | 2026-06-17 |
+| Phase 3 — Admin-paneeli | Complete | 2026-06-17 | 2026-06-17 |
+| Phase 4 — Tietoturva & Deploy | Complete | 2026-06-17 | 2026-06-18 |
+| Phase 5 — Blogi | Complete | 2026-06-18 | 2026-06-18 |
+| Phase 6 — Teema-infrastruktuuri | Not started | — | — |
+| Phase 7 — Oletusteman rakenne | Not started | — | — |
+| Phase 8 — Sivukontrollerien migraatio | Not started | — | — |
+| Phase 9 — Admin-teemavalinta & Altervista | Not started | — | — |
 
 ## Configuration
 
 - **Mode:** YOLO
 - **Granularity:** Coarse
-- **Research:** Disabled
+- **Research:** Completed (research/SUMMARY.md)
 - **Plan Check:** Enabled
 - **Verifier:** Enabled
 - **Git tracking:** Enabled
 
-## Active Decisions
+## Accumulated Context
+
+### Decisions
 
 - Admin-paneeli: kirjautuminen bcrypt+CSRF, pehmeä poisto hevosille, kuvat finfo_file() MIME-tarkistuksella
-- Slug generoidaan automaattisesti nimestä (slugify), duplikaatit saavat numeron loppuun
-- horse_edit.php estää itse-viittauksen sire/dam dropdowneissa
-- Kaikki 8 tietoturvavaatimusta (SEC-01–SEC-08) toteutettu koodissa
-- CI/CD: SamKirkland/FTP-Deploy-Action@v4 deployaa public/ Altervistaan push main -triggerillä; FTP-tunnukset GitHub Secretseissä
+- CI/CD: SamKirkland/FTP-Deploy-Action@v4 deployaa public/ Altervistaan push main -triggerillä
+- v1.1: resolveThemePath() käyttää preg_match + realpath + prefix-check (path-traversal-suojaus)
+- v1.1: admin-paneeli ei koskaan lataa theme.php-shimmiä
+- v1.1: public/assets/css/style.css pysyy muuttumattomana — admin_header.php riippuu siitä
 
-## Security Implementation (Phase 4)
+### Blockers/Concerns
 
-- **SEC-01** ✅ PDO prepared statements throughout
-- **SEC-02** ✅ validate_email(), filter_var(URL) on admin forms
-- **SEC-03** ✅ e() / htmlspecialchars() on all output
-- **SEC-04** ✅ CSRF tokens on all POST forms (generate + validate helpers)
-- **SEC-05** ✅ validate_image_upload() + generate_safe_filename() + .htaccess
-- **SEC-06** ✅ .htaccess blocks direct access to includes/
-- **SEC-07** ✅ Session hardening (httponly, secure, samesite, 30min timeout)
-- **SEC-08** ✅ display_errors Off via .htaccess
+- Altervistan CSS MIME-tyyppi subdirektoreille `public/themes/*/assets/css/` — ei voi varmistaa ennen FTP-deploymenttia (Phase 9)
 
-## CI/CD Deployment (Phase 4 Plan 2)
+## Session Continuity
 
-- **Workflow:** `.github/workflows/deploy.yml` — GitHub Actions FTP deploy on push to main
-- **Action:** SamKirkland/FTP-Deploy-Action@v4
-- **Scope:** Only `public/` → Altervista web root (`/`)
-- **Setup required:** Add `FTP_HOST`, `FTP_USERNAME`, `FTP_PASSWORD` as GitHub repository secrets
-
-## Next Action
-
-Add GitHub Secrets (FTP_HOST, FTP_USERNAME, FTP_PASSWORD) and push to main to trigger first deploy.
-See `.planning/phases/04-tietoturva-deploy/DEPLOYMENT_CHECKLIST.md` for full instructions.
-
----
-*Last updated: 2026-06-18 — Phase 4 Plan 2 complete: GitHub Actions CI/CD deployment workflow added*
-
-## Current Position
-
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-06-22 — Milestone v1.1 started
+Last session: 2026-06-22
+Stopped at: Roadmap created for v1.1 — phases 6–9 written to ROADMAP.md
+Resume file: None
