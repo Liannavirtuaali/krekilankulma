@@ -7,11 +7,13 @@ $db = getDB();
 if (!empty($_GET['slug'])) {
     $slug = preg_replace('/[^a-z0-9\-]/', '', strtolower(trim($_GET['slug'])));
     $stmt = $db->prepare(
-        'SELECT h.*, d.name AS discipline_name, l.name AS level_name,
+        'SELECT h.*,
+                (SELECT GROUP_CONCAT(d.name ORDER BY d.name SEPARATOR \', \')
+                 FROM horse_disciplines hd
+                 JOIN disciplines d ON d.id = hd.discipline_id
+                 WHERE hd.horse_id = h.id) AS discipline_names,
                 b.name AS breed_name, c.name AS color_name
          FROM horses h
-         LEFT JOIN disciplines d ON d.id = h.discipline_id
-         LEFT JOIN levels l ON l.id = h.level_id
          LEFT JOIN breeds b ON b.id = h.breed_id
          LEFT JOIN colors c ON c.id = h.color_id
          WHERE h.slug = :slug AND h.is_deleted = 0'
@@ -21,11 +23,13 @@ if (!empty($_GET['slug'])) {
     // Taaksepäin yhteensopivuus vanhoille linkeille
     $id = (int)$_GET['id'];
     $stmt = $db->prepare(
-        'SELECT h.*, d.name AS discipline_name, l.name AS level_name,
+        'SELECT h.*,
+                (SELECT GROUP_CONCAT(d.name ORDER BY d.name SEPARATOR \', \')
+                 FROM horse_disciplines hd
+                 JOIN disciplines d ON d.id = hd.discipline_id
+                 WHERE hd.horse_id = h.id) AS discipline_names,
                 b.name AS breed_name, c.name AS color_name
          FROM horses h
-         LEFT JOIN disciplines d ON d.id = h.discipline_id
-         LEFT JOIN levels l ON l.id = h.level_id
          LEFT JOIN breeds b ON b.id = h.breed_id
          LEFT JOIN colors c ON c.id = h.color_id
          WHERE h.id = :id AND h.is_deleted = 0'
@@ -56,7 +60,7 @@ $page_title = $horse['name'];
 
 // Hae kilpailut
 $stmtComp = $db->prepare(
-    'SELECT competition_date, organizer, class, placement, notes
+    'SELECT competition_date, discipline, country, organizer, organizer_url, class, placement, points, notes
      FROM competitions WHERE horse_id = :id ORDER BY competition_date DESC'
 );
 $stmtComp->execute([':id' => $id]);
@@ -115,10 +119,24 @@ $heroStyle = $heroPhoto
       <?php if ($horse['breed_name']): ?><span class="hero-pill"><?= e($horse['breed_name']) ?></span><?php endif; ?>
       <span class="hero-pill"><?= e($genderFi[$horse['gender']] ?? $horse['gender']) ?></span>
       <?php if ($horse['birth_date']): ?>
-        <span class="hero-pill"><?= e((string)calculateAge($horse['birth_date'])) ?> v.</span>
+        <?php
+          $agingSystem = $horse['aging_system'] ?: 'IRL';
+          $heroAge = calculateAgeBySystem($horse['birth_date'], $agingSystem);
+        ?>
+        <span class="hero-pill"><?= e((string)$heroAge) ?> v. (<?= e($agingSystem) ?>)</span>
       <?php endif; ?>
-      <?php if ($horse['discipline_name']): ?>
-        <span class="hero-pill"><?= e($horse['discipline_name']) ?></span>
+      <?php if ($horse['discipline_names']): ?>
+        <?php
+          $levelParts = [];
+          if (!empty($horse['level_ko'])) $levelParts[] = 'ko: ' . $horse['level_ko'];
+          if (!empty($horse['level_re'])) $levelParts[] = 're: ' . $horse['level_re'];
+        ?>
+        <span class="hero-pill">
+          <?= e($horse['discipline_names']) ?>
+          <?php if ($levelParts): ?>
+            <span style="opacity:.75;font-size:.85em">(<?= e(implode(', ', $levelParts)) ?>)</span>
+          <?php endif; ?>
+        </span>
       <?php endif; ?>
     </div>
   </div>
@@ -152,10 +170,14 @@ $heroStyle = $heroPhoto
           <?php endif; ?>
           <div class="info-row"><dt>Sukupuoli</dt><dd><?= e($genderFi[$horse['gender']] ?? $horse['gender']) ?></dd></div>
           <?php if ($horse['birth_date']): ?>
-            <div class="info-row"><dt>Syntymäaika</dt><dd><?= e(formatDate($horse['birth_date'])) ?></dd></div>
+            <?php
+              $sidebarSystem = $horse['aging_system'] ?: 'IRL';
+              $sidebarAge    = calculateAgeBySystem($horse['birth_date'], $sidebarSystem);
+            ?>
+            <div class="info-row"><dt>Syntymäaika</dt><dd><?= e(formatDate($horse['birth_date'])) ?> <span style="color:var(--color-text-muted);font-size:var(--text-sm)">(<?= e((string)$sidebarAge) ?> v., <?= e($sidebarSystem) ?>)</span></dd></div>
           <?php endif; ?>
           <?php if ($horse['color_name']): ?>
-            <div class="info-row"><dt>Väri</dt><dd><?= e($horse['color_name']) ?></dd></div>
+            <div class="info-row"><dt>Väri</dt><dd><?= e($horse['color_name']) ?><?php if (!empty($horse['genes'])): ?> <span style="color:var(--color-text-muted)">(<?= e($horse['genes']) ?>)</span><?php endif; ?></dd></div>
           <?php endif; ?>
           <?php if ($horse['height_cm']): ?>
             <div class="info-row"><dt>Säkäkorkeus</dt><dd><?= e((string)$horse['height_cm']) ?> cm</dd></div>
@@ -163,27 +185,53 @@ $heroStyle = $heroPhoto
           <?php if ($horse['vh_id']): ?>
             <div class="info-row"><dt>VH-tunnus</dt><dd style="font-family:var(--font-mono);font-size:var(--text-xs);"><?= e($horse['vh_id']) ?></dd></div>
           <?php endif; ?>
-          <?php if ($horse['discipline_name']): ?>
-            <div class="info-row"><dt>Laji</dt><dd><?= e($horse['discipline_name']) ?></dd></div>
-          <?php endif; ?>
-          <?php if ($horse['level_name']): ?>
-            <div class="info-row"><dt>Taso</dt><dd><?= e($horse['level_name']) ?></dd></div>
+          <?php if ($horse['discipline_names']): ?>
+            <?php
+              $levelParts = [];
+              if (!empty($horse['level_ko'])) $levelParts[] = 'ko: ' . $horse['level_ko'];
+              if (!empty($horse['level_re'])) $levelParts[] = 're: ' . $horse['level_re'];
+            ?>
+            <div class="info-row">
+              <dt>Lajit</dt>
+              <dd>
+                <?= e($horse['discipline_names']) ?>
+                <?php if ($levelParts): ?>
+                  <span style="color:var(--color-text-muted)">(<?= e(implode(', ', $levelParts)) ?>)</span>
+                <?php endif; ?>
+              </dd>
+            </div>
+          <?php elseif (!empty($horse['level_ko']) || !empty($horse['level_re'])): ?>
+            <?php
+              $levelParts = [];
+              if (!empty($horse['level_ko'])) $levelParts[] = 'ko: ' . $horse['level_ko'];
+              if (!empty($horse['level_re'])) $levelParts[] = 're: ' . $horse['level_re'];
+            ?>
+            <div class="info-row"><dt>Taso</dt><dd><?= e(implode(', ', $levelParts)) ?></dd></div>
           <?php endif; ?>
         </dl>
       </div>
 
-      <?php if ($horse['owner_name'] || $horse['breeder_name'] || $horse['importer_name']): ?>
+<?php if ($horse['owner_name'] || $horse['owner_email'] || $horse['breeder_name'] || $horse['breeder_email'] || $horse['importer_name'] || $horse['importer_email']): ?>
       <div class="sidebar-card">
         <h3>Omistus & kasvatus</h3>
         <dl>
-          <?php if ($horse['owner_name']): ?>
-            <div class="info-row"><dt>Omistaja</dt><dd><?= e($horse['owner_name']) ?></dd></div>
+          <?php if ($horse['owner_name'] || $horse['owner_email']): ?>
+            <div class="info-row"><dt>Omistaja</dt><dd>
+              <?= e($horse['owner_name']) ?>
+              <?php if ($horse['owner_email']): ?><br><a href="mailto:<?= e($horse['owner_email']) ?>" style="font-size:var(--text-sm)"><?= e($horse['owner_email']) ?></a><?php endif; ?>
+            </dd></div>
           <?php endif; ?>
-          <?php if ($horse['breeder_name']): ?>
-            <div class="info-row"><dt>Kasvattaja</dt><dd><?= e($horse['breeder_name']) ?></dd></div>
+          <?php if ($horse['breeder_name'] || $horse['breeder_email']): ?>
+            <div class="info-row"><dt>Kasvattaja</dt><dd>
+              <?= e($horse['breeder_name']) ?>
+              <?php if ($horse['breeder_email']): ?><br><a href="mailto:<?= e($horse['breeder_email']) ?>" style="font-size:var(--text-sm)"><?= e($horse['breeder_email']) ?></a><?php endif; ?>
+            </dd></div>
           <?php endif; ?>
-          <?php if ($horse['importer_name']): ?>
-            <div class="info-row"><dt>Tuoja</dt><dd><?= e($horse['importer_name']) ?></dd></div>
+          <?php if ($horse['importer_name'] || $horse['importer_email']): ?>
+            <div class="info-row"><dt>Tuoja</dt><dd>
+              <?= e($horse['importer_name']) ?>
+              <?php if ($horse['importer_email']): ?><br><a href="mailto:<?= e($horse['importer_email']) ?>" style="font-size:var(--text-sm)"><?= e($horse['importer_email']) ?></a><?php endif; ?>
+            </dd></div>
           <?php endif; ?>
         </dl>
       </div>
@@ -254,19 +302,31 @@ $heroStyle = $heroPhoto
     <?php else: ?>
       <div class="comp-list">
         <div class="comp-header">
-          <div>Päivämäärä</div>
+          <div>PVM</div>
+          <div>Laji</div>
+          <div>Maa</div>
           <div>Järjestäjä</div>
           <div>Luokka</div>
           <div>Tulos</div>
-          <div>Huomiot</div>
+          <div>Pisteet</div>
+          <div>Huom</div>
         </div>
         <?php foreach ($competitions as $comp): ?>
           <div class="comp-row">
-            <div class="comp-cell" data-label="Päivämäärä"><?= e(formatDate($comp['competition_date'])) ?></div>
-            <div class="comp-cell" data-label="Järjestäjä"><?= e($comp['organizer'] ?? '—') ?></div>
+            <div class="comp-cell" data-label="PVM"><?= e(formatDate($comp['competition_date'])) ?></div>
+            <div class="comp-cell" data-label="Laji"><?= e($comp['discipline'] ?? '—') ?></div>
+            <div class="comp-cell" data-label="Maa"><?= e($comp['country'] ?? '—') ?></div>
+            <div class="comp-cell" data-label="Järjestäjä">
+              <?php if (!empty($comp['organizer_url'])): ?>
+                <a href="<?= e($comp['organizer_url']) ?>" target="_blank" rel="noopener"><?= e($comp['organizer'] ?? '—') ?></a>
+              <?php else: ?>
+                <?= e($comp['organizer'] ?? '—') ?>
+              <?php endif; ?>
+            </div>
             <div class="comp-cell" data-label="Luokka"><?= e($comp['class'] ?? '—') ?></div>
             <div class="comp-cell" data-label="Tulos"><?= e($comp['placement'] ?? '—') ?></div>
-            <div class="comp-cell" data-label="Huomiot"><?= e($comp['notes'] ?? '') ?></div>
+            <div class="comp-cell" data-label="Pisteet"><?= $comp['points'] !== null ? e((string)$comp['points']) : '—' ?></div>
+            <div class="comp-cell" data-label="Huom"><?= e($comp['notes'] ?? '') ?></div>
           </div>
         <?php endforeach; ?>
       </div>

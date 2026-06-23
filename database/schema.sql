@@ -64,13 +64,15 @@ CREATE TABLE IF NOT EXISTS `horses` (
   `call_name` VARCHAR(100) DEFAULT NULL COMMENT 'Kutsumanimi',
   `breed_id` INT UNSIGNED DEFAULT NULL COMMENT 'Rotu (breeds.id)',
   `birth_date` DATE DEFAULT NULL COMMENT 'Syntymäpäivä',
+  `aging_system` ENUM('IRL','VHKR','VARL','CAS','KATT','SHS') DEFAULT NULL COMMENT 'Ikääntymisjärjestelmä',
   `gender` ENUM('ori','tamma','ruuna') NOT NULL DEFAULT 'tamma',
   `color_id` INT UNSIGNED DEFAULT NULL COMMENT 'Väri (colors.id)',
+  `genes` VARCHAR(255) DEFAULT NULL COMMENT 'Geenit',
   `height_cm` SMALLINT UNSIGNED DEFAULT NULL COMMENT 'Säkäkorkeus cm',
   `vh_id` VARCHAR(50) DEFAULT NULL COMMENT 'VH-tunnus',
   -- Painotus
-  `discipline_id` INT UNSIGNED DEFAULT NULL,
-  `level_id` INT UNSIGNED DEFAULT NULL,
+  `level_ko` VARCHAR(150) DEFAULT NULL COMMENT 'Koulutaso (vapaa teksti)',
+  `level_re` VARCHAR(150) DEFAULT NULL COMMENT 'Esteratsastustaso (vapaa teksti)',
   -- Yhteystiedot
   `owner_name` VARCHAR(150) DEFAULT NULL,
   `owner_email` VARCHAR(255) DEFAULT NULL,
@@ -101,10 +103,19 @@ CREATE TABLE IF NOT EXISTS `horses` (
   KEY `idx_horses_deleted` (`is_deleted`),
   CONSTRAINT `fk_horses_breed` FOREIGN KEY (`breed_id`) REFERENCES `breeds` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_horses_color` FOREIGN KEY (`color_id`) REFERENCES `colors` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `fk_horses_discipline` FOREIGN KEY (`discipline_id`) REFERENCES `disciplines` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `fk_horses_level` FOREIGN KEY (`level_id`) REFERENCES `levels` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_horses_sire` FOREIGN KEY (`sire_id`) REFERENCES `horses` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_horses_dam` FOREIGN KEY (`dam_id`) REFERENCES `horses` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ------------------------------------------------------------
+-- Hevosen lajit (many-to-many)
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `horse_disciplines` (
+  `horse_id`      INT UNSIGNED NOT NULL,
+  `discipline_id` INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`horse_id`, `discipline_id`),
+  CONSTRAINT `fk_hd_horse`      FOREIGN KEY (`horse_id`)      REFERENCES `horses`      (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_hd_discipline` FOREIGN KEY (`discipline_id`) REFERENCES `disciplines` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------
@@ -131,13 +142,15 @@ CREATE TABLE IF NOT EXISTS `horse_photos` (
 CREATE TABLE IF NOT EXISTS `competitions` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `horse_id` INT UNSIGNED NOT NULL,
-  `competition_name` VARCHAR(200) DEFAULT NULL,
   `competition_date` DATE NOT NULL,
-  `organizer` VARCHAR(200) DEFAULT NULL COMMENT 'Järjestäjä',
+  `discipline` VARCHAR(100) DEFAULT NULL COMMENT 'Laji',
+  `country` VARCHAR(100) DEFAULT NULL COMMENT 'Maa',
+  `organizer` VARCHAR(200) DEFAULT NULL COMMENT 'Järjestäjän nimi',
+  `organizer_url` VARCHAR(500) DEFAULT NULL COMMENT 'Järjestäjän URL',
+  `notes` TEXT DEFAULT NULL COMMENT 'Huom',
   `class` VARCHAR(100) DEFAULT NULL COMMENT 'Luokka',
   `placement` VARCHAR(50) DEFAULT NULL COMMENT 'Tulos (esim. "1.", "DQ", "Hyv")',
-  `points` DECIMAL(8,2) DEFAULT NULL,
-  `notes` TEXT DEFAULT NULL,
+  `points` DECIMAL(8,2) DEFAULT NULL COMMENT 'Pisteet',
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `idx_comp_horse` (`horse_id`),

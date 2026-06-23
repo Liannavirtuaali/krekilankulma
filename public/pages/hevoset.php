@@ -7,11 +7,13 @@ $db = getDB();
 $stmt = $db->prepare(
     'SELECT h.id, h.name, h.slug, h.gender, h.birth_date,
             b.name AS breed_name,
-            d.name AS discipline_name,
+            (SELECT GROUP_CONCAT(d.name ORDER BY d.name SEPARATOR \', \')
+             FROM horse_disciplines hd
+             JOIN disciplines d ON d.id = hd.discipline_id
+             WHERE hd.horse_id = h.id) AS discipline_names,
             hp.filename
      FROM horses h
      LEFT JOIN breeds b ON b.id = h.breed_id
-     LEFT JOIN disciplines d ON d.id = h.discipline_id
      LEFT JOIN horse_photos hp
             ON hp.horse_id = h.id
            AND hp.sort_order = (SELECT MIN(sort_order) FROM horse_photos WHERE horse_id = h.id)
@@ -66,8 +68,8 @@ $genderFi = ['ori' => 'Ori', 'tamma' => 'Tamma', 'ruuna' => 'Ruuna', 'käkky' =>
                 <span><?= e((string)calculateAge($horse['birth_date'])) ?> v.</span>
               <?php endif; ?>
             </div>
-            <?php if ($horse['discipline_name']): ?>
-              <span class="card-tag"><?= e($horse['discipline_name']) ?></span>
+            <?php if ($horse['discipline_names']): ?>
+              <span class="card-tag"><?= e($horse['discipline_names']) ?></span>
             <?php endif; ?>
           </div>
         </div>

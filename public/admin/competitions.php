@@ -29,15 +29,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         if ($action === 'add') {
                 $stmt = $db->prepare(
-                    'INSERT INTO competitions (horse_id, competition_date, organizer, class, placement, notes)
-                     VALUES (:horse_id, :competition_date, :organizer, :class, :placement, :notes)'
+                    'INSERT INTO competitions (horse_id, competition_date, discipline, country, organizer, organizer_url, class, placement, points, notes)
+                     VALUES (:horse_id, :competition_date, :discipline, :country, :organizer, :organizer_url, :class, :placement, :points, :notes)'
                 );
                 $stmt->execute([
                     ':horse_id'        => $horse_id,
                     ':competition_date'=> sanitize($_POST['competition_date'] ?? '') ?: null,
+                    ':discipline'      => sanitize($_POST['discipline'] ?? '') ?: null,
+                    ':country'         => sanitize($_POST['country'] ?? '') ?: null,
                     ':organizer'       => sanitize($_POST['organizer'] ?? '') ?: null,
+                    ':organizer_url'   => sanitize($_POST['organizer_url'] ?? '') ?: null,
                     ':class'           => sanitize($_POST['class'] ?? '') ?: null,
                     ':placement'       => sanitize($_POST['placement'] ?? '') ?: null,
+                    ':points'          => is_numeric($_POST['points'] ?? '') ? (float)$_POST['points'] : null,
                     ':notes'           => sanitize($_POST['notes'] ?? '') ?: null,
                 ]);
                 redirect(SITE_URL . '/admin/competitions.php?horse_id=' . $horse_id . '&added=1');
@@ -48,13 +52,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($own->fetch()) {
                     $stmt = $db->prepare(
                         'UPDATE competitions SET competition_date=:competition_date,
-                         organizer=:organizer, class=:class, placement=:placement, notes=:notes WHERE id=:comp_id'
+                         discipline=:discipline, country=:country, organizer=:organizer,
+                         organizer_url=:organizer_url, class=:class, placement=:placement,
+                         points=:points, notes=:notes WHERE id=:comp_id'
                     );
                     $stmt->execute([
                         ':competition_date'=> sanitize($_POST['competition_date'] ?? '') ?: null,
+                        ':discipline'      => sanitize($_POST['discipline'] ?? '') ?: null,
+                        ':country'         => sanitize($_POST['country'] ?? '') ?: null,
                         ':organizer'       => sanitize($_POST['organizer'] ?? '') ?: null,
+                        ':organizer_url'   => sanitize($_POST['organizer_url'] ?? '') ?: null,
                         ':class'           => sanitize($_POST['class'] ?? '') ?: null,
                         ':placement'       => sanitize($_POST['placement'] ?? '') ?: null,
+                        ':points'          => is_numeric($_POST['points'] ?? '') ? (float)$_POST['points'] : null,
                         ':notes'           => sanitize($_POST['notes'] ?? '') ?: null,
                         ':comp_id'         => $comp_id,
                     ]);
@@ -127,16 +137,17 @@ $wins = count(array_filter($competitions, fn($c) => $c['placement'] === '1.'));
 
 <?php if ($competitions): ?>
 <div class="compact-list">
-  <div class="compact-list-header" style="grid-template-columns:1.5fr 1.5fr 80px 60px 28px">
-    <div>Järjestäjä</div><div>Luokka</div><div>Päivämäärä</div><div>Tulos</div><div></div>
+  <div class="compact-list-header" style="grid-template-columns:1fr 1fr 1fr 80px 60px 28px">
+    <div>Järjestäjä</div><div>Laji</div><div>Luokka</div><div>Päivämäärä</div><div>Tulos</div><div></div>
   </div>
   <?php foreach ($competitions as $c):
     $pl = $c['placement'] ?? '';
-    $pbClass = match($pl) { '1' => 'pbadge-1', '2' => 'pbadge-2', '3' => 'pbadge-3', default => 'pbadge-x' };
+    $pbClass = match($pl) { '1.' => 'pbadge-1', '2.' => 'pbadge-2', '3.' => 'pbadge-3', default => 'pbadge-x' };
   ?>
-  <div class="compact-list-row" style="grid-template-columns:1.5fr 1.5fr 80px 60px 28px"
+  <div class="compact-list-row" style="grid-template-columns:1fr 1fr 1fr 80px 60px 28px"
        onclick="adminToggleExpand('c<?= (int)$c['id'] ?>')">
     <div class="cl-name"><?= e($c['organizer'] ?? '—') ?></div>
+    <div class="cl-meta"><?= e($c['discipline'] ?? '—') ?></div>
     <div class="cl-meta"><?= e($c['class'] ?? '—') ?></div>
     <div class="cl-meta"><?= $c['competition_date'] ? formatDate($c['competition_date']) : '—' ?></div>
     <div><span class="pbadge <?= $pbClass ?>"><?= $pl !== '' ? e($pl) : '—' ?></span></div>
@@ -146,8 +157,13 @@ $wins = count(array_filter($competitions, fn($c) => $c['placement'] === '1.'));
     </div>
   </div>
   <div class="cl-expanded" id="cl-exp-c<?= (int)$c['id'] ?>">
-    <?php if ($c['notes']): ?>
-      <p style="font-size:0.8rem;color:var(--color-text-muted);margin:0 0 0.5rem"><?= e($c['notes']) ?></p>
+    <?php if ($c['country'] || $c['organizer_url'] || $c['points'] !== null || $c['notes']): ?>
+      <dl style="font-size:0.8rem;color:var(--color-text-muted);margin:0 0 0.5rem;display:flex;flex-wrap:wrap;gap:0.25rem 1.5rem">
+        <?php if ($c['country']): ?><div><dt style="display:inline;font-weight:600">Maa:</dt> <dd style="display:inline"><?= e($c['country']) ?></dd></div><?php endif; ?>
+        <?php if ($c['organizer_url']): ?><div><dt style="display:inline;font-weight:600">URL:</dt> <dd style="display:inline"><a href="<?= e($c['organizer_url']) ?>" target="_blank" rel="noopener"><?= e($c['organizer_url']) ?></a></dd></div><?php endif; ?>
+        <?php if ($c['points'] !== null): ?><div><dt style="display:inline;font-weight:600">Pisteet:</dt> <dd style="display:inline"><?= e((string)$c['points']) ?></dd></div><?php endif; ?>
+        <?php if ($c['notes']): ?><div style="width:100%"><dt style="display:inline;font-weight:600">Huom:</dt> <dd style="display:inline"><?= e($c['notes']) ?></dd></div><?php endif; ?>
+      </dl>
     <?php endif; ?>
     <div class="cl-expanded-actions">
       <button class="btn-sm btn-edit" onclick="openEditComp(<?= (int)$c['id'] ?>, <?= htmlspecialchars(json_encode($c), ENT_QUOTES) ?>)">✏️ Muokkaa</button>
@@ -180,26 +196,46 @@ $wins = count(array_filter($competitions, fn($c) => $c['placement'] === '1.'));
       <div class="admin-modal-body">
         <div class="form-row">
           <div class="form-group">
-            <label for="competition_date">Päivämäärä</label>
+            <label for="competition_date">PVM</label>
             <input type="date" id="competition_date" name="competition_date">
           </div>
           <div class="form-group">
-            <label for="placement">Tulos</label>
-            <input type="text" id="placement" name="placement" placeholder="esim. 1., 2., DNS, DQ…">
+            <label for="discipline">Laji</label>
+            <input type="text" id="discipline" name="discipline" placeholder="esim. Koulu, Rata, Länsi…">
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label for="organizer">Järjestäjä</label>
-            <input type="text" id="organizer" name="organizer" placeholder="Järjestävä talli">
+            <label for="country">Maa</label>
+            <input type="text" id="country" name="country" placeholder="esim. Suomi, Ruotsi…">
           </div>
           <div class="form-group">
             <label for="class">Luokka</label>
             <input type="text" id="class" name="class" placeholder="esim. EA, EP, Helppo A…">
           </div>
         </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="organizer">Järjestäjän nimi</label>
+            <input type="text" id="organizer" name="organizer" placeholder="Järjestävä talli">
+          </div>
+          <div class="form-group">
+            <label for="organizer_url">Järjestäjän URL</label>
+            <input type="url" id="organizer_url" name="organizer_url" placeholder="https://…">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="placement">Tulos</label>
+            <input type="text" id="placement" name="placement" placeholder="esim. 1., 2., DNS, DQ…">
+          </div>
+          <div class="form-group">
+            <label for="points">Pisteet</label>
+            <input type="number" id="points" name="points" step="0.01" min="0" placeholder="esim. 65.5">
+          </div>
+        </div>
         <div class="form-group">
-          <label for="notes">Huomiot</label>
+          <label for="notes">Huom</label>
           <textarea id="notes" name="notes"></textarea>
         </div>
       </div>
@@ -217,9 +253,13 @@ function openEditComp(id, data) {
   document.getElementById('modal-comp-action').value       = 'edit';
   document.getElementById('modal-comp-id').value           = id;
   document.getElementById('competition_date').value        = data.competition_date  || '';
+  document.getElementById('discipline').value              = data.discipline        || '';
+  document.getElementById('country').value                 = data.country           || '';
   document.getElementById('organizer').value               = data.organizer         || '';
+  document.getElementById('organizer_url').value           = data.organizer_url     || '';
   document.getElementById('class').value                   = data.class             || '';
   document.getElementById('placement').value               = data.placement         || '';
+  document.getElementById('points').value                  = data.points            || '';
   document.getElementById('notes').value                   = data.notes             || '';
   document.getElementById('modal-comp-btn').textContent    = 'Tallenna muutokset';
   adminOpenModal('comp');

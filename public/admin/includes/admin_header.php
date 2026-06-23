@@ -223,6 +223,12 @@ $_adminTheme = $GLOBALS['color_theme'];
     .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--color-accent, #a0633a); }
     .form-group textarea { min-height: 80px; resize: vertical; }
 
+    /* ── CHECKBOX GRID ────────────────────────── */
+    .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.25rem 0.5rem; padding: 0.5rem 0; }
+    .checkbox-label { display: flex; align-items: center; gap: 0.45rem; font-size: 0.85rem; color: var(--color-text, #2c2c2c); cursor: pointer; padding: 0.25rem 0.35rem; border-radius: 4px; font-weight: normal; text-transform: none; letter-spacing: 0; }
+    .checkbox-label:hover { background: var(--color-surface-warm, #faf6f0); }
+    .checkbox-label input[type=checkbox] { width: auto; border: 1px solid var(--color-border, #e0d5c5); border-radius: 3px; cursor: pointer; accent-color: var(--color-accent, #a0633a); }
+
     /* ── AUTOCOMPLETE ──────────────────────────── */
     .ac-wrap { position: relative; }
     .ac-wrap .ac-text { width: 100%; }

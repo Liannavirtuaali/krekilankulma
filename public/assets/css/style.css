@@ -525,7 +525,7 @@ tr:hover td { background: var(--color-parchment); }
 .comp-list { border: 1px solid var(--color-border-warm); border-radius: var(--radius-sm); overflow: hidden; }
 .comp-header {
   display: grid;
-  grid-template-columns: 7rem 1fr 5rem 5rem 1fr;
+  grid-template-columns: 6rem 1fr 4.5rem 1fr 5rem 4.5rem 5rem 1.5fr;
   background: var(--color-primary);
   color: var(--color-cream);
   font-size: var(--text-xs);
@@ -535,7 +535,7 @@ tr:hover td { background: var(--color-parchment); }
 .comp-header > div { padding: 0.5rem 0.75rem; }
 .comp-row {
   display: grid;
-  grid-template-columns: 7rem 1fr 5rem 5rem 1fr;
+  grid-template-columns: 6rem 1fr 4.5rem 1fr 5rem 4.5rem 5rem 1.5fr;
   border-top: 1px solid var(--color-border-warm);
   font-size: var(--text-sm);
 }
@@ -696,7 +696,7 @@ tr:hover td { background: var(--color-parchment); }
 /* ── Profiilisivu layout (hero + sidebar) ────── */
 .profile-layout {
   display: grid;
-  grid-template-columns: 1fr 300px;
+  grid-template-columns: 1fr 380px;
   gap: 1.5rem;
   align-items: start;
   margin-top: 1.5rem;
