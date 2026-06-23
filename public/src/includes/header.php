@@ -39,6 +39,11 @@ $page_title = isset($page_title) ? htmlspecialchars($page_title, ENT_QUOTES, 'UT
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><?= $page_title ?> — <?= htmlspecialchars($site_display_name, ENT_QUOTES, 'UTF-8') ?></title>
+  <!-- TODO WR-02: Replace hardcoded path with THEME_URL once theme CSS integration is complete.
+       Current: always loads /assets/css/style.css regardless of active theme.
+       Target:  e(THEME_URL) . 'assets/css/style.css'  (requires theme.php to be loaded first)
+       Until then, theme.php constants (THEME_PATH, THEME_URL, THEMES_ROOT) are defined
+       but have no effect on rendered output. -->
   <link rel="stylesheet" href="<?= SITE_URL ?>/assets/css/style.css">
 </head>
 <body>

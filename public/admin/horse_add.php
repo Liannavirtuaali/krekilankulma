@@ -5,19 +5,20 @@ requireLogin();
 $db = getDB();
 $allHorses    = $db->query('SELECT id, name FROM horses WHERE is_deleted = 0 ORDER BY name')->fetchAll();
 $disciplines  = $db->query('SELECT id, name FROM disciplines ORDER BY name')->fetchAll();
-$levels       = $db->query('SELECT id, name FROM levels ORDER BY name')->fetchAll();
 $breeds       = $db->query('SELECT id, name FROM breeds ORDER BY name')->fetchAll();
 $colors       = $db->query('SELECT id, name FROM colors ORDER BY name')->fetchAll();
 
 $errors = [];
 $f = [
     'name' => '', 'call_name' => '', 'vh_id' => '', 'breed_id' => '',
-    'birth_date' => '', 'gender' => '', 'color_id' => '', 'height_cm' => '',
-    'discipline_id' => '', 'level_id' => '', 'owner_name' => '', 'owner_email' => '',
+    'birth_date' => '', 'aging_system' => '', 'gender' => '', 'color_id' => '', 'genes' => '', 'height_cm' => '',
+    'level_ko' => '', 'level_re' => '', 'owner_name' => '', 'owner_email' => '',
     'breeder_name' => '', 'breeder_email' => '', 'importer_name' => '', 'importer_email' => '',
     'sire_id' => '', 'dam_id' => '', 'evm' => '', 'profile_url' => '',
     'description' => '', 'pedigree_notes' => '',
 ];
+$selectedDisciplineIds = [];
+$validAgingSystems = ['IRL','VHKR','VARL','CAS','KATT','SHS'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
@@ -26,6 +27,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         foreach ($f as $k => $_) {
             $f[$k] = sanitize($_POST[$k] ?? '');
         }
+        $validDisciplineIds = array_column($disciplines, 'id');
+        $selectedDisciplineIds = array_values(array_filter(
+            array_map('intval', $_POST['discipline_ids'] ?? []),
+            fn($id) => in_array($id, $validDisciplineIds)
+        ));
         if ($f['name'] === '') {
             $errors[] = 'Nimi on pakollinen.';
         }
@@ -63,13 +69,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $stmt = $db->prepare(
                 'INSERT INTO horses
-                 (name, call_name, vh_id, breed_id, birth_date, gender, color_id, height_cm,
-                  discipline_id, level_id, owner_name, owner_email, breeder_name, breeder_email,
+                 (name, call_name, vh_id, breed_id, birth_date, aging_system, gender, color_id, genes, height_cm,
+                  level_ko, level_re, owner_name, owner_email, breeder_name, breeder_email,
                   importer_name, importer_email, sire_id, dam_id, evm, profile_url,
                   description, pedigree_notes, slug)
                  VALUES
-                 (:name, :call_name, :vh_id, :breed_id, :birth_date, :gender, :color_id, :height_cm,
-                  :discipline_id, :level_id, :owner_name, :owner_email, :breeder_name, :breeder_email,
+                 (:name, :call_name, :vh_id, :breed_id, :birth_date, :aging_system, :gender, :color_id, :genes, :height_cm,
+                  :level_ko, :level_re, :owner_name, :owner_email, :breeder_name, :breeder_email,
                   :importer_name, :importer_email, :sire_id, :dam_id, :evm, :profile_url,
                   :description, :pedigree_notes, :slug)'
             );
@@ -79,11 +85,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':vh_id'          => $f['vh_id'] ?: null,
                 ':breed_id'       => $f['breed_id'] !== '' ? (int)$f['breed_id'] : null,
                 ':birth_date'     => $f['birth_date'] ?: null,
+                ':aging_system'   => in_array($f['aging_system'], $validAgingSystems, true) ? $f['aging_system'] : null,
                 ':gender'         => in_array($f['gender'], $validGenders, true) ? $f['gender'] : 'tamma',
                 ':color_id'       => $f['color_id'] !== '' ? (int)$f['color_id'] : null,
+                ':genes'          => $f['genes'] ?: null,
                 ':height_cm'      => $f['height_cm'] !== '' ? (int)$f['height_cm'] : null,
-                ':discipline_id'  => $f['discipline_id'] !== '' ? (int)$f['discipline_id'] : null,
-                ':level_id'       => $f['level_id'] !== '' ? (int)$f['level_id'] : null,
+                ':level_ko'       => $f['level_ko'] ?: null,
+                ':level_re'       => $f['level_re'] ?: null,
                 ':owner_name'     => $f['owner_name'] ?: null,
                 ':owner_email'    => $f['owner_email'] ?: null,
                 ':breeder_name'   => $f['breeder_name'] ?: null,
@@ -98,6 +106,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':pedigree_notes' => $f['pedigree_notes'] ?: null,
                 ':slug'           => $slug,
             ]);
+            $newHorseId = (int)$db->lastInsertId();
+            if ($selectedDisciplineIds) {
+                $ins = $db->prepare('INSERT IGNORE INTO horse_disciplines (horse_id, discipline_id) VALUES (:h, :d)');
+                foreach ($selectedDisciplineIds as $did) {
+                    $ins->execute([':h' => $newHorseId, ':d' => $did]);
+                }
+            }
             redirect(SITE_URL . '/admin/horses.php?added=1');
         }
     }
@@ -106,7 +121,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $pageTitle = 'Lisää hevonen';
 $breedsJson = json_encode(array_map(fn($b) => ['id' => $b['id'], 'label' => $b['name']], $breeds), JSON_UNESCAPED_UNICODE);
 $colorsJson = json_encode(array_map(fn($c) => ['id' => $c['id'], 'label' => $c['name']], $colors), JSON_UNESCAPED_UNICODE);
-$disciplinesJson = json_encode(array_map(fn($d) => ['id' => $d['id'], 'label' => $d['name']], $disciplines), JSON_UNESCAPED_UNICODE);
 $horsesJson = json_encode(array_map(fn($h) => ['id' => $h['id'], 'label' => $h['name']], $allHorses), JSON_UNESCAPED_UNICODE);
 require __DIR__ . '/includes/admin_header.php';
 ?>
@@ -156,6 +170,18 @@ require __DIR__ . '/includes/admin_header.php';
       <input type="date" id="birth_date" name="birth_date" value="<?= e($f['birth_date']) ?>">
     </div>
     <div class="form-group">
+      <label for="aging_system">Ikääntymisjärjestelmä</label>
+      <select id="aging_system" name="aging_system">
+        <option value="">— ei valittu —</option>
+        <?php foreach (['IRL','VHKR','VARL','CAS','KATT','SHS'] as $sys): ?>
+          <option value="<?= e($sys) ?>" <?= $f['aging_system'] === $sys ? 'selected' : '' ?>><?= e($sys) ?></option>
+        <?php endforeach; ?>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group" style="flex:0 0 calc(50% - 0.5rem)">
       <label for="gender">Sukupuoli</label>
       <select id="gender" name="gender">
         <option value="">— valitse —</option>
@@ -185,23 +211,34 @@ require __DIR__ . '/includes/admin_header.php';
 
   <div class="form-row">
     <div class="form-group">
-      <label for="discipline_id_text">Laji</label>
-      <div class="ac-wrap"
-           data-items='<?= htmlspecialchars($disciplinesJson, ENT_QUOTES) ?>'
-           data-input-id="discipline_id"
-           data-hidden-name="discipline_id"
-           data-current-id=""
-           data-current-label=""
-           data-placeholder="Hae lajia..."></div>
+      <label for="genes">Geenit</label>
+      <input type="text" id="genes" name="genes" value="<?= e($f['genes']) ?>" placeholder="esim. Ee Aa">
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group" style="grid-column:1/-1">
+      <label>Lajit</label>
+      <div class="checkbox-grid">
+        <?php foreach ($disciplines as $d): ?>
+          <label class="checkbox-label">
+            <input type="checkbox" name="discipline_ids[]" value="<?= (int)$d['id'] ?>"
+                   <?= in_array((int)$d['id'], $selectedDisciplineIds) ? 'checked' : '' ?>>
+            <?= e($d['name']) ?>
+          </label>
+        <?php endforeach; ?>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label for="level_ko">Taso — ko</label>
+      <input type="text" id="level_ko" name="level_ko" value="<?= e($f['level_ko']) ?>" placeholder="esim. Vaativa A">
     </div>
     <div class="form-group">
-      <label for="level_id">Taso</label>
-      <select id="level_id" name="level_id">
-        <option value="">— ei valittu —</option>
-        <?php foreach ($levels as $lv): ?>
-          <option value="<?= (int)$lv['id'] ?>" <?= (int)$f['level_id'] === (int)$lv['id'] ? 'selected' : '' ?>><?= e($lv['name']) ?></option>
-        <?php endforeach; ?>
-      </select>
+      <label for="level_re">Taso — re</label>
+      <input type="text" id="level_re" name="level_re" value="<?= e($f['level_re']) ?>" placeholder="esim. 130cm, CIC5">
     </div>
   </div>
 

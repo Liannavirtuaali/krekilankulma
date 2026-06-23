@@ -14,6 +14,18 @@ foreach ($rows as $row) {
 $errors  = [];
 $success = false;
 
+// Lue saatavilla olevat ulkoasuteeman kansiot (tarvitaan POST-validoinnissa)
+$available_themes = [];
+$themes_dir = __DIR__ . '/../themes';
+foreach (glob($themes_dir . '/*/theme.json') ?: [] as $json_path) {
+    $theme_key = basename(dirname($json_path));
+    $meta = json_decode(file_get_contents($json_path), true);
+    $available_themes[$theme_key] = $meta['name'] ?? $theme_key;
+}
+if (empty($available_themes)) {
+    $available_themes['default'] = 'Default';
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
         $errors[] = 'Virheellinen pyyntö.';
@@ -52,10 +64,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $values[$key] = $val;
         }
 
-        // Teema: sallitut arvot
+        // Väriteema: sallitut arvot
         $valid_themes = ['savi','metsa','yo','ruusu','kivikko','arktinen','aurinko','laventeli','talvi','kulta'];
         $theme_post = $_POST['color_theme'] ?? 'savi';
         $values['color_theme'] = in_array($theme_post, $valid_themes, true) ? $theme_post : 'savi';
+
+        // Aktiivinen ulkoasuteema
+        $active_theme_post = $_POST['active_theme'] ?? 'default';
+        $values['active_theme'] = array_key_exists($active_theme_post, $available_themes) ? $active_theme_post : 'default';
 
         if (empty($errors)) {
             $stmt = $db->prepare(
@@ -77,6 +93,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $pageTitle = 'Ylläpitäjän tiedot';
+
+$current_active_theme = $s['active_theme'] ?? 'default';
 
 // Teemamäärittely väriesikatselua varten
 $theme_defs = [
@@ -186,6 +204,25 @@ require __DIR__ . '/includes/admin_header.php';
                maxlength="500" placeholder="https://...">
       </div>
       <div class="form-group"></div>
+    </div>
+  </div>
+
+  <div class="admin-card">
+    <h2>Ulkoasuteema</h2>
+    <p style="font-size:0.85rem; color:var(--color-text-muted); margin-bottom:0.75rem">
+      Valitse käytettävä sivupohja. <strong>Default</strong> on järjestelmän vakiopohja.
+    </p>
+    <div style="display:flex; flex-wrap:wrap; gap:0.75rem">
+      <?php foreach ($available_themes as $key => $label): ?>
+      <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer; font-size:0.9rem">
+        <input type="radio" name="active_theme" value="<?= e($key) ?>"
+               <?= $current_active_theme === $key ? 'checked' : '' ?>>
+        <?= e($label) ?>
+        <?php if ($key === 'default'): ?>
+          <span style="font-size:0.75rem; color:var(--color-text-muted)">(vakio)</span>
+        <?php endif; ?>
+      </label>
+      <?php endforeach; ?>
     </div>
   </div>
 

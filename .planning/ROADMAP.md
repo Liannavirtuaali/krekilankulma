@@ -12,9 +12,13 @@ Projekti rakentaa PHP/MySQL-pohjaisen virtuaalitallin kokonaan uudelleen: ensin 
 
 - [x] **Phase 1: Perusta & Tietokantarakenne** - Hakemistorakenne, tietokantaskeema ja PHP-peruspohja
 - [x] **Phase 2: Julkiset sivut** - Kaikki 5 julkista sivua live-datalla tietokannasta
-- [ ] **Phase 3: Admin-paneeli** - Hevosten hallinta, kirjautuminen, kuvat, kilpailut
-- [ ] **Phase 4: Tietoturva & Viimeistely** - OWASP, CSRF, XSS ja Altervista-deployment
+- [x] **Phase 3: Admin-paneeli** - Hevosten hallinta, kirjautuminen, kuvat, kilpailut
+- [x] **Phase 4: Tietoturva & Viimeistely** - OWASP, CSRF, XSS ja Altervista-deployment
 - [x] **Phase 5: Blogi** - Postausten hallinta adminissa, julkinen postauslista ja yksittäinen postaussivu arkistosidebarilla (completed 2026-06-18)
+- [ ] **Phase 6: Teema-infrastruktuuri** - theme.php-shim, DB-migraatio, resolveThemePath()-helper ja julkinen/admin-eristys
+- [ ] **Phase 7: Oletusteman rakenne** - public/themes/default/-rakenne: includes, sivupohjat, CSS ja theme.json
+- [ ] **Phase 8: Sivukontrollerien migraatio** - Kaikki 7 julkista sivukontrolleria muuttuvat data-only-kontrollereiksi
+- [ ] **Phase 9: Admin-teemavalinta & Altervista-verifiointi** - Admin voi valita teeman; järjestelmä toimii tuotannossa
 
 ## Phase Details
 
@@ -100,7 +104,7 @@ Plans:
 
 ---
 *Roadmap created: 2026-06-17*
-*Last updated: 2026-06-18 — Phase 5 Blogi lisätty; Phase 4 CI/CD-deployment-suunnitelma lisätty*
+*Last updated: 2026-06-22 — v1.1 Teemajärjestelmä phases 6–9 added*
 
 ### Phase 5: Blogi
 
@@ -116,3 +120,91 @@ Plans:
   5. Admin voi lisätä, muokata ja poistaa postauksia (`/admin/posts.php`)
 
 **Plans**: 0 plans
+
+---
+
+## v1.1 — Teemajärjestelmä
+
+### Phase 6: Teema-infrastruktuuri
+
+**Goal**: Teemajärjestelmän perusta on pystyssä — julkiset sivut saavat THEME_PATH/THEME_URL-vakiot shimistä, aktiivinen teema tallennetaan tietokantaan, ja path-traversal-hyökkäykset on estetty.
+**Depends on**: Phase 5
+**Requirements**: [THEME-01, THEME-02, THEME-03, THEME-04]
+**Success Criteria** (what must be TRUE):
+
+  1. `resolveThemePath()` palauttaa oikean polun aktiiviiselle teemalle ja fallbackaa `default`-teemaan kun tiedosto puuttuu
+  2. `resolveThemePath()` hylkää teemanimet joissa on polkutraversaalimerkkejä (`../`, `%2F` jne.) — testi: syöte `../../etc/passwd` ei tuota osumaa
+  3. Julkinen sivu saa `THEME_PATH`- ja `THEME_URL`-vakiot `src/includes/theme.php`-shimistä; admin-sivu ei lataa shimmiä lainkaan
+  4. `settings`-taulussa on `active_theme`-rivi ja sen arvo on haettavissa tietokannasta
+  5. Jokainen teemakansio jolla on `theme.json` löytyy ja luetaan oikein (nimi, versio)
+
+**Plans**: 2 plans
+Plans:
+**Wave 1**
+
+- [x] 06-01-PLAN.md — migrate_theme.sql (active_theme-rivi) ja public/themes/default/theme.json (THEME-02, THEME-04)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [x] 06-02-PLAN.md — theme.php-shim (THEME_PATH/THEME_URL + resolveThemePath path-traversal-suojauksella) ja index.php-integraatiotodistus (THEME-01, THEME-03)
+
+**UI hint**: no
+
+### Phase 7: Oletusteman rakenne
+
+**Goal**: Sivusto näyttää täsmälleen samalta kuin ennen, mutta kaikki julkinen HTML on nyt `public/themes/default/`-rakenteessa ja admin-puoli käyttää edelleen muuttumattomia tiedostojaan.
+**Depends on**: Phase 6
+**Requirements**: [THEME-05, THEME-06, THEME-07]
+**Success Criteria** (what must be TRUE):
+
+  1. `public/themes/default/includes/` sisältää header.php, footer.php ja nav.php — sivusto näyttää visuaalisesti identtiseltä kuin ennen
+  2. `public/themes/default/pages/` sisältää kaikki 7 sivupohjaa (index, hevoset, hevonen, kasvatus, yhteystiedot, blogi, postaus)
+  3. `public/themes/default/assets/css/style.css` palvelee teeman tyylit; `public/assets/css/style.css` pysyy muuttumattomana (admin käyttää sitä)
+  4. `public/themes/default/theme.json` on olemassa ja sisältää nimen ja version
+
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 8: Sivukontrollerien migraatio
+
+**Goal**: Kaikki 7 julkista sivukontrolleria ovat data-only — ne hakevat datan tietokannasta ja delegoivat kaiken HTML-renderöinnin aktiivisen teeman sivupohjille `resolveThemePath()`:n kautta.
+**Depends on**: Phase 7
+**Requirements**: [THEME-08, THEME-09]
+**Success Criteria** (what must be TRUE):
+
+  1. Kaikki 5 perussivua (index.php, hevoset.php, hevonen.php, kasvatus.php, yhteystiedot.php) latautuvat oikein ilman inline-HTML:ää kontrollerissa
+  2. Molemmat blogi-sivut (blogi.php, postaus.php) latautuvat oikein data-only-mallin mukaisesti
+  3. Teeman vaihtaminen (manuaalisesti DB:ssä) vaihtaa sivuston ulkoasun — kontrolleri ei tarvitse muutoksia
+
+**Plans**: TBD
+**UI hint**: no
+
+### Phase 9: Admin-teemavalinta & Altervista-verifiointi
+
+**Goal**: Tallinpitäjä voi vaihtaa aktiivisen teeman admin-paneelista yhdellä klikkauksella, ja koko teemajärjestelmä toimii varmistettuna Altervistan tuotantoympäristössä.
+**Depends on**: Phase 8
+**Requirements**: [THEME-10, THEME-11, THEME-12]
+**Success Criteria** (what must be TRUE):
+
+  1. Admin-paneelin settings.php listaa kaikki asennetut teemat `theme.json`-nimillä (ei raakoja hakemistonimiä)
+  2. Admin voi valita teeman listasta ja tallentaa valinnan — sivusto vaihtaa ulkoasun välittömästi
+  3. Teeman tallennus hylkää arvot jotka eivät ole asennettujen teemojen allowlistilla; CSRF-token vaaditaan
+  4. `public/themes/`-kansio on suojattu suoralta selailuulta Altervistassa
+  5. Teeman CSS latautuu oikealla MIME-tyypillä (`text/css`) Altervistassa — testattu FTP-deploymentilla
+
+**Plans**: TBD
+**UI hint**: yes
+
+## Progress Table
+
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|-----------|
+| 1. Perusta & Tietokantarakenne | 3/3 | Complete | 2026-06-17 |
+| 2. Julkiset sivut | 3/3 | Complete | 2026-06-17 |
+| 3. Admin-paneeli | 4/4 | Complete | 2026-06-17 |
+| 4. Tietoturva & Viimeistely | 2/2 | Complete | 2026-06-18 |
+| 5. Blogi | 0/0 | Complete | 2026-06-18 |
+| 6. Teema-infrastruktuuri | 2/2 | Complete | 2026-06-22 |
+| 7. Oletusteman rakenne | 0/? | Not started | - |
+| 8. Sivukontrollerien migraatio | 0/? | Not started | - |
+| 9. Admin-teemavalinta & Altervista-verifiointi | 0/? | Not started | - |

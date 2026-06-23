@@ -70,13 +70,95 @@ function formatDate(?string $date): string {
 }
 
 /**
- * Laskee hevosen iän syntymäpäivästä
+ * Laskee hevosen iän syntymäpäivästä (IRL, kokonaiset vuodet)
  */
 function calculateAge(?string $birthDate): ?int {
     if (!$birthDate) return null;
     $birth = new DateTime($birthDate);
     $now = new DateTime();
     return (int) $now->diff($birth)->y;
+}
+
+/**
+ * VHKR-ikä: 1 irl kuukausi = 1 vuosi
+ */
+function calculateAgeVHKR(?string $birthDate): ?int {
+    if (!$birthDate) return null;
+    $birth = new DateTime($birthDate);
+    $now = new DateTime();
+    if ($birth > $now) return 0;
+    $diff = $birth->diff($now);
+    return $diff->y * 12 + $diff->m;
+}
+
+/**
+ * VARL-ikä: 48 irl päivää = 1 vuosi
+ */
+function calculateAgeVARL(?string $birthDate): ?int {
+    if (!$birthDate) return null;
+    $birth = new DateTime($birthDate);
+    $now = new DateTime();
+    if ($birth > $now) return 0;
+    return (int) floor((int) $birth->diff($now)->days / 48);
+}
+
+/**
+ * CAS-ikä: 12 irl viikkoa (84 pv) = 1 vuosi, ajanlasku alkoi 04.12.2006 (CAS 1)
+ */
+function calculateAgeCAS(?string $birthDate): ?int {
+    if (!$birthDate) return null;
+    $epoch = new DateTime('2006-12-04');
+    $birth = new DateTime($birthDate);
+    $now   = new DateTime();
+    if ($birth > $now) return 0;
+    $birthDays = $birth >= $epoch ? (int) $epoch->diff($birth)->days : 0;
+    $nowDays   = $now   >= $epoch ? (int) $epoch->diff($now)->days   : 0;
+    $birthCasYear = (int) floor($birthDays / 84) + 1;
+    $nowCasYear   = (int) floor($nowDays   / 84) + 1;
+    return max(0, $nowCasYear - $birthCasYear);
+}
+
+/**
+ * KATT-ikä: 6 irl kuukautta = 1 vuosi
+ */
+function calculateAgeKATT(?string $birthDate): ?int {
+    if (!$birthDate) return null;
+    $birth = new DateTime($birthDate);
+    $now = new DateTime();
+    if ($birth > $now) return 0;
+    $diff = $birth->diff($now);
+    return (int) floor(($diff->y * 12 + $diff->m) / 6);
+}
+
+/**
+ * Laskee iän valitun järjestelmän mukaan (apufunktio näytölle)
+ */
+function calculateAgeBySystem(?string $birthDate, ?string $system): ?int {
+    return match ($system) {
+        'VHKR' => calculateAgeVHKR($birthDate),
+        'VARL' => calculateAgeVARL($birthDate),
+        'CAS'  => calculateAgeCAS($birthDate),
+        'KATT' => calculateAgeKATT($birthDate),
+        'SHS'  => calculateAgeSHS($birthDate),
+        default => calculateAge($birthDate),
+    };
+}
+
+/**
+ * SHS-ikä taulukkokaavan mukaan
+ */
+function calculateAgeSHS(?string $birthDate): ?int {
+    if (!$birthDate) return null;
+    $birth = new DateTime($birthDate);
+    $now = new DateTime();
+    if ($birth > $now) return 0;
+    $diff   = $birth->diff($now);
+    $months = $diff->y * 12 + $diff->m;
+    if ($months < 3)  return 0;
+    if ($months < 6)  return 1;
+    if ($months < 10) return 2;
+    if ($months < 16) return 3;
+    return (int) round($months / 8 + 2);
 }
 
 /**

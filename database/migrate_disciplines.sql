@@ -46,6 +46,7 @@ INSERT INTO `disciplines` (`id`,`name`,`abbreviation`) VALUES
   (10,'laukat',             'lauk.'),
   (11,'poniravit',          'pora'),
   (12,'maastoeste',         'me'),
-  (13,'näyttelyt',          'n.');
+  (13,'näyttelyt',          'n.'),
+  (14,'yleispainotus',      'yleis.');
 
 SET FOREIGN_KEY_CHECKS = 1;

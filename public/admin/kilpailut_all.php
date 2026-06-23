@@ -5,7 +5,7 @@ requireLogin();
 $db = getDB();
 
 $competitions = $db->query(
-    'SELECT c.id, c.competition_date, c.organizer, c.class, c.placement, c.notes,
+    'SELECT c.id, c.competition_date, c.discipline, c.country, c.organizer, c.organizer_url, c.class, c.placement, c.points, c.notes,
             h.id AS horse_id, h.name AS horse_name
      FROM competitions c
      JOIN horses h ON h.id = c.horse_id AND h.is_deleted = 0
@@ -38,24 +38,27 @@ require __DIR__ . '/includes/admin_header.php';
   <p style="color:var(--color-text-muted)">Ei kilpailumerkintöjä. Lisää tuloksia hevosen omalta Kilpailut-sivulta.</p>
 <?php else: ?>
 <div class="compact-list">
-  <div class="compact-list-header" style="grid-template-columns:1.5fr 1.5fr 1fr 80px 60px">
-    <div>Järjestäjä</div><div>Hevonen</div><div>Luokka</div><div>Päivämäärä</div><div>Tulos</div>
+  <div class="compact-list-header" style="grid-template-columns:1.5fr 1.5fr 1fr 1fr 80px 60px">
+    <div>Järjestäjä</div><div>Hevonen</div><div>Laji</div><div>Luokka</div><div>Päivämäärä</div><div>Tulos</div>
   </div>
   <?php foreach ($competitions as $c):
     $pl = $c['placement'] ?? '';
     $pbClass = match($pl) { '1.' => 'pbadge-1', '2.' => 'pbadge-2', '3.' => 'pbadge-3', default => 'pbadge-x' };
   ?>
-  <div class="compact-list-row" style="grid-template-columns:1.5fr 1.5fr 1fr 80px 60px">
+  <div class="compact-list-row" style="grid-template-columns:1.5fr 1.5fr 1fr 1fr 80px 60px">
     <div>
-      <div class="cl-name"><?= e($c['organizer'] ?? '—') ?></div>
-      <?php if ($c['notes']): ?>
-        <div class="cl-meta"><?= e(mb_strimwidth($c['notes'], 0, 60, '…')) ?></div>
+      <?php if (!empty($c['organizer_url'])): ?>
+        <a href="<?= e($c['organizer_url']) ?>" target="_blank" rel="noopener" class="cl-name"><?= e($c['organizer'] ?? '—') ?></a>
+      <?php else: ?>
+        <div class="cl-name"><?= e($c['organizer'] ?? '—') ?></div>
       <?php endif; ?>
+      <?php if ($c['country']): ?><div class="cl-meta"><?= e($c['country']) ?></div><?php endif; ?>
     </div>
     <div>
       <a href="<?= e(SITE_URL) ?>/admin/competitions.php?horse_id=<?= (int)$c['horse_id'] ?>"
          class="cl-name" style="text-decoration:none"><?= e($c['horse_name']) ?></a>
     </div>
+    <div class="cl-meta"><?= e($c['discipline'] ?? '—') ?></div>
     <div class="cl-meta"><?= e($c['class'] ?? '—') ?></div>
     <div class="cl-meta"><?= $c['competition_date'] ? formatDate($c['competition_date']) : '—' ?></div>
     <div><span class="pbadge <?= $pbClass ?>"><?= $pl !== '' ? e($pl) : '—' ?></span></div>

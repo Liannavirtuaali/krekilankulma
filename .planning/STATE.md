@@ -1,72 +1,80 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-current_phase: 04
-status: Phase 04 Complete
-last_updated: "2026-06-18T00:00:00.000Z"
+milestone: v1.1
+milestone_name: — Teemajärjestelmä
+status: phase_complete
+stopped_at: "Completed 06-02-PLAN.md"
+last_updated: "2026-06-22T16:05:00.000Z"
+last_activity: 2026-06-22 -- Phase 06 Plan 02 completed
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 13
-  completed_plans: 13
-  percent: 100
+  total_phases: 4
+  completed_phases: 1
+  total_plans: 2
+  completed_plans: 2
+  percent: 25
 ---
 
 # Project State
 
-**Project:** Virtuaalitalli
-**Initialized:** 2026-06-17
-**Current Phase:** 04
+## Project Reference
+
+See: .planning/PROJECT.md (updated 2026-06-22)
+
+**Core value:** Hevosomistaja voi hallita koko tallinsa hevostietoja yhdestä turvallisesta admin-paneelista, ja kaikki tieto näkyy automaattisesti julkisella sivustolla.
+**Current focus:** Phase 06 — teema-infrastruktuuri
+
+## Current Position
+
+Phase: 06 (teema-infrastruktuuri) — COMPLETE
+Plan: 2 of 2 (kaikki valmiina)
+Status: Phase 06 valmis — seuraava: Phase 07 (oletusteman rakenne)
+Last activity: 2026-06-22 -- Phase 06 Plan 02 completed
+
+Progress: [██████░░░░] 60% (v1.1 scope)
 
 ## Workflow Status
 
 | Phase | Status | Started | Completed |
 |-------|--------|---------|-----------|
-| Phase 1 — Perusta & DB | ✅ Complete | 2026-06-17 | 2026-06-17 |
-| Phase 2 — Julkiset sivut | ✅ Complete | 2026-06-17 | 2026-06-17 |
-| Phase 3 — Admin-paneeli | ✅ Complete | 2026-06-17 | 2026-06-17 |
-| Phase 4 — Tietoturva & Deploy | ✅ Code complete | 2026-06-17 | 2026-06-17 |
+| Phase 1 — Perusta & DB | Complete | 2026-06-17 | 2026-06-17 |
+| Phase 2 — Julkiset sivut | Complete | 2026-06-17 | 2026-06-17 |
+| Phase 3 — Admin-paneeli | Complete | 2026-06-17 | 2026-06-17 |
+| Phase 4 — Tietoturva & Deploy | Complete | 2026-06-17 | 2026-06-18 |
+| Phase 5 — Blogi | Complete | 2026-06-18 | 2026-06-18 |
+| Phase 6 — Teema-infrastruktuuri | Complete | 2026-06-22 | 2026-06-22 |
+| Phase 7 — Oletusteman rakenne | Not started | — | — |
+| Phase 8 — Sivukontrollerien migraatio | Not started | — | — |
+| Phase 9 — Admin-teemavalinta & Altervista | Not started | — | — |
 
 ## Configuration
 
 - **Mode:** YOLO
 - **Granularity:** Coarse
-- **Research:** Disabled
+- **Research:** Completed (research/SUMMARY.md)
 - **Plan Check:** Enabled
 - **Verifier:** Enabled
 - **Git tracking:** Enabled
 
-## Active Decisions
+## Accumulated Context
+
+### Decisions
 
 - Admin-paneeli: kirjautuminen bcrypt+CSRF, pehmeä poisto hevosille, kuvat finfo_file() MIME-tarkistuksella
-- Slug generoidaan automaattisesti nimestä (slugify), duplikaatit saavat numeron loppuun
-- horse_edit.php estää itse-viittauksen sire/dam dropdowneissa
-- Kaikki 8 tietoturvavaatimusta (SEC-01–SEC-08) toteutettu koodissa
-- CI/CD: SamKirkland/FTP-Deploy-Action@v4 deployaa public/ Altervistaan push main -triggerillä; FTP-tunnukset GitHub Secretseissä
+- CI/CD: SamKirkland/FTP-Deploy-Action@v4 deployaa public/ Altervistaan push main -triggerillä
+- v1.1: resolveThemePath() käyttää preg_match + realpath + prefix-check (path-traversal-suojaus)
+- v1.1: admin-paneeli ei koskaan lataa theme.php-shimmiä
+- v1.1: public/assets/css/style.css pysyy muuttumattomana — admin_header.php riippuu siitä
+- v1.1 Plan 01: INSERT IGNORE (ei ON DUPLICATE KEY UPDATE) migraatioissa — yhdenmukaisuus migrate_*.sql-tiedostojen kanssa
+- v1.1 Plan 01: theme.json vain name+version — description/author/preview ovat V2-05 laajennuksia
+- v1.1 Plan 02: resolveThemePath() käyttää str_starts_with + string|false union type (PHP 8.0+); Altervista-yhteensopivuus varmistetaan Phase 9:ssä
+- v1.1 Plan 02: realpath()-fallback shimissä — shim ei kuole vaikka themes/-hakemisto puuttuu käynnistyksessä
 
-## Security Implementation (Phase 4)
+### Blockers/Concerns
 
-- **SEC-01** ✅ PDO prepared statements throughout
-- **SEC-02** ✅ validate_email(), filter_var(URL) on admin forms
-- **SEC-03** ✅ e() / htmlspecialchars() on all output
-- **SEC-04** ✅ CSRF tokens on all POST forms (generate + validate helpers)
-- **SEC-05** ✅ validate_image_upload() + generate_safe_filename() + .htaccess
-- **SEC-06** ✅ .htaccess blocks direct access to includes/
-- **SEC-07** ✅ Session hardening (httponly, secure, samesite, 30min timeout)
-- **SEC-08** ✅ display_errors Off via .htaccess
+- Altervistan CSS MIME-tyyppi subdirektoreille `public/themes/*/assets/css/` — ei voi varmistaa ennen FTP-deploymenttia (Phase 9)
 
-## CI/CD Deployment (Phase 4 Plan 2)
+## Session Continuity
 
-- **Workflow:** `.github/workflows/deploy.yml` — GitHub Actions FTP deploy on push to main
-- **Action:** SamKirkland/FTP-Deploy-Action@v4
-- **Scope:** Only `public/` → Altervista web root (`/`)
-- **Setup required:** Add `FTP_HOST`, `FTP_USERNAME`, `FTP_PASSWORD` as GitHub repository secrets
-
-## Next Action
-
-Add GitHub Secrets (FTP_HOST, FTP_USERNAME, FTP_PASSWORD) and push to main to trigger first deploy.
-See `.planning/phases/04-tietoturva-deploy/DEPLOYMENT_CHECKLIST.md` for full instructions.
-
----
-*Last updated: 2026-06-18 — Phase 4 Plan 2 complete: GitHub Actions CI/CD deployment workflow added*
+Last session: 2026-06-22T16:05:00.000Z
+Stopped at: Completed 06-02-PLAN.md (Phase 06 valmis)
+Resume file: .planning/phases/07-oletusteman-rakenne/07-01-PLAN.md
