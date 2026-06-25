@@ -1,0 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=Comic+Relief:wght@400;700&family=Dosis:wght@200..800&family=Gudea:ital,wght@0,400;0,700;1,400&family=Mea+Culpa&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Satisfy&family=Winky+Rough:ital,wght@0,300..900;1,300..900&display=swap');
+
+.container {
+  overflow: hidden;
+}
+
+.filterDiv {
+  width: 100%;
+  text-align: justify;
+  display: none; /* Hidden by default */
+margin: 1px 0;
+}
+
+.filterDiv_hevoset {
+  float: left;
+  width: 520px;
+  text-align: justify;
+  display: none; /* Hidden by default */
+margin: 1px 0;
+}
+
+/* The "show" class is added to the filtered elements */
+.show {
+  display: block;
+}
+
+/* Style the buttons */
+.btn {
+background:none;
+text-transform: uppercase;
+        font-family: Gudea;
+        font-size: 16px;
+        font-weight: normal;
+        text-shadow: 2px 1px 7px #fff;
+
+
+  border: none;
+  outline: none;
+  padding: 10px 10px;
+  cursor: pointer;
+margin: 17px;
+}
+
+/* Add a light grey background on mouse-over */
+.btn:hover {
+        color: #822711;
+        text-shadow: 2px 1px 7px #eee;
+}
+
+/* Add a dark background to the active button */
+.btn.active {
+border-bottom: solid #822711 1px;
+        color: #822711;
+        text-shadow: 2px 1px 7px #eee;
+}
