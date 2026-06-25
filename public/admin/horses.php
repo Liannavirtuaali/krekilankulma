@@ -8,7 +8,7 @@ $horses = $db->query(
             b.name AS breed_name
      FROM horses h
      LEFT JOIN breeds b ON b.id = h.breed_id
-     WHERE h.is_deleted = 0 AND h.ancestor = 0
+     WHERE h.is_deleted = 0 AND h.ancestor = 0 AND h.evm = 0
      ORDER BY h.name ASC'
 )->fetchAll();
 
