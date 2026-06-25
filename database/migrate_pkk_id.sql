@@ -1,0 +1,2 @@
+ALTER TABLE horses
+  ADD COLUMN `pkk_id` VARCHAR(100) DEFAULT NULL COMMENT 'PKK-tunnus' AFTER `vh_id`;

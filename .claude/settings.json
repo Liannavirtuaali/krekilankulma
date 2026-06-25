@@ -22,11 +22,21 @@
       "Read(//c/Users/annii/.claude/gsd-core/templates/**)",
       "Bash(node 'C:\\\\Users\\\\annii/.claude/gsd-core/bin/gsd-tools.cjs' query commit 'docs: create milestone v1.1 roadmap \\(4 phases\\)' --files .planning/ROADMAP.md .planning/STATE.md .planning/REQUIREMENTS.md)",
       "Bash(ls c:/Users/annii/Documents/dev/PHP/simgamestable-template-php/.planning/todos/pending/)",
-      "Bash(echo \"NO_PENDING_TODOS\")"
+      "Bash(echo \"NO_PENDING_TODOS\")",
+      "Bash(grep -E \"\\\\.php$\")",
+      "Bash(php -l public/themes/oma-talli/asukkaat.php)",
+      "Bash(php -l public/themes/oma-talli/hevonen.php)",
+      "PowerShell(php -l \"public/themes/oma-talli/asukkaat.php\")",
+      "PowerShell(php -l \"public/themes/oma-talli/hevonen.php\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8080/admin/horse_add.php -L)",
+      "Bash(curl -s http://localhost:8080/)",
+      "Bash(curl -s http://localhost:8080/admin/horse_add.php -L)",
+      "Bash(curl -s \"http://localhost:8080/admin/horses.php\" -L)"
     ],
     "additionalDirectories": [
       "C:\\Users\\annii\\AppData\\Local\\Temp\\sv-04-reviewfix-Kuyuxz\\.github\\workflows",
-      "C:\\Users\\annii\\AppData\\Local\\Temp\\sv-06-reviewfix-tJMeEz\\public\\src\\includes"
+      "C:\\Users\\annii\\AppData\\Local\\Temp\\sv-06-reviewfix-tJMeEz\\public\\src\\includes",
+      "C:\\Users\\annii\\AppData\\Local\\Temp\\sv-06-reviewfix-tJMeEz\\public\\pages"
     ]
   }
 }

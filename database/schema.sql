@@ -32,6 +32,22 @@ CREATE TABLE IF NOT EXISTS `colors` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------
+-- Yhteystiedot (contacts) — osoitekirja
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `contacts` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `nickname` VARCHAR(150) DEFAULT NULL COMMENT 'Nimimerkki',
+  `stable_name` VARCHAR(150) DEFAULT NULL COMMENT 'Tallin nimi',
+  `stable_url` VARCHAR(500) DEFAULT NULL COMMENT 'Tallin URL',
+  `vrl_id` VARCHAR(50) DEFAULT NULL COMMENT 'VRL-tunnus',
+  `email` VARCHAR(255) DEFAULT NULL COMMENT 'Sähköposti',
+  `country` VARCHAR(100) DEFAULT NULL COMMENT 'Maa',
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ------------------------------------------------------------
 -- Lajit (disciplines) — lookup-taulu
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `disciplines` (
@@ -70,16 +86,16 @@ CREATE TABLE IF NOT EXISTS `horses` (
   `genes` VARCHAR(255) DEFAULT NULL COMMENT 'Geenit',
   `height_cm` SMALLINT UNSIGNED DEFAULT NULL COMMENT 'Säkäkorkeus cm',
   `vh_id` VARCHAR(50) DEFAULT NULL COMMENT 'VH-tunnus',
+  `pkk_id` VARCHAR(100) DEFAULT NULL COMMENT 'PKK-tunnus',
+  `porrastetut` TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'Kilpailee porrastetuissa',
+  `porrastetut_discipline_id` INT UNSIGNED DEFAULT NULL COMMENT 'Porrastettu-laji (disciplines.id)',
   -- Painotus
   `level_ko` VARCHAR(150) DEFAULT NULL COMMENT 'Koulutaso (vapaa teksti)',
   `level_re` VARCHAR(150) DEFAULT NULL COMMENT 'Esteratsastustaso (vapaa teksti)',
-  -- Yhteystiedot
-  `owner_name` VARCHAR(150) DEFAULT NULL,
-  `owner_email` VARCHAR(255) DEFAULT NULL,
-  `breeder_name` VARCHAR(150) DEFAULT NULL,
-  `breeder_email` VARCHAR(255) DEFAULT NULL,
-  `importer_name` VARCHAR(150) DEFAULT NULL,
-  `importer_email` VARCHAR(255) DEFAULT NULL,
+  -- Yhteystiedot (FK → contacts)
+  `owner_contact_id` INT UNSIGNED DEFAULT NULL COMMENT 'Omistaja (contacts.id)',
+  `breeder_contact_id` INT UNSIGNED DEFAULT NULL COMMENT 'Kasvattaja (contacts.id)',
+  `importer_contact_id` INT UNSIGNED DEFAULT NULL COMMENT 'Tuoja (contacts.id)',
   -- Kuvaus
   `description` TEXT DEFAULT NULL COMMENT 'Luonnekuvaus',
   `pedigree_notes` TEXT DEFAULT NULL COMMENT 'Sukuselvitys',
@@ -101,10 +117,16 @@ CREATE TABLE IF NOT EXISTS `horses` (
   KEY `idx_horses_sire` (`sire_id`),
   KEY `idx_horses_dam` (`dam_id`),
   KEY `idx_horses_deleted` (`is_deleted`),
+  KEY `idx_horses_owner_contact` (`owner_contact_id`),
+  KEY `idx_horses_breeder_contact` (`breeder_contact_id`),
+  KEY `idx_horses_importer_contact` (`importer_contact_id`),
   CONSTRAINT `fk_horses_breed` FOREIGN KEY (`breed_id`) REFERENCES `breeds` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_horses_color` FOREIGN KEY (`color_id`) REFERENCES `colors` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_horses_sire` FOREIGN KEY (`sire_id`) REFERENCES `horses` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `fk_horses_dam` FOREIGN KEY (`dam_id`) REFERENCES `horses` (`id`) ON DELETE SET NULL
+  CONSTRAINT `fk_horses_dam` FOREIGN KEY (`dam_id`) REFERENCES `horses` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_horses_owner_contact` FOREIGN KEY (`owner_contact_id`) REFERENCES `contacts` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_horses_breeder_contact` FOREIGN KEY (`breeder_contact_id`) REFERENCES `contacts` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_horses_importer_contact` FOREIGN KEY (`importer_contact_id`) REFERENCES `contacts` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------

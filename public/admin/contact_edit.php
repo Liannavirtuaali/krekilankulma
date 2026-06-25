@@ -1,0 +1,105 @@
+<?php
+require_once __DIR__ . '/../src/includes/db.php';
+requireLogin();
+
+$id = (int)($_GET['id'] ?? 0);
+if ($id <= 0) redirect(SITE_URL . '/admin/contacts.php');
+
+$db = getDB();
+$contact = $db->prepare('SELECT * FROM contacts WHERE id = :id');
+$contact->execute([':id' => $id]);
+$contact = $contact->fetch();
+if (!$contact) redirect(SITE_URL . '/admin/contacts.php');
+
+$errors = [];
+$f = $contact;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
+        $errors[] = 'Virheellinen pyyntö.';
+    } else {
+        foreach (['nickname','stable_name','stable_url','vrl_id','email','country'] as $k) {
+            $f[$k] = sanitize($_POST[$k] ?? '');
+        }
+        if (!$f['nickname'] && !$f['stable_name']) {
+            $errors[] = 'Anna vähintään nimimerkki tai tallin nimi.';
+        }
+        if ($f['email'] !== '') {
+            $r = validate_email($f['email']);
+            if (!$r['valid']) $errors[] = $r['error'];
+            else $f['email'] = $r['value'];
+        }
+        if ($f['stable_url'] !== '' && filter_var($f['stable_url'], FILTER_VALIDATE_URL) === false) {
+            $errors[] = 'Tallin URL ei ole kelvollinen.';
+        }
+        if (empty($errors)) {
+            $stmt = $db->prepare(
+                'UPDATE contacts SET nickname=:nickname, stable_name=:stable_name, stable_url=:stable_url,
+                 vrl_id=:vrl_id, email=:email, country=:country WHERE id=:id'
+            );
+            $stmt->execute([
+                ':nickname'    => $f['nickname'] ?: null,
+                ':stable_name' => $f['stable_name'] ?: null,
+                ':stable_url'  => $f['stable_url'] ?: null,
+                ':vrl_id'      => $f['vrl_id'] ?: null,
+                ':email'       => $f['email'] ?: null,
+                ':country'     => $f['country'] ?: null,
+                ':id'          => $id,
+            ]);
+            redirect(SITE_URL . '/admin/contacts.php?updated=1');
+        }
+    }
+}
+
+$pageTitle = 'Muokkaa yhteystietoa';
+require __DIR__ . '/includes/admin_header.php';
+?>
+<div class="admin-page-header">
+  <a href="<?= e(SITE_URL) ?>/admin/contacts.php" class="back-link">← Osoitekirja</a>
+  <h1>Muokkaa yhteystietoa</h1>
+</div>
+<div class="admin-body">
+<?php if ($errors): ?>
+  <div class="flash-err"><ul><?php foreach ($errors as $e): ?><li><?= e($e) ?></li><?php endforeach; ?></ul></div>
+<?php endif; ?>
+<form method="post" style="max-width:680px">
+  <input type="hidden" name="csrf_token" value="<?= e(generate_csrf_token()) ?>">
+
+  <div class="form-row">
+    <div class="form-group">
+      <label for="nickname">Nimimerkki</label>
+      <input type="text" id="nickname" name="nickname" value="<?= e($f['nickname'] ?? '') ?>" autofocus>
+    </div>
+    <div class="form-group">
+      <label for="stable_name">Tallin nimi</label>
+      <input type="text" id="stable_name" name="stable_name" value="<?= e($f['stable_name'] ?? '') ?>">
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label for="stable_url">Tallin URL</label>
+      <input type="url" id="stable_url" name="stable_url" value="<?= e($f['stable_url'] ?? '') ?>" placeholder="https://...">
+    </div>
+    <div class="form-group">
+      <label for="vrl_id">VRL-tunnus</label>
+      <input type="text" id="vrl_id" name="vrl_id" value="<?= e($f['vrl_id'] ?? '') ?>" placeholder="VRL-XXXXX">
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label for="email">Sähköposti</label>
+      <input type="email" id="email" name="email" value="<?= e($f['email'] ?? '') ?>">
+    </div>
+    <div class="form-group">
+      <label for="country">Maa</label>
+      <input type="text" id="country" name="country" value="<?= e($f['country'] ?? '') ?>">
+    </div>
+  </div>
+
+  <div style="margin-top:1.5rem;display:flex;gap:0.75rem">
+    <button type="submit" class="btn">Tallenna muutokset</button>
+    <a href="<?= e(SITE_URL) ?>/admin/contacts.php" class="btn-ghost">Peruuta</a>
+  </div>
+</form>
+</div>
+<?php require __DIR__ . '/includes/admin_footer.php'; ?>
