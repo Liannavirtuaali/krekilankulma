@@ -28,15 +28,25 @@ Options -Indexes
     RewriteRule ^ajankohtaista/?$ /demotalli/pages/ajankohtaista.php [L,QSA]
     RewriteRule ^ajankohtaista/?$ /pages/ajankohtaista.php [L,QSA]
 
-    # Hevosen profiilisivu: /pages/horse/slug
+    # Hevosen profiilisivu: /pages/hevonen/slug
     RewriteCond %{HTTP_HOST} altervista\.org$ [NC]
-    RewriteRule ^pages/horse/([^/]+)/?$ /demotalli/pages/hevonen.php?slug=$1 [L,QSA]
-    RewriteRule ^pages/horse/([^/]+)/?$ /pages/hevonen.php?slug=$1 [L,QSA]
+    RewriteRule ^pages/hevonen/([^/]+)/?$ /demotalli/pages/hevonen.php?slug=$1 [L,QSA]
+    RewriteRule ^pages/hevonen/([^/]+)/?$ /pages/hevonen.php?slug=$1 [L,QSA]
 
     # Blogijuttu: /pages/ajankohtaista/slug
     RewriteCond %{HTTP_HOST} altervista\.org$ [NC]
     RewriteRule ^pages/ajankohtaista/([^/]+)/?$ /demotalli/pages/postaus.php?slug=$1 [L,QSA]
     RewriteRule ^pages/ajankohtaista/([^/]+)/?$ /pages/postaus.php?slug=$1 [L,QSA]
+
+    # Teeman sivut: /pages/{slug} → theme-page.php (catch-all, vain jos tiedostoa ei ole)
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{HTTP_HOST} altervista\.org$ [NC]
+    RewriteRule ^pages/([a-z0-9\-]+)/?$ /demotalli/pages/theme-page.php?page=$1 [L,QSA]
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^pages/([a-z0-9\-]+)/?$ /pages/theme-page.php?page=$1 [L,QSA]
 </IfModule>
 
 # Tietoturva: Estä suora pääsy arkaluonteisiin tiedostoihin

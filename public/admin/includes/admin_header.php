@@ -257,6 +257,10 @@ $_adminTheme = $GLOBALS['color_theme'];
     .admin-table tr:last-child td { border-bottom: none; }
     .admin-table tr:hover td { background: var(--color-surface-warm, #faf6f0); }
 
+    /* ── CONTACT CARD ─────────────────────────── */
+    .contact-card { background: var(--color-surface-warm,#faf6f0); border: 1px solid var(--color-border,#e0d5c5); border-radius: 6px; padding: 0.4rem 0.75rem; font-size: 0.85rem; color: var(--color-text,#2c2c2c); margin-bottom: 0.5rem; }
+    .contact-card a { color: var(--color-accent,#a0633a); }
+
     /* ── JS HELPERS ────────────────────────────── */
     .js-slide-trigger { cursor: pointer; }
 
@@ -280,6 +284,8 @@ $_adminTheme = $GLOBALS['color_theme'];
          href="<?= e(SITE_URL) ?>/admin/">⊞ Dashboard</a>
       <a class="admin-nav-item <?= in_array($_activePage, ['horses','horse_add','horse_edit','horse_delete']) ? 'active' : '' ?>"
          href="<?= e(SITE_URL) ?>/admin/horses.php">🐎 Hevoset</a>
+      <a class="admin-nav-item <?= in_array($_activePage, ['contacts','contact_add','contact_edit']) ? 'active' : '' ?>"
+         href="<?= e(SITE_URL) ?>/admin/contacts.php">📒 Osoitekirja</a>
       <a class="admin-nav-item <?= $_activePage === 'sukulaiset' ? 'active' : '' ?>"
          href="<?= e(SITE_URL) ?>/admin/sukulaiset.php">🌳 Sukulaiset</a>
       <a class="admin-nav-item <?= $_activePage === 'horse_import_vrl' ? 'active' : '' ?>"

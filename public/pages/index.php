@@ -1,6 +1,15 @@
 <?php
 require_once __DIR__ . '/../src/includes/db.php';
-require_once __DIR__ . '/../src/includes/theme.php'; // Phase 6: teemashim
+require_once __DIR__ . '/../src/includes/theme.php';
+
+// Jos aktiivisella teemalla on oma etusivu, käytetään sitä
+$_vt_themeFile = realpath(THEME_PATH . 'index.php');
+if ($_vt_themeFile !== false
+    && str_starts_with($_vt_themeFile, THEME_PATH)
+    && !str_starts_with(THEME_PATH, THEMES_ROOT . 'default' . DIRECTORY_SEPARATOR)) {
+    require $_vt_themeFile;
+    exit;
+}
 
 $page_title = 'Etusivu';
 

@@ -1,38 +1,58 @@
 <?php
 require_once __DIR__ . '/../src/includes/db.php';
+require_once __DIR__ . '/../src/includes/theme.php';
+
+// Jos aktiivisella teemalla on oma hevosen profiilisivu, käytetään sitä
+$_vt_themeFile = resolveThemePath('hevonen.php');
+if ($_vt_themeFile !== false
+    && !str_starts_with(THEME_PATH, THEMES_ROOT . 'default' . DIRECTORY_SEPARATOR)) {
+    require $_vt_themeFile;
+    exit;
+}
 
 $db = getDB();
 
 // Hae hevonen slugin tai id:n perusteella
+$contactCols = 'oc.nickname AS owner_nickname, oc.stable_name AS owner_stable_name, oc.stable_url AS owner_stable_url, oc.vrl_id AS owner_vrl_id, oc.email AS owner_email, oc.country AS owner_country,
+                bc.nickname AS breeder_nickname, bc.stable_name AS breeder_stable_name, bc.stable_url AS breeder_stable_url, bc.vrl_id AS breeder_vrl_id, bc.email AS breeder_email, bc.country AS breeder_country,
+                ic.nickname AS importer_nickname, ic.stable_name AS importer_stable_name, ic.stable_url AS importer_stable_url, ic.vrl_id AS importer_vrl_id, ic.email AS importer_email, ic.country AS importer_country';
+$contactJoins = 'LEFT JOIN contacts oc ON oc.id = h.owner_contact_id
+         LEFT JOIN contacts bc ON bc.id = h.breeder_contact_id
+         LEFT JOIN contacts ic ON ic.id = h.importer_contact_id';
+
 if (!empty($_GET['slug'])) {
     $slug = preg_replace('/[^a-z0-9\-]/', '', strtolower(trim($_GET['slug'])));
     $stmt = $db->prepare(
-        'SELECT h.*,
-                (SELECT GROUP_CONCAT(d.name ORDER BY d.name SEPARATOR \', \')
+        "SELECT h.*,
+                (SELECT GROUP_CONCAT(d.name ORDER BY d.name SEPARATOR ', ')
                  FROM horse_disciplines hd
                  JOIN disciplines d ON d.id = hd.discipline_id
                  WHERE hd.horse_id = h.id) AS discipline_names,
-                b.name AS breed_name, c.name AS color_name
+                b.name AS breed_name, c.name AS color_name,
+                $contactCols
          FROM horses h
          LEFT JOIN breeds b ON b.id = h.breed_id
          LEFT JOIN colors c ON c.id = h.color_id
-         WHERE h.slug = :slug AND h.is_deleted = 0'
+         $contactJoins
+         WHERE h.slug = :slug AND h.is_deleted = 0"
     );
     $stmt->execute([':slug' => $slug]);
 } elseif (!empty($_GET['id'])) {
     // Taaksepäin yhteensopivuus vanhoille linkeille
     $id = (int)$_GET['id'];
     $stmt = $db->prepare(
-        'SELECT h.*,
-                (SELECT GROUP_CONCAT(d.name ORDER BY d.name SEPARATOR \', \')
+        "SELECT h.*,
+                (SELECT GROUP_CONCAT(d.name ORDER BY d.name SEPARATOR ', ')
                  FROM horse_disciplines hd
                  JOIN disciplines d ON d.id = hd.discipline_id
                  WHERE hd.horse_id = h.id) AS discipline_names,
-                b.name AS breed_name, c.name AS color_name
+                b.name AS breed_name, c.name AS color_name,
+                $contactCols
          FROM horses h
          LEFT JOIN breeds b ON b.id = h.breed_id
          LEFT JOIN colors c ON c.id = h.color_id
-         WHERE h.id = :id AND h.is_deleted = 0'
+         $contactJoins
+         WHERE h.id = :id AND h.is_deleted = 0"
     );
     $stmt->execute([':id' => $id]);
 } else {
@@ -183,7 +203,10 @@ $heroStyle = $heroPhoto
             <div class="info-row"><dt>Säkäkorkeus</dt><dd><?= e((string)$horse['height_cm']) ?> cm</dd></div>
           <?php endif; ?>
           <?php if ($horse['vh_id']): ?>
-            <div class="info-row"><dt>VH-tunnus</dt><dd style="font-family:var(--font-mono);font-size:var(--text-xs);"><?= e($horse['vh_id']) ?></dd></div>
+            <div class="info-row"><dt>VH-tunnus</dt><dd style="font-family:var(--font-mono);font-size:var(--text-xs);"><a href="https://virtuaalihevoset.net/virtuaalihevoset/hevonen/<?= e($horse['vh_id']) ?>" target="_blank" rel="noopener"><?= e($horse['vh_id']) ?></a></dd></div>
+          <?php endif; ?>
+          <?php if ($horse['pkk_id']): ?>
+            <div class="info-row"><dt>PKK-tunnus</dt><dd style="font-family:var(--font-mono);font-size:var(--text-xs);"><a href="https://piirroshevosille.fi/hevoset/hevonen/<?= e($horse['pkk_id']) ?>" target="_blank" rel="noopener"><?= e($horse['pkk_id']) ?></a></dd></div>
           <?php endif; ?>
           <?php if ($horse['discipline_names']): ?>
             <?php
@@ -211,28 +234,35 @@ $heroStyle = $heroPhoto
         </dl>
       </div>
 
-<?php if ($horse['owner_name'] || $horse['owner_email'] || $horse['breeder_name'] || $horse['breeder_email'] || $horse['importer_name'] || $horse['importer_email']): ?>
+<?php
+$contactRows = [];
+foreach (['Omistaja' => 'owner', 'Kasvattaja' => 'breeder', 'Tuoja' => 'importer'] as $label => $prefix) {
+    $nick    = $horse[$prefix.'_nickname'] ?? '';
+    $stable  = $horse[$prefix.'_stable_name'] ?? '';
+    $url     = $horse[$prefix.'_stable_url'] ?? '';
+    $vrl     = $horse[$prefix.'_vrl_id'] ?? '';
+    $email   = $horse[$prefix.'_email'] ?? '';
+    $country = $horse[$prefix.'_country'] ?? '';
+    if (!$nick && !$stable && !$vrl && !$email && !$country) continue;
+    $contactRows[] = ['label' => $label, 'nick' => $nick, 'stable' => $stable, 'url' => $url,
+                      'vrl' => $vrl, 'email' => $email, 'country' => $country];
+}
+if ($contactRows): ?>
       <div class="sidebar-card">
         <h3>Omistus & kasvatus</h3>
         <dl>
-          <?php if ($horse['owner_name'] || $horse['owner_email']): ?>
-            <div class="info-row"><dt>Omistaja</dt><dd>
-              <?= e($horse['owner_name']) ?>
-              <?php if ($horse['owner_email']): ?><br><a href="mailto:<?= e($horse['owner_email']) ?>" style="font-size:var(--text-sm)"><?= e($horse['owner_email']) ?></a><?php endif; ?>
+          <?php foreach ($contactRows as $cr): ?>
+            <div class="info-row"><dt><?= $cr['label'] ?></dt><dd>
+              <?php if ($cr['nick']): ?><strong><?= e($cr['nick']) ?></strong><?php endif; ?>
+              <?php if ($cr['stable']): ?>
+                <?php if ($cr['nick']): ?><br><?php endif; ?>
+                <?php if ($cr['url']): ?><a href="<?= e($cr['url']) ?>" target="_blank" rel="noopener"><?= e($cr['stable']) ?></a><?php else: ?><?= e($cr['stable']) ?><?php endif; ?>
+              <?php endif; ?>
+              <?php if ($cr['vrl']): ?><br><span style="font-size:var(--text-sm)"><?= e($cr['vrl']) ?></span><?php endif; ?>
+              <?php if ($cr['email']): ?><br><a href="mailto:<?= e($cr['email']) ?>" style="font-size:var(--text-sm)"><?= e($cr['email']) ?></a><?php endif; ?>
+              <?php if ($cr['country']): ?><br><span style="font-size:var(--text-sm)"><?= e($cr['country']) ?></span><?php endif; ?>
             </dd></div>
-          <?php endif; ?>
-          <?php if ($horse['breeder_name'] || $horse['breeder_email']): ?>
-            <div class="info-row"><dt>Kasvattaja</dt><dd>
-              <?= e($horse['breeder_name']) ?>
-              <?php if ($horse['breeder_email']): ?><br><a href="mailto:<?= e($horse['breeder_email']) ?>" style="font-size:var(--text-sm)"><?= e($horse['breeder_email']) ?></a><?php endif; ?>
-            </dd></div>
-          <?php endif; ?>
-          <?php if ($horse['importer_name'] || $horse['importer_email']): ?>
-            <div class="info-row"><dt>Tuoja</dt><dd>
-              <?= e($horse['importer_name']) ?>
-              <?php if ($horse['importer_email']): ?><br><a href="mailto:<?= e($horse['importer_email']) ?>" style="font-size:var(--text-sm)"><?= e($horse['importer_email']) ?></a><?php endif; ?>
-            </dd></div>
-          <?php endif; ?>
+          <?php endforeach; ?>
         </dl>
       </div>
       <?php endif; ?>

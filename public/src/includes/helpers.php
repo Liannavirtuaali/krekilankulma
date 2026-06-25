@@ -34,7 +34,7 @@ function slugify(string $text): string {
  */
 function horseUrl(array $horse): string {
     $slug = $horse['slug'] ?? slugify($horse['name']);
-    return SITE_URL . '/pages/horse/' . rawurlencode($slug);
+    return SITE_URL . '/pages/hevonen/' . rawurlencode($slug);
 }
 
 /**

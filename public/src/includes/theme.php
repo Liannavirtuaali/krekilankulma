@@ -57,6 +57,22 @@ if (!defined('THEME_PATH')) {
 }
 
 /**
+ * Palauttaa aktiivisen teeman theme.json-manifestin taulukkona.
+ * Palauttaa tyhjän taulukon jos tiedostoa ei löydy tai JSON on virheellinen.
+ */
+function getThemeManifest(): array {
+    static $manifest = null;
+    if ($manifest !== null) return $manifest;
+
+    $jsonFile = THEME_PATH . 'theme.json';
+    if (!is_file($jsonFile)) {
+        return $manifest = [];
+    }
+    $data = json_decode(file_get_contents($jsonFile), true);
+    return $manifest = (is_array($data) ? $data : []);
+}
+
+/**
  * Palauttaa absoluuttisen palvelinpolun teematiedostolle.
  *
  * Tarkistukset järjestyksessä (D-04):

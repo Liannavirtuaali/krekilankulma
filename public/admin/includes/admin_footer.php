@@ -57,12 +57,16 @@ document.addEventListener('DOMContentLoaded', () => {
       hiddenEl.value = li.dataset.id;
       listEl.classList.remove('open');
       activeIdx = -1;
+      wrap.dispatchEvent(new CustomEvent('ac:selected', { detail: { id: li.dataset.id } }));
     }
 
     function clearIfNoMatch() {
       const val = textEl.value.trim().toLowerCase();
       const exact = items.find(i => i.label.toLowerCase() === val);
-      if (!exact) { hiddenEl.value = ''; }
+      if (!exact) {
+        if (hiddenEl.value) wrap.dispatchEvent(new CustomEvent('ac:cleared'));
+        hiddenEl.value = '';
+      }
     }
 
     textEl.addEventListener('input',  () => render(textEl.value.trim()));
@@ -80,6 +84,62 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+
+/* ── Yhteystieto-valitsin ─────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.contact-ac').forEach(wrap => {
+    const previewId = wrap.dataset.previewTarget;
+    const newId     = wrap.dataset.newTarget;
+    const items     = JSON.parse(wrap.dataset.items || '[]');
+    const itemsById = Object.fromEntries(items.map(i => [i.id, i]));
+
+    // Kun käyttäjä valitsee yhteystiedon autocomplete-listasta
+    wrap.addEventListener('ac:selected', e => {
+      const contact = itemsById[e.detail.id];
+      if (!contact) return;
+      updatePreview(previewId, contact);
+      // Piilotetaan "luo uusi" -osio
+      const newEl = document.getElementById(newId);
+      if (newEl) newEl.style.display = 'none';
+    });
+
+    // Kun valinta tyhjennetään
+    wrap.addEventListener('ac:cleared', () => {
+      const preview = document.getElementById(previewId);
+      if (preview) preview.style.display = 'none';
+    });
+  });
+});
+
+function updatePreview(previewId, c) {
+  const el = document.getElementById(previewId);
+  if (!el) return;
+  const stableHtml = c.stable_name
+    ? (c.stable_url ? ` / <a href="${c.stable_url}" target="_blank" rel="noopener">${c.stable_name}</a>` : ` / ${c.stable_name}`)
+    : '';
+  const extras = [c.vrl_id, c.email, c.country].filter(Boolean).join(' · ');
+  el.innerHTML = `<div class="contact-card">
+    ${c.nickname ? `<strong>${c.nickname}</strong>` : ''}${stableHtml}
+    ${extras ? ` &middot; ${extras}` : ''}
+  </div>`;
+  el.style.display = 'block';
+}
+
+function toggleContactNew(role) {
+  const el = document.getElementById(role + '-new');
+  if (!el) return;
+  const isOpen = el.style.display !== 'none';
+  el.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) {
+    // Tyhjennetään mahdollinen aiempi AC-valinta kun avataan "luo uusi"
+    const hidden = document.querySelector(`[name="${role}_contact_id"]`);
+    const text   = document.querySelector(`#${role}_contact_text`);
+    if (hidden) hidden.value = '';
+    if (text)   text.value  = '';
+    const preview = document.getElementById(role + '-preview');
+    if (preview) preview.style.display = 'none';
+  }
+}
 
 function adminToggleExpand(id) {
   const row = document.getElementById('cl-exp-' + id);
