@@ -5,10 +5,10 @@
  */
 
 // Sivuston asetukset
-define('SITE_NAME', 'Virtuaalitalli Demotesti');
+define('SITE_NAME', 'Krekilänkulma');
 // Docker-kehitys: aseta SITE_URL ympäristömuuttujana (docker-compose.yml)
 // Altervista: päivitä osoite tähän suoraan
-define('SITE_URL', rtrim(getenv('SITE_URL') ?: 'https://tilli.altervista.org/demotalli', '/'));
+define('SITE_URL', rtrim(getenv('SITE_URL') ?: 'https://lianna.altervista.org/krekilankulma', '/'));
 
 // Uploads-polku
 define('UPLOADS_DIR', __DIR__ . '/../../uploads/');
