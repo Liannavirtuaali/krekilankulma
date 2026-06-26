@@ -42,7 +42,7 @@ Options -Indexes
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{HTTP_HOST} altervista\.org$ [NC]
-    RewriteRule ^pages/([a-z0-9\-]+)/?$ /krekilankulma/pages/theme-page.php?page=$1 [L,QSA]
+    RewriteRule ^pages/([a-z0-9\-]+)/?$ /krekilankulman/pages/theme-page.php?page=$1 [L,QSA]
 
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
