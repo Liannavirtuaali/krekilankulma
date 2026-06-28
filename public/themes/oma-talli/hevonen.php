@@ -359,7 +359,7 @@ if (is_array($obj) && isset($obj['error']) && $obj['error'] == 0) {
   <tr>
     <th style="text-align:left;padding:4px 8px">Rotu</th>
     <th style="text-align:left;padding:4px 8px">Varsan nimi</th>
-    <th style="text-align:left;padding:4px 8px">Syntymäpäivä</th>
+    <th style="text-align:left;padding:4px 8px">Syntynyt</th>
     <th style="text-align:left;padding:4px 8px">i/e. Hevosen nimi</th>
     <th style="text-align:left;padding:4px 8px">Omistaja</th>
     <th style="text-align:left;padding:4px 8px">Meriitit</th>
@@ -381,7 +381,6 @@ if (is_array($obj) && isset($obj['error']) && $obj['error'] == 0) {
     }
 
     $birthStr  = $f['birth_date'] ? 's. ' . date('d.m.Y', strtotime($f['birth_date'])) : '—';
-    $statusStr = $f['status'] === 'expected' ? 'Odotettu' : 'Syntynyt';
 
     $ownerStr = '';
     if ($f['owner_nickname']) {
@@ -394,8 +393,8 @@ if (is_array($obj) && isset($obj['error']) && $obj['error'] == 0) {
     if ($f['owner_vrl']) $ownerStr .= ($ownerStr ? ' ' : '') . '(' . e($f['owner_vrl']) . ')';
   ?>
   <tr class="kilpailutulos">
-    <td class="pvm"><small><?= $breedGender ?: '—' ?></small></td>
-    <td class="pvm">
+    <td><small><?= $breedGender ?: '—' ?></small></td>
+    <td>
       <?php if ($f['foal_horse_id']): ?>
         <?php $foalUrl = $f['foal_horse_slug'] ? horseUrl(['slug' => $f['foal_horse_slug']]) : 'hevonen.php?id=' . (int)$f['foal_horse_id']; ?>
         <a href="<?= e($foalUrl) ?>"><?= e($f['foal_name'] ?? '—') ?></a>
@@ -403,14 +402,14 @@ if (is_array($obj) && isset($obj['error']) && $obj['error'] == 0) {
         <?= e($f['foal_name'] ?? '—') ?>
       <?php endif; ?>
     </td>
-    <td class="pvm"><small><?= $birthStr ?></small></td>
-    <td class="laji">
+    <td><small><?= $birthStr ?></small></td>
+    <td>
       <?php if ($otherName): ?>
         <?= e($otherLabel) ?> <a href="hevonen.php?id=<?= $otherId ?>"><?= e($otherName) ?></a>
       <?php else: ?>—<?php endif; ?>
     </td>
-    <td class="luokka"><small><?= $ownerStr ? 'om. ' . $ownerStr : '—' ?></small></td>
-    <td class="luokka"><small><?= $f['merits'] ? nl2br(e($f['merits'])) : '—' ?></small></td>
+    <td><small><?= $ownerStr ? 'om. ' . $ownerStr : '—' ?></small></td>
+    <td><small><?= $f['merits'] ? nl2br(e($f['merits'])) : '—' ?></small></td>
   </tr>
   <?php endforeach; ?>
 </table>
