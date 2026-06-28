@@ -356,14 +356,6 @@ if (is_array($obj) && isset($obj['error']) && $obj['error'] == 0) {
 
 <h2>Jälkeläiset</h2>
 <table class="kisat" style="width:100%">
-  <tr>
-    <th style="text-align:left;padding:4px 8px">Rotu</th>
-    <th style="text-align:left;padding:4px 8px">Varsan nimi</th>
-    <th style="text-align:left;padding:4px 8px">Syntynyt</th>
-    <th style="text-align:left;padding:4px 8px">i/e. Hevosen nimi</th>
-    <th style="text-align:left;padding:4px 8px">Omistaja</th>
-    <th style="text-align:left;padding:4px 8px">Meriitit</th>
-  </tr>
   <?php foreach ($foals as $f):
     $breedGender = '';
     if ($f['breed_abbr']) $breedGender .= e($f['breed_abbr']);
