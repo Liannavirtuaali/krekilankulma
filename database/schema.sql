@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS `contacts` (
   `nickname` VARCHAR(150) DEFAULT NULL COMMENT 'Nimimerkki',
   `stable_name` VARCHAR(150) DEFAULT NULL COMMENT 'Tallin nimi',
   `stable_url` VARCHAR(500) DEFAULT NULL COMMENT 'Tallin URL',
+  `character_url` VARCHAR(500) DEFAULT NULL COMMENT 'Hahmon sivujen URL',
   `vrl_id` VARCHAR(50) DEFAULT NULL COMMENT 'VRL-tunnus',
   `email` VARCHAR(255) DEFAULT NULL COMMENT 'Sähköposti',
   `country` VARCHAR(100) DEFAULT NULL COMMENT 'Maa',
