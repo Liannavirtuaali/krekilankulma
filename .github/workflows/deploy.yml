@@ -5,6 +5,7 @@ on:
     branches:
       - main
   workflow_dispatch:  # allow manual re-runs from GitHub Actions UI (e.g. after secret rotation or FTP timeout)
+  asdasd
 
 jobs:
   deploy:
@@ -26,7 +27,7 @@ jobs:
           protocol: ftps          # enforce encrypted transport (FTPS); if Altervista uses implicit TLS add: port: 990
           local-dir: ./public/
           # FTP root = /membri/tilli/ (user home). Web root subfolder = demotalli/.
-          server-dir: /demotalli/
+          server-dir: /demotalli-02/
           exclude: |
             **/.git*
             **/.git*/**

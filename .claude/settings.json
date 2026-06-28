@@ -31,7 +31,12 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8080/admin/horse_add.php -L)",
       "Bash(curl -s http://localhost:8080/)",
       "Bash(curl -s http://localhost:8080/admin/horse_add.php -L)",
-      "Bash(curl -s \"http://localhost:8080/admin/horses.php\" -L)"
+      "Bash(curl -s \"http://localhost:8080/admin/horses.php\" -L)",
+      "Bash(docker exec virtuaalitalli-db mysql -u root -proot virtuaalitalli -e ' *)",
+      "Bash(docker exec virtuaalitalli-db mysql -u vt_user -pvt_password virtuaalitalli -e ' *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"http://localhost:8080/admin/kasvatus_all.php\" -b \"session=test\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"http://localhost:8080/pages/hevonen/kaamosprinssi\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"http://localhost:8080/admin/kasvatus_all.php\")"
     ],
     "additionalDirectories": [
       "C:\\Users\\annii\\AppData\\Local\\Temp\\sv-04-reviewfix-Kuyuxz\\.github\\workflows",
