@@ -1,0 +1,16 @@
+{
+  "name": "Oma talli",
+  "version": "1.0.0",
+  "nav": [
+    {"label": "Etusivu", "url": ""},
+    {"label": "Esittelykierros", "slug": "esittely", "file": "esittely.php"},
+    {"label": "Tallin asukkaat", "slug": "asukkaat", "file": "asukkaat.php"},
+    {"label": "Toiminta", "slug": "toiminta", "file": "toiminta.php"},
+    {"label": "Foorumi", "url": "https://krekilankulma.palstani.com/"}
+  ],
+  "pages": [
+    {"slug": "tarhaus", "file": "tarhaus.php", "label": "Tarhausjärjestys"},
+    {"slug": "henkilot", "file": "henkilot.php", "label": "Henkilöt"},
+    {"slug": "info", "file": "info.php", "label": "Info"}
+  ]
+}

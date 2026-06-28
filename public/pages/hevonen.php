@@ -94,6 +94,27 @@ $stmtPhotos = $db->prepare(
 $stmtPhotos->execute([':id' => $id]);
 $photos = $stmtPhotos->fetchAll();
 
+// Varsat (tämä hevonen isänä tai emänä)
+$stmtFoals = $db->prepare(
+    'SELECT f.foal_name, f.birth_date, f.gender, f.status, f.merits,
+            f.sire_id, f.dam_id, f.foal_horse_id,
+            b.abbreviation AS breed_abbr,
+            s.name AS sire_name, s.slug AS sire_slug,
+            d.name AS dam_name,  d.slug AS dam_slug,
+            oc.nickname AS owner_nickname, oc.vrl_id AS owner_vrl, oc.email AS owner_email,
+            fh.slug AS foal_horse_slug
+     FROM foals f
+     LEFT JOIN breeds   b  ON b.id  = f.breed_id
+     LEFT JOIN horses   s  ON s.id  = f.sire_id          AND s.is_deleted = 0
+     LEFT JOIN horses   d  ON d.id  = f.dam_id           AND d.is_deleted = 0
+     LEFT JOIN contacts oc ON oc.id = f.owner_contact_id
+     LEFT JOIN horses   fh ON fh.id = f.foal_horse_id    AND fh.is_deleted = 0
+     WHERE f.sire_id = :id1 OR f.dam_id = :id2
+     ORDER BY f.birth_date DESC, f.foal_name ASC'
+);
+$stmtFoals->execute([':id1' => $id, ':id2' => $id]);
+$foals = $stmtFoals->fetchAll();
+
 // Sukutaulu
 $pedigree = getHorsePedigree($id);
 
@@ -323,6 +344,81 @@ if ($contactRows): ?>
       <p style="margin-top:.75rem;font-size:var(--text-sm);color:var(--color-text-muted);"><?= nl2br(e($horse['pedigree_notes'])) ?></p>
     <?php endif; ?>
   </section>
+
+  <!-- Varsat — koko leveys -->
+  <?php if (!empty($foals)): ?>
+  <section class="profile-fullwidth">
+    <h2>Varsat</h2>
+    <div class="comp-list">
+      <div class="comp-header" style="grid-template-columns:120px 2fr 130px 80px 2fr 2fr 2fr">
+        <div>Rotu</div><div>Varsan nimi</div><div>Syntymäpäivä</div><div>Tilanne</div><div>i/e. Vanhempi</div><div>Omistaja</div><div>Meriitit</div>
+      </div>
+      <?php foreach ($foals as $f):
+        // Rotu + sukupuoli
+        $breedGender = '';
+        if ($f['breed_abbr']) $breedGender .= e($f['breed_abbr']);
+        if ($f['gender'] && $f['gender'] !== 'tuntematon') {
+            $breedGender .= ($breedGender ? '-' : '') . e($f['gender']);
+        }
+
+        // i/e — näytetään se vanhempi joka EI ole tämä hevonen
+        if ((int)$f['sire_id'] === $id) {
+            // Tämä hevonen on isä → näytetään emä
+            $otherLabel = 'e.';
+            $otherName  = $f['dam_name']  ?? null;
+            $otherSlug  = $f['dam_slug']  ?? null;
+        } else {
+            // Tämä hevonen on emä → näytetään isä
+            $otherLabel = 'i.';
+            $otherName  = $f['sire_name'] ?? null;
+            $otherSlug  = $f['sire_slug'] ?? null;
+        }
+
+        // Syntymäpäivä ja tilanne
+        $birthStr  = $f['birth_date'] ? 's. ' . date('d.m.Y', strtotime($f['birth_date'])) : '—';
+        $statusStr = $f['status'] === 'expected' ? 'Odotettu' : 'Syntynyt';
+
+        // Omistaja
+        $ownerStr = '';
+        if ($f['owner_nickname']) {
+            if ($f['owner_email']) {
+                $ownerStr .= '<a href="mailto:' . e($f['owner_email']) . '">' . e($f['owner_nickname']) . '</a>';
+            } else {
+                $ownerStr .= e($f['owner_nickname']);
+            }
+        }
+        if ($f['owner_vrl'])  $ownerStr .= ($ownerStr ? ' ' : '') . '(' . e($f['owner_vrl']) . ')';
+        if ($ownerStr)        $ownerStr = 'om. ' . $ownerStr;
+      ?>
+      <div class="comp-row" style="grid-template-columns:120px 2fr 130px 80px 2fr 2fr 2fr">
+        <div class="comp-cell cl-mono" style="font-size:var(--text-sm)"><?= $breedGender ?: '—' ?></div>
+        <div class="comp-cell">
+          <?php if ($f['foal_horse_id']): ?>
+            <?php $foalUrl = $f['foal_horse_slug'] ? horseUrl(['slug' => $f['foal_horse_slug']]) : SITE_URL . '/pages/hevonen.php?id=' . (int)$f['foal_horse_id']; ?>
+            <a href="<?= e($foalUrl) ?>"><strong><?= e($f['foal_name'] ?? '—') ?></strong></a>
+          <?php else: ?>
+            <strong><?= e($f['foal_name'] ?? '—') ?></strong>
+          <?php endif; ?>
+        </div>
+        <div class="comp-cell cl-mono" style="font-size:var(--text-sm)"><?= $birthStr ?></div>
+        <div class="comp-cell" style="font-size:var(--text-sm)"><?= e($statusStr) ?></div>
+        <div class="comp-cell">
+          <?php if ($otherName): ?>
+            <?= e($otherLabel) ?>
+            <?php if ($otherSlug): ?>
+              <a href="<?= e(SITE_URL) ?>/pages/horse/<?= e(rawurlencode($otherSlug)) ?>"><?= e($otherName) ?></a>
+            <?php else: ?>
+              <?= e($otherName) ?>
+            <?php endif; ?>
+          <?php else: ?>—<?php endif; ?>
+        </div>
+        <div class="comp-cell" style="font-size:var(--text-sm)"><?= $ownerStr ?: '—' ?></div>
+        <div class="comp-cell" style="font-size:var(--text-sm)"><?= $f['merits'] ? nl2br(e($f['merits'])) : '—' ?></div>
+      </div>
+      <?php endforeach; ?>
+    </div>
+  </section>
+  <?php endif; ?>
 
   <!-- Kisakalenteri — koko leveys -->
   <section class="profile-fullwidth">

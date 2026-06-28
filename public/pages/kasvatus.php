@@ -11,7 +11,7 @@ $stmt = $db->prepare(
      FROM foals f
      LEFT JOIN horses sire ON sire.id = f.sire_id AND sire.is_deleted = 0
      LEFT JOIN horses dam  ON dam.id  = f.dam_id  AND dam.is_deleted = 0
-     ORDER BY FIELD(f.status, \'expected\', \'born\'), f.birth_year DESC'
+     ORDER BY FIELD(f.status, \'expected\', \'born\'), f.birth_date DESC'
 );
 $stmt->execute();
 $allFoals = $stmt->fetchAll();
@@ -70,8 +70,8 @@ $genderFi = ['ori' => 'Ori', 'tamma' => 'Tamma', 'ruuna' => 'Ruuna', 'tuntematon
                     <a href="<?= e(SITE_URL . '/pages/horse/' . rawurlencode($foal['dam_slug'] ?? $foal['dam_name'])) ?>"><?= e($foal['dam_name']) ?></a>
                   <?php else: ?>—<?php endif; ?>
                 </span>
-                <?php if ($foal['birth_year']): ?>
-                  <span class="foal-year"><?= e((string)$foal['birth_year']) ?></span>
+                <?php if ($foal['birth_date']): ?>
+                  <span class="foal-year"><?= e(date('d.m.Y', strtotime($foal['birth_date']))) ?></span>
                 <?php endif; ?>
               </div>
               <div class="foal-status"><span class="status-expected">Odotettu</span></div>
@@ -108,8 +108,8 @@ $genderFi = ['ori' => 'Ori', 'tamma' => 'Tamma', 'ruuna' => 'Ruuna', 'tuntematon
                     <a href="<?= e(SITE_URL . '/pages/horse/' . rawurlencode($foal['dam_slug'] ?? $foal['dam_name'])) ?>"><?= e($foal['dam_name']) ?></a>
                   <?php else: ?>—<?php endif; ?>
                 </span>
-                <?php if ($foal['birth_year']): ?>
-                  <span class="foal-year"><?= e((string)$foal['birth_year']) ?></span>
+                <?php if ($foal['birth_date']): ?>
+                  <span class="foal-year"><?= e(date('d.m.Y', strtotime($foal['birth_date']))) ?></span>
                 <?php endif; ?>
                 <?php if (!empty($foal['gender'])): ?>
                   <span class="foal-year"><?= e($genderFi[$foal['gender']] ?? $foal['gender']) ?></span>
