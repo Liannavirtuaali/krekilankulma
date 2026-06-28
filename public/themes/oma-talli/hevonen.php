@@ -360,7 +360,6 @@ if (is_array($obj) && isset($obj['error']) && $obj['error'] == 0) {
     <th style="text-align:left;padding:4px 8px">Rotu</th>
     <th style="text-align:left;padding:4px 8px">Varsan nimi</th>
     <th style="text-align:left;padding:4px 8px">Syntymäpäivä</th>
-    <th style="text-align:left;padding:4px 8px">Tilanne</th>
     <th style="text-align:left;padding:4px 8px">i/e. Hevosen nimi</th>
     <th style="text-align:left;padding:4px 8px">Omistaja</th>
     <th style="text-align:left;padding:4px 8px">Meriitit</th>
@@ -405,7 +404,6 @@ if (is_array($obj) && isset($obj['error']) && $obj['error'] == 0) {
       <?php endif; ?>
     </td>
     <td class="pvm"><small><?= $birthStr ?></small></td>
-    <td class="pvm"><small><?= e($statusStr) ?></small></td>
     <td class="laji">
       <?php if ($otherName): ?>
         <?= e($otherLabel) ?> <a href="hevonen.php?id=<?= $otherId ?>"><?= e($otherName) ?></a>
