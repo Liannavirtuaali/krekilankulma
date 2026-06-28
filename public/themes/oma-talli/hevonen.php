@@ -393,7 +393,7 @@ if (is_array($obj) && isset($obj['error']) && $obj['error'] == 0) {
     if ($f['owner_vrl']) $ownerStr .= ($ownerStr ? ' ' : '') . '(' . e($f['owner_vrl']) . ')';
   ?>
   <tr class="kilpailutulos">
-    <td><small><?= $breedGender ?: '—' ?></small></td>
+    <td><?= $breedGender ?: '—' ?></td>
     <td>
       <?php if ($f['foal_horse_id']): ?>
         <?php $foalUrl = $f['foal_horse_slug'] ? horseUrl(['slug' => $f['foal_horse_slug']]) : 'hevonen.php?id=' . (int)$f['foal_horse_id']; ?>
@@ -402,14 +402,14 @@ if (is_array($obj) && isset($obj['error']) && $obj['error'] == 0) {
         <?= e($f['foal_name'] ?? '—') ?>
       <?php endif; ?>
     </td>
-    <td><small><?= $birthStr ?></small></td>
+    <td><?= $birthStr ?></td>
     <td>
       <?php if ($otherName): ?>
         <?= e($otherLabel) ?> <a href="hevonen.php?id=<?= $otherId ?>"><?= e($otherName) ?></a>
       <?php else: ?>—<?php endif; ?>
     </td>
-    <td><small><?= $ownerStr ? 'om. ' . $ownerStr : '—' ?></small></td>
-    <td><small><?= $f['merits'] ? nl2br(e($f['merits'])) : '—' ?></small></td>
+    <td><?= $ownerStr ? 'om. ' . $ownerStr : '—' ?></td>
+    <td><?= $f['merits'] ? nl2br(e($f['merits'])) : '—' ?></td>
   </tr>
   <?php endforeach; ?>
 </table>
