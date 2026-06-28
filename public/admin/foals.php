@@ -15,11 +15,46 @@ if (!$horse) {
     redirect(SITE_URL . '/admin/horses.php');
 }
 
-$allHorses = $db->query('SELECT id, name FROM horses WHERE is_deleted = 0 ORDER BY name')->fetchAll();
+$sireHorses = $db->query("SELECT id, name FROM horses WHERE is_deleted = 0 AND gender = 'ori'  ORDER BY name")->fetchAll();
+$damHorses  = $db->query("SELECT id, name FROM horses WHERE is_deleted = 0 AND gender = 'tamma' ORDER BY name")->fetchAll();
+$allHorses  = $db->query("SELECT id, name FROM horses WHERE is_deleted = 0 ORDER BY name")->fetchAll();
+$horsesJson = json_encode(array_map(fn($h) => ['id' => $h['id'], 'label' => $h['name']], $allHorses), JSON_UNESCAPED_UNICODE);
+$breeds     = $db->query('SELECT id, name, abbreviation FROM breeds ORDER BY name')->fetchAll();
+$contacts   = $db->query('SELECT * FROM contacts ORDER BY nickname, stable_name')->fetchAll();
+
+$contactsById  = array_column($contacts, null, 'id');
+$contactsJson  = json_encode(array_map(fn($c) => [
+    'id'          => $c['id'],
+    'label'       => trim(($c['nickname'] ?? '') . ' ' . ($c['stable_name'] ?? '')),
+    'nickname'    => $c['nickname']    ?? '',
+    'stable_name' => $c['stable_name'] ?? '',
+    'stable_url'  => $c['stable_url']  ?? '',
+    'vrl_id'      => $c['vrl_id']      ?? '',
+    'email'       => $c['email']       ?? '',
+    'country'     => $c['country']     ?? '',
+], $contacts), JSON_UNESCAPED_UNICODE);
 
 $edit_id = (int)($_GET['edit'] ?? 0);
 $errors  = [];
 $flash   = '';
+
+// Apufunktio: käsittele omistaja (olemassa oleva tai uusi kontakti)
+function resolveOwnerContact(PDO $db, array $post): ?int {
+    $cid = (int)($post['owner_contact_id'] ?? 0);
+    if ($cid > 0) return $cid;
+    $nn  = sanitize($post['owner_new_nickname']    ?? '');
+    $sn  = sanitize($post['owner_new_stable_name'] ?? '');
+    $vrl = sanitize($post['owner_new_vrl_id']      ?? '');
+    $em  = sanitize($post['owner_new_email']        ?? '');
+    $co  = sanitize($post['owner_new_country']      ?? '');
+    if (!$nn && !$sn && !$em) return null;
+    $stmt = $db->prepare(
+        'INSERT INTO contacts (nickname, stable_name, vrl_id, email, country)
+         VALUES (:nn, :sn, :vrl, :em, :co)'
+    );
+    $stmt->execute([':nn'=>$nn?:null,':sn'=>$sn?:null,':vrl'=>$vrl?:null,':em'=>$em?:null,':co'=>$co?:null]);
+    return (int)$db->lastInsertId();
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action  = $_POST['action'] ?? '';
@@ -29,22 +64,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'Virheellinen pyyntö.';
     } else {
         if ($action === 'add') {
-            $foal_name = sanitize($_POST['foal_name'] ?? '');
-            if ($foal_name === '') {
-                $errors[] = 'Varsan nimi on pakollinen.';
-            } else {
+            $foal_name     = sanitize($_POST['foal_name'] ?? '');
+            $foal_horse_id = ($_POST['foal_horse_id'] ?? '') !== '' ? (int)$_POST['foal_horse_id'] : null;
+            if ($foal_name === '' && $foal_horse_id === null) $errors[] = 'Varsan nimi tai linkki hevoseen on pakollinen.';
+            if (empty($errors)) {
+                $ownerCid = resolveOwnerContact($db, $_POST);
                 $stmt = $db->prepare(
-                    'INSERT INTO foals (horse_id, foal_name, sire_id, dam_id, birth_year, gender, status)
-                     VALUES (:horse_id, :foal_name, :sire_id, :dam_id, :birth_year, :gender, :status)'
+                    'INSERT INTO foals (horse_id, foal_name, breed_id, sire_id, dam_id, birth_date, gender, status, owner_contact_id, merits, foal_horse_id)
+                     VALUES (:horse_id, :foal_name, :breed_id, :sire_id, :dam_id, :birth_date, :gender, :status, :owner_contact_id, :merits, :foal_horse_id)'
                 );
                 $stmt->execute([
-                    ':horse_id'  => $horse_id,
-                    ':foal_name' => $foal_name,
-                    ':sire_id'   => $_POST['sire_id'] !== '' ? (int)$_POST['sire_id'] : null,
-                    ':dam_id'    => $_POST['dam_id']  !== '' ? (int)$_POST['dam_id']  : null,
-                    ':birth_year'=> $_POST['birth_year'] !== '' ? (int)$_POST['birth_year'] : null,
-                    ':gender'    => sanitize($_POST['gender'] ?? '') ?: null,
-                    ':status'    => sanitize($_POST['status'] ?? 'born'),
+                    ':horse_id'         => $horse_id,
+                    ':foal_name'        => $foal_name ?: null,
+                    ':breed_id'         => ($_POST['breed_id'] ?? '') !== '' ? (int)$_POST['breed_id'] : null,
+                    ':sire_id'          => ($_POST['sire_id']  ?? '') !== '' ? (int)$_POST['sire_id']  : null,
+                    ':dam_id'           => ($_POST['dam_id']   ?? '') !== '' ? (int)$_POST['dam_id']   : null,
+                    ':birth_date'       => sanitize($_POST['birth_date'] ?? '') ?: null,
+                    ':gender'           => sanitize($_POST['gender']     ?? '') ?: null,
+                    ':status'           => sanitize($_POST['status']     ?? 'born'),
+                    ':owner_contact_id' => $ownerCid,
+                    ':merits'           => sanitize($_POST['merits']     ?? '') ?: null,
+                    ':foal_horse_id'    => $foal_horse_id,
                 ]);
                 redirect(SITE_URL . '/admin/foals.php?horse_id=' . $horse_id . '&added=1');
             }
@@ -52,23 +92,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $own = $db->prepare('SELECT id FROM foals WHERE id = :foal_id AND horse_id = :horse_id');
             $own->execute([':foal_id' => $foal_id, ':horse_id' => $horse_id]);
             if ($own->fetch()) {
-                $foal_name = sanitize($_POST['foal_name'] ?? '');
-                if ($foal_name === '') {
-                    $errors[] = 'Varsan nimi on pakollinen.';
-                } else {
+                $foal_name     = sanitize($_POST['foal_name'] ?? '');
+                $foal_horse_id = ($_POST['foal_horse_id'] ?? '') !== '' ? (int)$_POST['foal_horse_id'] : null;
+                if ($foal_name === '' && $foal_horse_id === null) $errors[] = 'Varsan nimi tai linkki hevoseen on pakollinen.';
+                if (empty($errors)) {
+                    $ownerCid = resolveOwnerContact($db, $_POST);
                     $stmt = $db->prepare(
-                        'UPDATE foals SET foal_name=:foal_name, sire_id=:sire_id, dam_id=:dam_id,
-                         birth_year=:birth_year, gender=:gender, status=:status
+                        'UPDATE foals SET foal_name=:foal_name, breed_id=:breed_id, sire_id=:sire_id, dam_id=:dam_id,
+                         birth_date=:birth_date, gender=:gender, status=:status,
+                         owner_contact_id=:owner_contact_id, merits=:merits, foal_horse_id=:foal_horse_id
                          WHERE id=:foal_id'
                     );
                     $stmt->execute([
-                        ':foal_name'  => $foal_name,
-                        ':sire_id'    => $_POST['sire_id'] !== '' ? (int)$_POST['sire_id'] : null,
-                        ':dam_id'     => $_POST['dam_id']  !== '' ? (int)$_POST['dam_id']  : null,
-                        ':birth_year' => $_POST['birth_year'] !== '' ? (int)$_POST['birth_year'] : null,
-                        ':gender'     => sanitize($_POST['gender'] ?? '') ?: null,
-                        ':status'     => sanitize($_POST['status'] ?? 'born'),
-                        ':foal_id'    => $foal_id,
+                        ':foal_name'        => $foal_name ?: null,
+                        ':breed_id'         => ($_POST['breed_id'] ?? '') !== '' ? (int)$_POST['breed_id'] : null,
+                        ':sire_id'          => ($_POST['sire_id']  ?? '') !== '' ? (int)$_POST['sire_id']  : null,
+                        ':dam_id'           => ($_POST['dam_id']   ?? '') !== '' ? (int)$_POST['dam_id']   : null,
+                        ':birth_date'       => sanitize($_POST['birth_date'] ?? '') ?: null,
+                        ':gender'           => sanitize($_POST['gender']     ?? '') ?: null,
+                        ':status'           => sanitize($_POST['status']     ?? 'born'),
+                        ':owner_contact_id' => $ownerCid,
+                        ':merits'           => sanitize($_POST['merits']     ?? '') ?: null,
+                        ':foal_horse_id'    => $foal_horse_id,
+                        ':foal_id'          => $foal_id,
                     ]);
                     redirect(SITE_URL . '/admin/foals.php?horse_id=' . $horse_id . '&updated=1');
                 }
@@ -84,24 +130,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Hae varsamerkinnät — JOIN isä + emä nimineen
 $foalsStmt = $db->prepare(
-    'SELECT f.*, s.name AS sire_name, d.name AS dam_name
+    'SELECT f.*, b.abbreviation AS breed_abbr,
+            s.name AS sire_name, d.name AS dam_name,
+            oc.nickname AS owner_nickname, oc.stable_name AS owner_stable, oc.vrl_id AS owner_vrl,
+            fh.name AS foal_horse_name
      FROM foals f
-     LEFT JOIN horses s ON s.id = f.sire_id AND s.is_deleted = 0
-     LEFT JOIN horses d ON d.id = f.dam_id  AND d.is_deleted = 0
+     LEFT JOIN breeds   b  ON b.id  = f.breed_id
+     LEFT JOIN horses   s  ON s.id  = f.sire_id          AND s.is_deleted = 0
+     LEFT JOIN horses   d  ON d.id  = f.dam_id           AND d.is_deleted = 0
+     LEFT JOIN contacts oc ON oc.id = f.owner_contact_id
+     LEFT JOIN horses   fh ON fh.id = f.foal_horse_id    AND fh.is_deleted = 0
      WHERE f.horse_id = :horse_id
-     ORDER BY f.birth_year DESC, f.foal_name ASC'
+     ORDER BY f.birth_date DESC, f.foal_name ASC'
 );
 $foalsStmt->execute([':horse_id' => $horse_id]);
 $foals = $foalsStmt->fetchAll();
-
-$editFoal = null;
-if ($edit_id > 0) {
-    $editStmt = $db->prepare('SELECT * FROM foals WHERE id = :id AND horse_id = :horse_id');
-    $editStmt->execute([':id' => $edit_id, ':horse_id' => $horse_id]);
-    $editFoal = $editStmt->fetch();
-}
 
 if (isset($_GET['added']))   $flash = '<p class="flash-ok">Varsamerkintä lisätty.</p>';
 if (isset($_GET['updated'])) $flash = '<p class="flash-ok">Varsamerkintä päivitetty.</p>';
@@ -119,13 +163,11 @@ require __DIR__ . '/includes/admin_header.php';
     <button class="btn" onclick="adminOpenSlide('foal')">+ Lisää varsa</button>
   </div>
 </div>
-
 <div class="horse-ctx-banner">
   <span class="hcb-name">🌱 <?= e($horse['name']) ?></span>
   <span class="hcb-meta"><?= count($foals) ?> varsamerkintää</span>
   <a href="<?= e(SITE_URL) ?>/admin/horses.php" class="hcb-back">← Hevoslistaan</a>
 </div>
-
 <div class="admin-body">
 <?php if ($errors): ?>
   <div class="flash-err"><ul><?php foreach ($errors as $emsg): ?><li><?= e($emsg) ?></li><?php endforeach; ?></ul></div>
@@ -134,18 +176,18 @@ require __DIR__ . '/includes/admin_header.php';
 
 <?php if ($foals): ?>
 <div class="compact-list">
-  <div class="compact-list-header" style="grid-template-columns:2fr 1fr 1fr 70px 80px 28px">
-    <div>Nimi</div><div>Isä</div><div>Emä</div><div>Synt.v.</div><div>Status</div><div></div>
+  <div class="compact-list-header" style="grid-template-columns:2fr 1fr 1fr 90px 80px 28px">
+    <div>Nimi</div><div>Isä</div><div>Emä</div><div>Syntymäpäivä</div><div>Status</div><div></div>
   </div>
   <?php foreach ($foals as $fo):
     $sClass = $fo['status'] === 'expected' ? 'sbadge-expected' : 'sbadge-born';
   ?>
-  <div class="compact-list-row" style="grid-template-columns:2fr 1fr 1fr 70px 80px 28px"
+  <div class="compact-list-row" style="grid-template-columns:2fr 1fr 1fr 90px 80px 28px"
        onclick="adminToggleExpand('f<?= (int)$fo['id'] ?>')">
     <div class="cl-name"><?= e($fo['foal_name']) ?></div>
     <div class="cl-meta"><?= e($fo['sire_name'] ?? '—') ?></div>
     <div class="cl-meta"><?= e($fo['dam_name']  ?? '—') ?></div>
-    <div class="cl-mono"><?= $fo['birth_year'] ? (int)$fo['birth_year'] : '—' ?></div>
+    <div class="cl-mono"><?= $fo['birth_date'] ? date('d.m.Y', strtotime($fo['birth_date'])) : '—' ?></div>
     <div><span class="sbadge <?= $sClass ?>"><?= e($statusLabels[$fo['status']] ?? $fo['status']) ?></span></div>
     <div>
       <button class="cl-expand-btn" id="cl-btn-f<?= (int)$fo['id'] ?>"
@@ -184,35 +226,24 @@ require __DIR__ . '/includes/admin_header.php';
     <div class="admin-slide-body">
       <div class="form-row">
         <div class="form-group">
-          <label for="foal_name">Varsan nimi *</label>
-          <input type="text" id="foal_name" name="foal_name" required>
+          <label for="foal_name">Varsan nimi</label>
+          <input type="text" id="foal_name" name="foal_name">
         </div>
         <div class="form-group">
-          <label for="birth_year">Syntymävuosi</label>
-          <input type="number" id="birth_year" name="birth_year" min="1900" max="2100">
+          <label for="birth_date">Syntymäpäivä</label>
+          <input type="date" id="birth_date" name="birth_date">
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label for="sire_id">Isä (ori)</label>
-          <select id="sire_id" name="sire_id">
-            <option value="">— ei valittu —</option>
-            <?php foreach ($allHorses as $ah): ?>
-              <option value="<?= (int)$ah['id'] ?>"><?= e($ah['name']) ?></option>
+          <label for="breed_id">Rotu</label>
+          <select id="breed_id" name="breed_id">
+            <option value="">— valitse —</option>
+            <?php foreach ($breeds as $br): ?>
+              <option value="<?= (int)$br['id'] ?>"><?= e($br['name']) ?><?= $br['abbreviation'] ? ' (' . e($br['abbreviation']) . ')' : '' ?></option>
             <?php endforeach; ?>
           </select>
         </div>
-        <div class="form-group">
-          <label for="dam_id">Emä (tamma)</label>
-          <select id="dam_id" name="dam_id">
-            <option value="">— ei valittu —</option>
-            <?php foreach ($allHorses as $ah): ?>
-              <option value="<?= (int)$ah['id'] ?>"><?= e($ah['name']) ?></option>
-            <?php endforeach; ?>
-          </select>
-        </div>
-      </div>
-      <div class="form-row">
         <div class="form-group">
           <label for="gender">Sukupuoli</label>
           <select id="gender" name="gender">
@@ -222,14 +253,97 @@ require __DIR__ . '/includes/admin_header.php';
             <?php endforeach; ?>
           </select>
         </div>
+      </div>
+      <div class="form-row">
         <div class="form-group">
-          <label for="status">Status</label>
-          <select id="status" name="status">
-            <?php foreach ($statusLabels as $val => $label): ?>
-              <option value="<?= e($val) ?>"><?= e($label) ?></option>
-            <?php endforeach; ?>
-          </select>
+          <label for="sire_id_text">Isä (ori)</label>
+          <div class="ac-wrap"
+               data-items='<?= htmlspecialchars($horsesJson, ENT_QUOTES) ?>'
+               data-input-id="sire_id"
+               data-hidden-name="sire_id"
+               data-current-id=""
+               data-current-label=""
+               data-placeholder="Hae ori..."></div>
         </div>
+        <div class="form-group">
+          <label for="dam_id_text">Emä (tamma)</label>
+          <div class="ac-wrap"
+               data-items='<?= htmlspecialchars($horsesJson, ENT_QUOTES) ?>'
+               data-input-id="dam_id"
+               data-hidden-name="dam_id"
+               data-current-id=""
+               data-current-label=""
+               data-placeholder="Hae tamma..."></div>
+        </div>
+      </div>
+
+      <!-- Omistaja -->
+      <fieldset style="border:1px solid var(--color-border,#e0d5c5);border-radius:8px;padding:1rem;margin-bottom:0">
+        <legend style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-muted,#6b5e52);padding:0 0.4rem">Omistaja</legend>
+        <div class="form-group" style="margin-bottom:0.75rem">
+          <label>Hae osoitekirjasta</label>
+          <div class="ac-wrap contact-ac"
+               data-items='<?= htmlspecialchars($contactsJson, ENT_QUOTES) ?>'
+               data-input-id="owner_contact"
+               data-hidden-name="owner_contact_id"
+               data-current-id=""
+               data-current-label=""
+               data-preview-target="owner-preview"
+               data-new-target="owner-new"
+               data-placeholder="Hae nimimerkillä tai tallin nimellä..."></div>
+        </div>
+        <div id="owner-preview" class="contact-preview" style="display:none"></div>
+        <div style="margin:0.5rem 0;font-size:0.78rem;color:var(--color-text-muted,#6b5e52)">— tai —</div>
+        <button type="button" class="btn-sm" onclick="toggleContactNew('owner')">+ Luo uusi yhteystieto osoitekirjaan</button>
+        <div id="owner-new" style="display:none;margin-top:0.75rem">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="owner_new_nickname">Nimimerkki</label>
+              <input type="text" id="owner_new_nickname" name="owner_new_nickname">
+            </div>
+            <div class="form-group">
+              <label for="owner_new_stable_name">Tallin nimi</label>
+              <input type="text" id="owner_new_stable_name" name="owner_new_stable_name">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="owner_new_vrl_id">VRL-tunnus</label>
+              <input type="text" id="owner_new_vrl_id" name="owner_new_vrl_id" placeholder="VRL-XXXXX">
+            </div>
+            <div class="form-group">
+              <label for="owner_new_email">Sähköposti</label>
+              <input type="email" id="owner_new_email" name="owner_new_email">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="owner_new_country">Maa</label>
+            <input type="text" id="owner_new_country" name="owner_new_country">
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="form-group" style="margin-top:1rem">
+        <label for="status">Status</label>
+        <select id="status" name="status">
+          <?php foreach ($statusLabels as $val => $label): ?>
+            <option value="<?= e($val) ?>"><?= e($label) ?></option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="foal_horse_id_text">Varsa hevosrekisterissä</label>
+        <div class="ac-wrap"
+             data-items='<?= htmlspecialchars($horsesJson, ENT_QUOTES) ?>'
+             data-input-id="foal_horse_id"
+             data-hidden-name="foal_horse_id"
+             data-current-id=""
+             data-current-label=""
+             data-placeholder="Hae varsa..."></div>
+      </div>
+      <div class="form-group">
+        <label for="merits">Meriitit</label>
+        <textarea id="merits" name="merits" rows="3" placeholder="Esim. kilpailutulokset, tittelit..."></textarea>
       </div>
     </div><!-- /.admin-slide-body -->
     <div class="admin-slide-footer">
@@ -240,16 +354,26 @@ require __DIR__ . '/includes/admin_header.php';
 </div>
 
 <script>
+function setAcValue(inputId, id, label) {
+  var textEl   = document.getElementById(inputId + '_text');
+  var hiddenEl = document.getElementById(inputId);
+  if (textEl)   textEl.value   = label || '';
+  if (hiddenEl) hiddenEl.value = id    || '';
+}
+
 function openEditFoal(id, data) {
   document.getElementById('slide-foal-title').textContent = 'Muokkaa varsamerkintää';
-  document.getElementById('slide-action').value = 'edit';
+  document.getElementById('slide-action').value  = 'edit';
   document.getElementById('slide-foal-id').value = id;
-  document.getElementById('foal_name').value   = data.foal_name  || '';
-  document.getElementById('birth_year').value  = data.birth_year || '';
-  document.getElementById('sire_id').value     = data.sire_id    || '';
-  document.getElementById('dam_id').value      = data.dam_id     || '';
-  document.getElementById('gender').value      = data.gender     || '';
-  document.getElementById('status').value      = data.status     || 'born';
+  document.getElementById('foal_name').value     = data.foal_name  || '';
+  document.getElementById('birth_date').value    = data.birth_date || '';
+  document.getElementById('breed_id').value      = data.breed_id   || '';
+  document.getElementById('gender').value        = data.gender     || '';
+  document.getElementById('status').value        = data.status     || 'born';
+  document.getElementById('merits').value        = data.merits     || '';
+  setAcValue('sire_id',       data.sire_id,       data.sire_name       || '');
+  setAcValue('dam_id',        data.dam_id,        data.dam_name        || '');
+  setAcValue('foal_horse_id', data.foal_horse_id, data.foal_horse_name || '');
   document.getElementById('slide-submit-btn').textContent = 'Tallenna muutokset';
   adminOpenSlide('foal');
 }

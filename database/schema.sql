@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS `contacts` (
   `nickname` VARCHAR(150) DEFAULT NULL COMMENT 'Nimimerkki',
   `stable_name` VARCHAR(150) DEFAULT NULL COMMENT 'Tallin nimi',
   `stable_url` VARCHAR(500) DEFAULT NULL COMMENT 'Tallin URL',
+  `character_url` VARCHAR(500) DEFAULT NULL COMMENT 'Hahmon sivujen URL',
   `vrl_id` VARCHAR(50) DEFAULT NULL COMMENT 'VRL-tunnus',
   `email` VARCHAR(255) DEFAULT NULL COMMENT 'Sähköposti',
   `country` VARCHAR(100) DEFAULT NULL COMMENT 'Maa',
@@ -185,20 +186,27 @@ CREATE TABLE IF NOT EXISTS `competitions` (
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `foals` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `horse_id` INT UNSIGNED NOT NULL COMMENT 'Tämän tallin hevonen (emo/ori)',
-  `foal_name` VARCHAR(150) DEFAULT NULL COMMENT 'Varsan nimi (jos tiedossa)',
-  `sire_id` INT UNSIGNED DEFAULT NULL COMMENT 'Isä (horses.id)',
-  `dam_id` INT UNSIGNED DEFAULT NULL COMMENT 'Emä (horses.id)',
-  `birth_year` SMALLINT UNSIGNED DEFAULT NULL,
-  `gender` ENUM('ori','tamma','ruuna','tuntematon') DEFAULT 'tuntematon',
-  `status` ENUM('born','expected') NOT NULL DEFAULT 'born',
-  `notes` TEXT DEFAULT NULL,
+  `horse_id`     INT UNSIGNED  DEFAULT NULL COMMENT 'Tämän tallin hevonen (emo/ori), voi olla NULL',
+  `foal_name`    VARCHAR(150)  DEFAULT NULL COMMENT 'Varsan nimi (jos tiedossa)',
+  `breed_id`     INT UNSIGNED  DEFAULT NULL COMMENT 'Varsan rotu (breeds.id)',
+  `sire_id`      INT UNSIGNED  DEFAULT NULL COMMENT 'Isä (horses.id)',
+  `dam_id`       INT UNSIGNED  DEFAULT NULL COMMENT 'Emä (horses.id)',
+  `birth_date`   DATE          DEFAULT NULL,
+  `gender`       ENUM('ori','tamma','ruuna','tuntematon') DEFAULT 'tuntematon',
+  `status`       ENUM('born','expected') NOT NULL DEFAULT 'born',
+  `owner_contact_id` INT UNSIGNED DEFAULT NULL,
+  `merits`           TEXT         DEFAULT NULL,
+  `foal_horse_id`    INT UNSIGNED  DEFAULT NULL COMMENT 'Linkki hevoseen kun status=born (horses.id)',
+  `notes`        TEXT          DEFAULT NULL,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `idx_foals_horse` (`horse_id`),
-  CONSTRAINT `fk_foals_horse` FOREIGN KEY (`horse_id`) REFERENCES `horses` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_foals_sire` FOREIGN KEY (`sire_id`) REFERENCES `horses` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `fk_foals_dam` FOREIGN KEY (`dam_id`) REFERENCES `horses` (`id`) ON DELETE SET NULL
+  CONSTRAINT `fk_foals_horse` FOREIGN KEY (`horse_id`)         REFERENCES `horses`   (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_foals_breed` FOREIGN KEY (`breed_id`)         REFERENCES `breeds`   (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_foals_sire`  FOREIGN KEY (`sire_id`)          REFERENCES `horses`   (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_foals_dam`   FOREIGN KEY (`dam_id`)           REFERENCES `horses`   (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_foals_owner` FOREIGN KEY (`owner_contact_id`) REFERENCES `contacts` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_foals_foal_horse` FOREIGN KEY (`foal_horse_id`) REFERENCES `horses` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------

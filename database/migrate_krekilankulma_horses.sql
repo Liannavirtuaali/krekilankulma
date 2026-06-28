@@ -1,7 +1,7 @@
 -- ============================================================
 -- Migraatio: Krekilänkulman hevoset
 -- Lähde: public/themes/oma-talli/Hevosten Sivut/*/index.php
--- Hevosia: 8 kpl + Kuningastaikan sukupuuhevoset (14 kpl)
+-- Hevosia: 8 kpl + sukupuuhevoset (14 ancestor + 7×14 = 98 evm-placeholder = 112 kpl)
 --
 -- Aja schema.sql ja seed.sql ensin!
 -- ============================================================
@@ -133,6 +133,167 @@ INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`ancesto
   ('Kuunlilja',  18, 'tamma', 130, 151, 1, 0, @susihukka,   @helmililja,
    'https://viixinyksityiset.weebly.com/lilja.html');
 SET @kuunlilja   = LAST_INSERT_ID();
+
+-- ------------------------------------------------------------
+-- 3f. Hiienhelmi — placeholder-sukupuuhevoset (evm=1)
+--     Värit: vkk=153, rtkm=115, rnvkk=130, vrt=150, vprt=148,
+--            tprt=144, rn=120, prt=108, rt=114
+-- ------------------------------------------------------------
+-- 3. polvi
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'ori',  115,156,1,0); SET @hh_iii = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'tamma',130,151,1,0); SET @hh_iie = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'ori',  115,153,1,0); SET @hh_iei = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'tamma',148,149,1,0); SET @hh_iee = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'ori',  120,151,1,0); SET @hh_eii = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'tamma',108,146,1,0); SET @hh_eie = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'ori',  114,149,1,0); SET @hh_eei = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'tamma',108,143,1,0); SET @hh_eee = LAST_INSERT_ID();
+-- 2. polvi
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'ori',  153,153,1,0,@hh_iii,@hh_iie); SET @hh_ii = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'tamma',150,150,1,0,@hh_iei,@hh_iee); SET @hh_ie = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'ori',  144,148,1,0,@hh_eii,@hh_eie); SET @hh_ei = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'tamma',150,145,1,0,@hh_eei,@hh_eee); SET @hh_ee = LAST_INSERT_ID();
+-- 1. polvi
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'ori',  153,151,1,0,@hh_ii, @hh_ie); SET @hh_i = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'tamma',150,144,1,0,@hh_ei, @hh_ee); SET @hh_e = LAST_INSERT_ID();
+
+-- ------------------------------------------------------------
+-- 3g. Kaamosprinssi — placeholder-sukupuuhevoset (evm=1)
+--     Värit: prtskrj=203, prn=109, tprn=145, prt=108,
+--            rtskrj=117, vkk=153, rnskrj=127, rnvkk=130, vrt=150, vprt=148
+-- ------------------------------------------------------------
+-- 3. polvi
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'ori',  145,164,1,0); SET @kp_iii = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'tamma',108,159,1,0); SET @kp_iie = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'ori',  153,158,1,0); SET @kp_iei = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'tamma',127,153,1,0); SET @kp_iee = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'ori',  153,162,1,0); SET @kp_eii = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'tamma',109,156,1,0); SET @kp_eie = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'ori',  120,158,1,0); SET @kp_eei = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'tamma',148,154,1,0); SET @kp_eee = LAST_INSERT_ID();
+-- 2. polvi
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'ori',  109,161,1,0,@kp_iii,@kp_iie); SET @kp_ii = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'tamma',117,156,1,0,@kp_iei,@kp_iee); SET @kp_ie = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'ori',  130,159,1,0,@kp_eii,@kp_eie); SET @kp_ei = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'tamma',150,155,1,0,@kp_eei,@kp_eee); SET @kp_ee = LAST_INSERT_ID();
+-- 1. polvi
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'ori',  203,162,1,0,@kp_ii, @kp_ie); SET @kp_i = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'tamma',153,158,1,0,@kp_ei, @kp_ee); SET @kp_e = LAST_INSERT_ID();
+
+-- ------------------------------------------------------------
+-- 3h. Maamanteli — placeholder-sukupuuhevoset (evm=1)
+--     Värit: m=89, rnkm=125, rn=120, mkm=90, trn=147,
+--            tprn=145, prt=108, prn=109
+-- ------------------------------------------------------------
+-- 3. polvi
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'ori',  125,166,1,0); SET @mm_iii = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'tamma', 89,161,1,0); SET @mm_iie = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'ori',  120,159,1,0); SET @mm_iei = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'tamma', 90,158,1,0); SET @mm_iee = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'ori',  108,166,1,0); SET @mm_eii = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'tamma',147,161,1,0); SET @mm_eie = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'ori',   89,166,1,0); SET @mm_eei = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'tamma',109,158,1,0); SET @mm_eee = LAST_INSERT_ID();
+-- 2. polvi
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'ori',   89,165,1,0,@mm_iii,@mm_iie); SET @mm_ii = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'tamma',120,161,1,0,@mm_iei,@mm_iee); SET @mm_ie = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'ori',  145,164,1,0,@mm_eii,@mm_eie); SET @mm_ei = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'tamma', 89,160,1,0,@mm_eei,@mm_eee); SET @mm_ee = LAST_INSERT_ID();
+-- 1. polvi
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'ori',   89,163,1,0,@mm_ii, @mm_ie); SET @mm_i = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'tamma',147,160,1,0,@mm_ei, @mm_ee); SET @mm_e = LAST_INSERT_ID();
+
+-- ------------------------------------------------------------
+-- 3i. Noitaneilikka — placeholder-sukupuuhevoset (evm=1)
+--     Värit: rtpäist=118, rnkm=125, mkm=90, rn=120, rnpäist=128,
+--            vrt=150, rtkm=115, vprt=148, vrn=151, prt=108
+-- ------------------------------------------------------------
+-- 3. polvi
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'ori',   90,166,1,0); SET @nn_iii = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'tamma',120,162,1,0); SET @nn_iie = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'ori',  128,163,1,0); SET @nn_iei = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'tamma',150,159,1,0); SET @nn_iee = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'ori',  151,158,1,0); SET @nn_eii = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'tamma',108,154,1,0); SET @nn_eie = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'ori',  120,156,1,0); SET @nn_eei = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'tamma',115,151,1,0); SET @nn_eee = LAST_INSERT_ID();
+-- 2. polvi
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'ori',  125,165,1,0,@nn_iii,@nn_iie); SET @nn_ii = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'tamma',118,160,1,0,@nn_iei,@nn_iee); SET @nn_ie = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'ori',  148,155,1,0,@nn_eii,@nn_eie); SET @nn_ei = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'tamma',115,152,1,0,@nn_eei,@nn_eee); SET @nn_ee = LAST_INSERT_ID();
+-- 1. polvi
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'ori',  118,163,1,0,@nn_ii, @nn_ie); SET @nn_i = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'tamma',115,153,1,0,@nn_ei, @nn_ee); SET @nn_e = LAST_INSERT_ID();
+
+-- ------------------------------------------------------------
+-- 3j. Samettiruletti — placeholder-sukupuuhevoset (evm=1)
+--     Värit: rnpäist=128, rtpäist=118, vrt=150, prn=109,
+--            m=89, rnkm=125, prt=108, vrn=151, vprn=149, rtkm=115, vkk=153
+-- ------------------------------------------------------------
+-- 3. polvi
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'ori',  118,166,1,0); SET @sr_iii = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'tamma',150,161,1,0); SET @sr_iie = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'ori',   89,162,1,0); SET @sr_iei = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'tamma',125,156,1,0); SET @sr_iee = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'ori',  108,162,1,0); SET @sr_eii = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'tamma',151,157,1,0); SET @sr_eie = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'ori',  153,158,1,0); SET @sr_eei = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'tamma',115,151,1,0); SET @sr_eee = LAST_INSERT_ID();
+-- 2. polvi
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'ori',  118,165,1,0,@sr_iii,@sr_iie); SET @sr_ii = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'tamma',109,159,1,0,@sr_iei,@sr_iee); SET @sr_ie = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'ori',  149,160,1,0,@sr_eii,@sr_eie); SET @sr_ei = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'tamma',115,154,1,0,@sr_eei,@sr_eee); SET @sr_ee = LAST_INSERT_ID();
+-- 1. polvi
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'ori',  128,162,1,0,@sr_ii, @sr_ie); SET @sr_i = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'tamma',108,157,1,0,@sr_ei, @sr_ee); SET @sr_e = LAST_INSERT_ID();
+
+-- ------------------------------------------------------------
+-- 3k. Suruvala — placeholder-sukupuuhevoset (evm=1)
+--     Värit: hprn=62, hpm=54, m=89, prn=109, rnkm=125,
+--            trn=147, tprn=145, rn=120, mkm=90
+-- ------------------------------------------------------------
+-- 3. polvi
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'ori',   62,165,1,0); SET @sv_iii = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'tamma', 89,155,1,0); SET @sv_iie = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'ori',  109,154,1,0); SET @sv_iei = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'tamma',125,149,1,0); SET @sv_iee = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'ori',   89,159,1,0); SET @sv_eii = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'tamma',120,151,1,0); SET @sv_eie = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'ori',   90,154,1,0); SET @sv_eei = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'tamma',109,152,1,0); SET @sv_eee = LAST_INSERT_ID();
+-- 2. polvi
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'ori',   54,161,1,0,@sv_iii,@sv_iie); SET @sv_ii = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'tamma',147,153,1,0,@sv_iei,@sv_iee); SET @sv_ie = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'ori',  147,156,1,0,@sv_eii,@sv_eie); SET @sv_ei = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'tamma',125,150,1,0,@sv_eei,@sv_eee); SET @sv_ee = LAST_INSERT_ID();
+-- 1. polvi
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'ori',   62,157,1,0,@sv_ii, @sv_ie); SET @sv_i = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'tamma',145,153,1,0,@sv_ei, @sv_ee); SET @sv_e = LAST_INSERT_ID();
+
+-- ------------------------------------------------------------
+-- 3l. Vallanveikee — placeholder-sukupuuhevoset (evm=1)
+--     Värit: tprt=144, prn=109, mkm=90, prt=108, trn=147,
+--            tprn=145, rtkm=115, vrt=150, rnkm=125, rt=114, vprt=148, vkk=153
+-- ------------------------------------------------------------
+-- 3. polvi
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'ori',   90,166,1,0); SET @vv_iii = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'tamma',108,162,1,0); SET @vv_iie = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'ori',  145,162,1,0); SET @vv_iei = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'tamma',115,156,1,0); SET @vv_iee = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'ori',  125,161,1,0); SET @vv_eii = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'tamma',114,157,1,0); SET @vv_eie = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'ori',  109,158,1,0); SET @vv_eei = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`) VALUES ('Hevosen nimi',18,'tamma',153,149,1,0); SET @vv_eee = LAST_INSERT_ID();
+-- 2. polvi
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'ori',  109,165,1,0,@vv_iii,@vv_iie); SET @vv_ii = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'tamma',147,159,1,0,@vv_iei,@vv_iee); SET @vv_ie = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'ori',  115,158,1,0,@vv_eii,@vv_eie); SET @vv_ei = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'tamma',148,154,1,0,@vv_eei,@vv_eee); SET @vv_ee = LAST_INSERT_ID();
+-- 1. polvi
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'ori',  144,163,1,0,@vv_ii, @vv_ie); SET @vv_i = LAST_INSERT_ID();
+INSERT INTO `horses` (`name`,`breed_id`,`gender`,`color_id`,`height_cm`,`evm`,`ancestor`,`sire_id`,`dam_id`) VALUES ('Hevosen nimi',18,'tamma',150,156,1,0,@vv_ei, @vv_ee); SET @vv_e = LAST_INSERT_ID();
 
 -- ------------------------------------------------------------
 -- 4. Kahdeksan päähevosta
@@ -305,6 +466,17 @@ INSERT INTO `horses` (
 SET @vallanveikee = LAST_INSERT_ID();
 
 -- ------------------------------------------------------------
+-- 4b. Linkitä 7 hevosen sukupuuplacheholder-vanhemmat
+-- ------------------------------------------------------------
+UPDATE `horses` SET `sire_id` = @hh_i, `dam_id` = @hh_e WHERE `id` = @hiienhelmi;
+UPDATE `horses` SET `sire_id` = @kp_i, `dam_id` = @kp_e WHERE `id` = @kaamosprinssi;
+UPDATE `horses` SET `sire_id` = @mm_i, `dam_id` = @mm_e WHERE `id` = @maamanteli;
+UPDATE `horses` SET `sire_id` = @nn_i, `dam_id` = @nn_e WHERE `id` = @noitaneilikka;
+UPDATE `horses` SET `sire_id` = @sr_i, `dam_id` = @sr_e WHERE `id` = @samettiruletti;
+UPDATE `horses` SET `sire_id` = @sv_i, `dam_id` = @sv_e WHERE `id` = @suruvala;
+UPDATE `horses` SET `sire_id` = @vv_i, `dam_id` = @vv_e WHERE `id` = @vallanveikee;
+
+-- ------------------------------------------------------------
 -- 5. Hevonen-laji -linkit (horse_disciplines)
 --    Kaikki: yleispainotus (14)
 --    Kuningastaika: este (1) + koulu (2) + kenttä (3)
@@ -410,8 +582,8 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 -- ============================================================
 -- Yhteenveto:
---   Kontaktit:   10 kpl (2 omistajaa + 8 kasvattajaa)
---   Hevoset:     22 kpl (14 sukupuuhevosta + 8 päähevosta)
---   Kilpailut:   29 kpl (20 Kuningastaika + 9 muut)
+--   Kontaktit:    10 kpl (2 omistajaa + 8 kasvattajaa)
+--   Hevoset:     120 kpl (14 ancestor + 98 evm-placeholder + 8 päähevosta)
+--   Kilpailut:    29 kpl (20 Kuningastaika + 9 muut)
 --   Värejä lisätty: 2 kpl (203 prtkrj, 204 prtpäis)
 -- ============================================================

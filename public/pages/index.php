@@ -21,7 +21,7 @@ $horseCount = (int)$stmtCount->fetchColumn();
 
 // Varsoja tänä vuonna
 $thisYear = (int)date('Y');
-$stmtFoals = $db->prepare('SELECT COUNT(*) FROM foals WHERE birth_year = :y');
+$stmtFoals = $db->prepare('SELECT COUNT(*) FROM foals WHERE YEAR(birth_date) = :y');
 $stmtFoals->execute([':y' => $thisYear]);
 $foalCount = (int)$stmtFoals->fetchColumn();
 

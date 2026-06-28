@@ -562,13 +562,26 @@ INSERT INTO `horses` (`id`, `name`, `slug`, `call_name`, `breed_id`, `birth_date
 INSERT INTO `horses` (`id`, `name`, `slug`, `call_name`, `breed_id`, `birth_date`, `gender`, `color_id`, `sire_id`, `evm`, `profile_url`) VALUES
   (2, 'Testijunkkari', 'testijunkkari', 'Junkku', 18, '2012-05-22', 'ori', 114, 1, 1, 'https://esimerkki.altervista.org/pages/hevonen.php?id=2');
 
+-- Testiyhteystiedot
+INSERT INTO `contacts` (`nickname`, `stable_name`, `email`, `country`) VALUES
+  ('Maija Meikäläinen', 'Testiponi Oy', 'maija@esimerkki.fi', 'fi');
+SET @test_owner = LAST_INSERT_ID();
+
+INSERT INTO `contacts` (`nickname`, `country`) VALUES ('Virtanen Oy', 'fi');
+SET @test_breeder = LAST_INSERT_ID();
+
 -- Hevonen 3: Tämän tallin hevonen (jälkeläinen)
-INSERT INTO `horses` (`id`, `name`, `slug`, `call_name`, `breed_id`, `birth_date`, `gender`, `color_id`, `height_cm`, `vh_id`, `discipline_id`, `level_id`, `owner_name`, `owner_email`, `breeder_name`, `sire_id`, `description`, `evm`) VALUES
-  (3, 'Testiponi Tähti', 'testiponi-tahti', 'Tähti', 18, '2018-07-10', 'tamma', 120, 145, 'VH-2018-12345', 1, 1, 'Maija Meikäläinen', 'maija@esimerkki.fi', 'Virtanen Oy', 2, 'Rauhallinen ja luotettava tamma. Sopii hyvin aloittelijoille.', 0);
+INSERT INTO `horses` (`id`, `name`, `slug`, `call_name`, `breed_id`, `birth_date`, `gender`, `color_id`, `height_cm`, `vh_id`,
+  `level_ko`, `level_re`, `owner_contact_id`, `breeder_contact_id`, `sire_id`, `description`, `evm`) VALUES
+  (3, 'Testiponi Tähti', 'testiponi-tahti', 'Tähti', 18, '2018-07-10', 'tamma', 120, 145, 'VH-2018-12345',
+  'Helppo A', '100cm', @test_owner, @test_breeder, 2, 'Rauhallinen ja luotettava tamma. Sopii hyvin aloittelijoille.', 0);
+
+-- Hevonen 3: lajit
+INSERT INTO `horse_disciplines` (`horse_id`, `discipline_id`) VALUES (3, 1), (3, 2);
 
 -- Kilpailu testihevoselle
-INSERT INTO `competitions` (`horse_id`, `competition_name`, `competition_date`, `organizer`, `class`, `placement`, `points`, `notes`) VALUES
-  (3, 'Kevätkilpailu 2024', '2024-05-12', 'Ruusupuiston talli', 'EA', '2.', 85.50, 'Hyvä suoritus, hieman hermostunut alussa.');
+INSERT INTO `competitions` (`horse_id`, `competition_date`, `discipline`, `country`, `organizer`, `class`, `placement`, `points`, `notes`) VALUES
+  (3, '2024-05-12', 'esteratsastus', 'fi', 'Ruusupuiston talli', 'EA', '2.', 85.50, 'Kevätkilpailu 2024 — Hyvä suoritus, hieman hermostunut alussa.');
 
 -- Tuleva varsa testihevoselle
 INSERT INTO `foals` (`horse_id`, `foal_name`, `sire_id`, `dam_id`, `birth_year`, `gender`, `status`) VALUES

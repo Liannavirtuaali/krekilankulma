@@ -9,8 +9,8 @@ Options -Indexes
     RewriteRule ^src/ - [F,L]
 
     # Sivut ilman .php-päätettä
-    # Altervistalla sovellus on /demotalli/-alihakemistossa joten absoluuttiset
-    # rewrite-kohteet vaativat /demotalli/-etuliitteen. Paikallisella Dockerilla
+    # Altervistalla sovellus on /demotalli-02/-alihakemistossa joten absoluuttiset
+    # rewrite-kohteet vaativat /demotalli-02/-etuliitteen. Paikallisella Dockerilla
     # DocRoot on public/ suoraan, joten /pages/... riittää.
     RewriteCond %{HTTP_HOST} altervista\.org$ [NC]
     RewriteRule ^hevoset/?$ /krekilankulma/pages/hevoset.php [L,QSA]

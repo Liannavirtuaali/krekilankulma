@@ -4,7 +4,7 @@ requireLogin();
 
 $db = getDB();
 $errors = [];
-$f = ['nickname' => '', 'stable_name' => '', 'stable_url' => '', 'vrl_id' => '', 'email' => '', 'country' => ''];
+$f = ['nickname' => '', 'stable_name' => '', 'stable_url' => '', 'character_url' => '', 'vrl_id' => '', 'email' => '', 'country' => ''];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
@@ -24,18 +24,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($f['stable_url'] !== '' && filter_var($f['stable_url'], FILTER_VALIDATE_URL) === false) {
             $errors[] = 'Tallin URL ei ole kelvollinen.';
         }
+        if ($f['character_url'] !== '' && filter_var($f['character_url'], FILTER_VALIDATE_URL) === false) {
+            $errors[] = 'Hahmon sivujen URL ei ole kelvollinen.';
+        }
         if (empty($errors)) {
             $stmt = $db->prepare(
-                'INSERT INTO contacts (nickname, stable_name, stable_url, vrl_id, email, country)
-                 VALUES (:nickname, :stable_name, :stable_url, :vrl_id, :email, :country)'
+                'INSERT INTO contacts (nickname, stable_name, stable_url, character_url, vrl_id, email, country)
+                 VALUES (:nickname, :stable_name, :stable_url, :character_url, :vrl_id, :email, :country)'
             );
             $stmt->execute([
-                ':nickname'    => $f['nickname'] ?: null,
-                ':stable_name' => $f['stable_name'] ?: null,
-                ':stable_url'  => $f['stable_url'] ?: null,
-                ':vrl_id'      => $f['vrl_id'] ?: null,
-                ':email'       => $f['email'] ?: null,
-                ':country'     => $f['country'] ?: null,
+                ':nickname'      => $f['nickname'] ?: null,
+                ':stable_name'   => $f['stable_name'] ?: null,
+                ':stable_url'    => $f['stable_url'] ?: null,
+                ':character_url' => $f['character_url'] ?: null,
+                ':vrl_id'        => $f['vrl_id'] ?: null,
+                ':email'         => $f['email'] ?: null,
+                ':country'       => $f['country'] ?: null,
             ]);
             redirect(SITE_URL . '/admin/contacts.php?added=1');
         }
@@ -72,9 +76,16 @@ require __DIR__ . '/includes/admin_header.php';
       <input type="url" id="stable_url" name="stable_url" value="<?= e($f['stable_url']) ?>" placeholder="https://...">
     </div>
     <div class="form-group">
+      <label for="character_url">Hahmon sivujen URL</label>
+      <input type="url" id="character_url" name="character_url" value="<?= e($f['character_url']) ?>" placeholder="https://...">
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
       <label for="vrl_id">VRL-tunnus</label>
       <input type="text" id="vrl_id" name="vrl_id" value="<?= e($f['vrl_id']) ?>" placeholder="VRL-XXXXX">
     </div>
+    <div class="form-group"></div>
   </div>
   <div class="form-row">
     <div class="form-group">
