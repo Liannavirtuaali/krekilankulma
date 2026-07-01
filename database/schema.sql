@@ -93,6 +93,7 @@ CREATE TABLE IF NOT EXISTS `horses` (
   -- Painotus
   `level_ko` VARCHAR(150) DEFAULT NULL COMMENT 'Koulutaso (vapaa teksti)',
   `level_re` VARCHAR(150) DEFAULT NULL COMMENT 'Esteratsastustaso (vapaa teksti)',
+  `level_ke` VARCHAR(150) DEFAULT NULL COMMENT 'Kenttäratsastustaso (vapaa teksti)',
   -- Yhteystiedot (FK → contacts)
   `owner_contact_id` INT UNSIGNED DEFAULT NULL COMMENT 'Omistaja (contacts.id)',
   `breeder_contact_id` INT UNSIGNED DEFAULT NULL COMMENT 'Kasvattaja (contacts.id)',
@@ -233,6 +234,18 @@ CREATE TABLE IF NOT EXISTS `posts` (
   `updated_at` DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_post_slug` (`slug`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ------------------------------------------------------------
+-- Postauksen hevoset (many-to-many)
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `post_horses` (
+  `post_id`  INT UNSIGNED NOT NULL,
+  `horse_id` INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`post_id`, `horse_id`),
+  KEY `idx_ph_horse` (`horse_id`),
+  CONSTRAINT `fk_ph_post`  FOREIGN KEY (`post_id`)  REFERENCES `posts`  (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_ph_horse` FOREIGN KEY (`horse_id`) REFERENCES `horses` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------

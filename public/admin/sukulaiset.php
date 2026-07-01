@@ -43,7 +43,7 @@ require __DIR__ . '/includes/admin_header.php';
 <?= $flash ?>
 
 <h2 style="margin:0 0 0.75rem">Toisen tallin hevoset</h2>
-<p style="margin:0 0 1rem;font-size:0.85rem;color:var(--color-text-muted,#6b5e52)">Ancestor-hevoset, joilla on profiilisivu toisessa tallissa.</p>
+<p style="margin:0 0 1rem;font-size:0.85rem;color:var(--color-text-muted,#6b5e52)">Sukulaiset, hevoset joilla on profiilisivu toisessa tallissa.</p>
 <?php if (empty($ancestors)): ?>
   <p>Ei toisen tallin sukulaishevosia.</p>
 <?php else: ?>

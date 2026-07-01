@@ -165,7 +165,7 @@ require __DIR__ . '/includes/admin_header.php';
     Jos varsa on jo tallennettu hevosiin (tallin asukit tai ulkopuoliset hevoset), voit linkittää varsamerkinnän siihen tässä.
   </p>
   <div class="form-group">
-    <label for="foal_horse_id_text">Varsa hevosrekisterissä</label>
+    <label for="foal_horse_id_text">Varsan sivut</label>
     <div class="ac-wrap"
          data-items='<?= htmlspecialchars($horsesJson, ENT_QUOTES) ?>'
          data-input-id="foal_horse_id"
