@@ -584,5 +584,5 @@ INSERT INTO `competitions` (`horse_id`, `competition_date`, `discipline`, `count
   (3, '2024-05-12', 'esteratsastus', 'fi', 'Ruusupuiston talli', 'EA', '2.', 85.50, 'Kevätkilpailu 2024 — Hyvä suoritus, hieman hermostunut alussa.');
 
 -- Tuleva varsa testihevoselle
-INSERT INTO `foals` (`horse_id`, `foal_name`, `sire_id`, `dam_id`, `birth_year`, `gender`, `status`) VALUES
-  (3, 'Tulevaisuus', 2, 3, 2026, 'tuntematon', 'expected');
+INSERT INTO `foals` (`horse_id`, `foal_name`, `sire_id`, `dam_id`, `birth_date`, `gender`, `status`) VALUES
+  (3, 'Tulevaisuus', 2, 3, '2026-01-01', 'tuntematon', 'expected');

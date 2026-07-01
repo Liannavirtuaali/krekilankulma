@@ -13,7 +13,7 @@ $errors = [];
 $f = [
     'name' => '', 'call_name' => '', 'vh_id' => '', 'pkk_id' => '', 'breed_id' => '',
     'birth_date' => '', 'aging_system' => '', 'gender' => '', 'color_id' => '', 'genes' => '', 'height_cm' => '',
-    'level_ko' => '', 'level_re' => '',
+    'level_ko' => '', 'level_re' => '', 'level_ke' => '',
     'owner_contact_id' => '', 'breeder_contact_id' => '', 'importer_contact_id' => '',
     'sire_id' => '', 'dam_id' => '', 'evm' => '', 'profile_url' => '',
     'description' => '', 'pedigree_notes' => '',
@@ -92,12 +92,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $db->prepare(
                 'INSERT INTO horses
                  (name, call_name, vh_id, pkk_id, breed_id, birth_date, aging_system, gender, color_id, genes, height_cm,
-                  level_ko, level_re, owner_contact_id, breeder_contact_id, importer_contact_id,
+                  level_ko, level_re, level_ke, owner_contact_id, breeder_contact_id, importer_contact_id,
                   sire_id, dam_id, evm, profile_url,
                   description, pedigree_notes, slug, porrastetut, porrastetut_discipline_id)
                  VALUES
                  (:name, :call_name, :vh_id, :pkk_id, :breed_id, :birth_date, :aging_system, :gender, :color_id, :genes, :height_cm,
-                  :level_ko, :level_re, :owner_contact_id, :breeder_contact_id, :importer_contact_id,
+                  :level_ko, :level_re, :level_ke, :owner_contact_id, :breeder_contact_id, :importer_contact_id,
                   :sire_id, :dam_id, :evm, :profile_url,
                   :description, :pedigree_notes, :slug, :porrastetut, :porrastetut_discipline_id)'
             );
@@ -115,6 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':height_cm'          => $f['height_cm'] !== '' ? (int)$f['height_cm'] : null,
                 ':level_ko'           => $f['level_ko'] ?: null,
                 ':level_re'           => $f['level_re'] ?: null,
+                ':level_ke'           => $f['level_ke'] ?: null,
                 ':owner_contact_id'   => $newContactIds['owner'],
                 ':breeder_contact_id' => $newContactIds['breeder'],
                 ':importer_contact_id'=> $newContactIds['importer'],
@@ -275,6 +276,10 @@ require __DIR__ . '/includes/admin_header.php';
     <div class="form-group">
       <label for="level_re">Taso — re</label>
       <input type="text" id="level_re" name="level_re" value="<?= e($f['level_re']) ?>" placeholder="esim. 130cm, CIC5">
+    </div>
+    <div class="form-group">
+      <label for="level_ke">Taso — ke</label>
+      <input type="text" id="level_ke" name="level_ke" value="<?= e($f['level_ke']) ?>" placeholder="esim. CCI2*-S">
     </div>
   </div>
 

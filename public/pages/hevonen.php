@@ -115,6 +115,17 @@ $stmtFoals = $db->prepare(
 $stmtFoals->execute([':id1' => $id, ':id2' => $id]);
 $foals = $stmtFoals->fetchAll();
 
+// Postaukset
+$stmtPosts = $db->prepare(
+    'SELECT p.title, p.slug, p.created_at
+     FROM posts p
+     JOIN post_horses ph ON ph.post_id = p.id
+     WHERE ph.horse_id = :id
+     ORDER BY p.created_at DESC'
+);
+$stmtPosts->execute([':id' => $id]);
+$horsePosts = $stmtPosts->fetchAll();
+
 // Sukutaulu
 $pedigree = getHorsePedigree($id);
 
@@ -171,6 +182,7 @@ $heroStyle = $heroPhoto
           $levelParts = [];
           if (!empty($horse['level_ko'])) $levelParts[] = 'ko: ' . $horse['level_ko'];
           if (!empty($horse['level_re'])) $levelParts[] = 're: ' . $horse['level_re'];
+          if (!empty($horse['level_ke'])) $levelParts[] = 'ke: ' . $horse['level_ke'];
         ?>
         <span class="hero-pill">
           <?= e($horse['discipline_names']) ?>
@@ -458,6 +470,22 @@ if ($contactRows): ?>
       </div>
     <?php endif; ?>
   </section>
+
+  <!-- Postaukset — koko leveys -->
+  <?php if (!empty($horsePosts)): ?>
+  <section class="profile-fullwidth">
+    <h2>Postaukset</h2>
+    <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.6rem;">
+      <?php foreach ($horsePosts as $hp): ?>
+        <li>
+          <a href="<?= e(SITE_URL) ?>/pages/postaus.php?slug=<?= rawurlencode($hp['slug']) ?>"
+             style="font-weight:600;"><?= e($hp['title']) ?></a>
+          <span style="color:var(--color-text-muted);font-size:var(--text-sm);margin-left:.5rem;"><?= e(formatDate($hp['created_at'])) ?></span>
+        </li>
+      <?php endforeach; ?>
+    </ul>
+  </section>
+  <?php endif; ?>
 
   <!-- Kuvagalleria — koko leveys -->
   <section class="profile-fullwidth">
