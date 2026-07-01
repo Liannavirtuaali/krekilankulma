@@ -26,11 +26,7 @@ jobs:
           protocol: ftps          # enforce encrypted transport (FTPS); if Altervista uses implicit TLS add: port: 990
           local-dir: ./public/
           # FTP root = /membri/tilli/ (user home). Web root subfolder = demotalli/.
-<<<<<<< HEAD
           server-dir: /krekilankulma/
-=======
-          server-dir: /krekilankulma/
->>>>>>> d21a2f23e8124a758feb7d054f6e0b73570c7481
           exclude: |
             **/.git*
             **/.git*/**
