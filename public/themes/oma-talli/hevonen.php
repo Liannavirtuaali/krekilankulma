@@ -82,6 +82,16 @@ $stmtPhotos = $db->prepare(
 $stmtPhotos->execute([':id' => $id]);
 $photos = $stmtPhotos->fetchAll();
 
+$stmtPosts = $db->prepare(
+    'SELECT p.title, p.slug, p.content, p.created_at
+     FROM posts p
+     JOIN post_horses ph ON ph.post_id = p.id
+     WHERE ph.horse_id = :id
+     ORDER BY p.created_at DESC'
+);
+$stmtPosts->execute([':id' => $id]);
+$horsePosts = $stmtPosts->fetchAll();
+
 $pedigree = getHorsePedigree($id);
 $sire = $pedigree['sire'] ?? null;
 $dam  = $pedigree['dam']  ?? null;
@@ -161,6 +171,8 @@ $tietokuva = !empty($photos) ? $photos[0] : null;
 	<li><a href="#view2">Suku</a></li>
 	<li><a href="#view3">Kilpailut</a></li>
 	<li><a href="#view4">Kuvagalleria</a></li>
+	<?php if (!empty($foals)): ?><li><a href="#view5">Varsat (<?= count($foals) ?>)</a></li><?php endif; ?>
+	<?php if (!empty($horsePosts)): ?><li><a href="#view6">Postaukset (<?= count($horsePosts) ?>)</a></li><?php endif; ?>
 </ul>
 
 	<div class="tabcontents"><div id="view1">
@@ -235,6 +247,7 @@ if ($ownerStr || $breederStr || $importerStr): ?>
 $levelParts = [];
 if (!empty($horse['level_ko'])) $levelParts[] = 'ko: ' . e($horse['level_ko']);
 if (!empty($horse['level_re'])) $levelParts[] = 're: ' . e($horse['level_re']);
+if (!empty($horse['level_ke'])) $levelParts[] = 'ke: ' . e($horse['level_ke']);
 if ($horse['discipline_names'] || $levelParts):
 ?>
 <p class="tiedot">
@@ -354,59 +367,6 @@ if (is_array($obj) && isset($obj['error']) && $obj['error'] == 0) {
 <?php endif; ?>
 
 
-<h2>Jälkeläiset</h2>
-<table class="kisat" style="width:100%">
-  <?php foreach ($foals as $f):
-    $breedGender = '';
-    if ($f['breed_abbr']) $breedGender .= e($f['breed_abbr']);
-    if (!empty($f['gender']) && $f['gender'] !== 'tuntematon')
-        $breedGender .= ($breedGender ? '-' : '') . e($f['gender']);
-
-    if ((int)$f['sire_id'] === $id) {
-        $otherLabel = 'e.';
-        $otherName  = $f['dam_name']  ?? null;
-        $otherId    = (int)$f['dam_id'];
-    } else {
-        $otherLabel = 'i.';
-        $otherName  = $f['sire_name'] ?? null;
-        $otherId    = (int)$f['sire_id'];
-    }
-
-    $birthStr  = $f['birth_date'] ? 's. ' . date('d.m.Y', strtotime($f['birth_date'])) : '—';
-
-    $ownerStr = '';
-    if ($f['owner_nickname']) {
-        if ($f['owner_email']) {
-            $ownerStr .= '<a href="mailto:' . e($f['owner_email']) . '">' . e($f['owner_nickname']) . '</a>';
-        } else {
-            $ownerStr .= e($f['owner_nickname']);
-        }
-    }
-    if ($f['owner_vrl']) $ownerStr .= ($ownerStr ? ' ' : '') . '(' . e($f['owner_vrl']) . ')';
-  ?>
-  <tr class="kilpailutulos">
-    <td><?= $breedGender ?: '—' ?></td>
-    <td>
-      <?php if ($f['foal_horse_id']): ?>
-        <?php $foalUrl = $f['foal_horse_slug'] ? horseUrl(['slug' => $f['foal_horse_slug']]) : 'hevonen.php?id=' . (int)$f['foal_horse_id']; ?>
-        <a href="<?= e($foalUrl) ?>"><?= e($f['foal_name'] ?? '—') ?></a>
-      <?php else: ?>
-        <?= e($f['foal_name'] ?? '—') ?>
-      <?php endif; ?>
-    </td>
-    <td><?= $birthStr ?></td>
-    <td>
-      <?php if ($otherName): ?>
-        <?= e($otherLabel) ?> <a href="hevonen.php?id=<?= $otherId ?>"><?= e($otherName) ?></a>
-      <?php else: ?>—<?php endif; ?>
-    </td>
-    <td><?= $ownerStr ? 'om. ' . $ownerStr : '—' ?></td>
-    <td><?= $f['merits'] ? nl2br(e($f['merits'])) : '—' ?></td>
-  </tr>
-  <?php endforeach; ?>
-</table>
-
-
 
 	</div><div id="view3">
 
@@ -477,7 +437,83 @@ if (is_array($obj) && isset($obj['error']) && $obj['error'] == 0) {
 
 
 
-	</div></div>
+	</div><?php if (!empty($horsePosts)): ?><div id="view6">
+
+<h2>Postaukset</h2>
+<?php foreach ($horsePosts as $hp): ?>
+<div class="postaus-entry">
+  <h3 class="postaus-otsikko"><?= e($hp['title']) ?></h3>
+  <small class="postaus-pvm"><?= e(formatDate($hp['created_at'])) ?></small>
+  <div class="postaus-teksti"><?= nl2br(e($hp['content'])) ?></div>
+</div>
+<?php endforeach; ?>
+
+	</div><?php endif; ?><?php if (!empty($foals)): ?><div id="view5">
+
+<h2>Varsat</h2>
+<table class="kisat" style="width:100%">
+  <tr>
+    <th style="text-align:left;padding:4px 8px">Rotu</th>
+    <th style="text-align:left;padding:4px 8px">Varsan nimi</th>
+    <th style="text-align:left;padding:4px 8px">Syntymäpäivä</th>
+    <th style="text-align:left;padding:4px 8px">Tilanne</th>
+    <th style="text-align:left;padding:4px 8px">i/e. Hevosen nimi</th>
+    <th style="text-align:left;padding:4px 8px">Omistaja</th>
+    <th style="text-align:left;padding:4px 8px">Meriitit</th>
+  </tr>
+  <?php foreach ($foals as $f):
+    $breedGender = '';
+    if ($f['breed_abbr']) $breedGender .= e($f['breed_abbr']);
+    if (!empty($f['gender']) && $f['gender'] !== 'tuntematon')
+        $breedGender .= ($breedGender ? '-' : '') . e($f['gender']);
+
+    if ((int)$f['sire_id'] === $id) {
+        $otherLabel = 'e.';
+        $otherName  = $f['dam_name']  ?? null;
+        $otherId    = (int)$f['dam_id'];
+    } else {
+        $otherLabel = 'i.';
+        $otherName  = $f['sire_name'] ?? null;
+        $otherId    = (int)$f['sire_id'];
+    }
+
+    $birthStr  = $f['birth_date'] ? 's. ' . date('d.m.Y', strtotime($f['birth_date'])) : '—';
+    $statusStr = $f['status'] === 'expected' ? 'Odotettu' : 'Syntynyt';
+
+    $ownerStr = '';
+    if ($f['owner_nickname']) {
+        if ($f['owner_email']) {
+            $ownerStr .= '<a href="mailto:' . e($f['owner_email']) . '">' . e($f['owner_nickname']) . '</a>';
+        } else {
+            $ownerStr .= e($f['owner_nickname']);
+        }
+    }
+    if ($f['owner_vrl']) $ownerStr .= ($ownerStr ? ' ' : '') . '(' . e($f['owner_vrl']) . ')';
+  ?>
+  <tr class="kilpailutulos">
+    <td class="pvm"><small><?= $breedGender ?: '—' ?></small></td>
+    <td class="pvm">
+      <?php if ($f['foal_horse_id']): ?>
+        <?php $foalUrl = $f['foal_horse_slug'] ? horseUrl(['slug' => $f['foal_horse_slug']]) : 'hevonen.php?id=' . (int)$f['foal_horse_id']; ?>
+        <a href="<?= e($foalUrl) ?>"><?= e($f['foal_name'] ?? '—') ?></a>
+      <?php else: ?>
+        <?= e($f['foal_name'] ?? '—') ?>
+      <?php endif; ?>
+    </td>
+    <td class="pvm"><small><?= $birthStr ?></small></td>
+    <td class="pvm"><small><?= e($statusStr) ?></small></td>
+    <td class="laji">
+      <?php if ($otherName): ?>
+        <?= e($otherLabel) ?> <a href="hevonen.php?id=<?= $otherId ?>"><?= e($otherName) ?></a>
+      <?php else: ?>—<?php endif; ?>
+    </td>
+    <td class="luokka"><small><?= $ownerStr ? 'om. ' . $ownerStr : '—' ?></small></td>
+    <td class="luokka"><small><?= $f['merits'] ? nl2br(e($f['merits'])) : '—' ?></small></td>
+  </tr>
+  <?php endforeach; ?>
+</table>
+
+	</div><?php endif; ?></div>
 
 
 

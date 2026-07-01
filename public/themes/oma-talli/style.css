@@ -318,4 +318,10 @@ background: url(img/bg.jpg);
 
 .nayttelytulokset { text-transform: none; border-bottom: 0px; margin-top: 5px; margin-bottom: 15px; margin-left: 0px; font-weight: ; display: block; }
 
+.postaus-entry { margin-bottom: 2em; padding-bottom: 1.5em; border-bottom: 1px solid rgba(255,255,255,.2); }
+.postaus-entry:last-child { border-bottom: none; margin-bottom: 0; }
+.postaus-otsikko { margin: 0 0 .2em 0; font-size: 1.1em; }
+.postaus-pvm { display: block; margin-bottom: .6em; color: #aaa; font-size: .85em; }
+.postaus-teksti { line-height: 1.65; }
+
 
